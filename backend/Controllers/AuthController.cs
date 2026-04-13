@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using backend.DTO.Auth;
+using backend.Errors;
 using backend.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,9 +20,14 @@ namespace backend.Controllers
             _authService = authService;
         }
         [HttpPost("register")]
-        public IActionResult Register([FromBody] RegisterRequest request)
+        public async Task<IActionResult> Register([FromBody] RegisterRequest request)
         {
-            // Implementation for registration logic
+           var result = await _authService.RegisterAsync(request);
+           if (result.IsError)
+            {
+                var error = result.FirstError;
+                return Problem(statusCode: error.ToStatusCode(), title: error.Code, detail: error.Description);
+            }
             return Ok(new { Message = "Registration successful" });
         }
 

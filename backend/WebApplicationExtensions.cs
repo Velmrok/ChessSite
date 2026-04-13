@@ -11,8 +11,13 @@ public static class WebApplicationExtensions
         app.Map("/error", (HttpContext httpContext) =>
         {
             var exceptionHandlerFeature = httpContext.Features.Get<IExceptionHandlerFeature>();
-            
-            return Results.Problem("An unexpected error occurred.");
+
+            var exception = exceptionHandlerFeature?.Error;
+            return Results.Problem(
+                detail: exception?.ToString(), // Development only !!!
+                statusCode: 500,
+                title: exception?.Message
+            );
         });
         return app;
     }

@@ -4,11 +4,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using backend.DTO.Auth;
 using backend.Models;
+using ErrorOr;
+using Microsoft.AspNetCore.Mvc;
 
 namespace backend.Services.Interfaces
 {
     public interface IAuthService
     {
-        public Task<List<User>> RegisterAsync(RegisterRequest request);
+        public Task<ErrorOr<string>> RegisterAsync(RegisterRequest request);
     }
 }

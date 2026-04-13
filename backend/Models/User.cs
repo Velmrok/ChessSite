@@ -1,4 +1,5 @@
 using backend.Enums;
+using Microsoft.EntityFrameworkCore;
 
 namespace backend.Models;
 public class User
@@ -15,5 +16,7 @@ public class User
     public int RapidRating { get; set; }
     public int BlitzRating { get; set; }
     public int BulletRating { get; set; }
-    public RoleType Role { get; set; }
+    public RoleType Role { get; set; } = RoleType.User;
+
+   
 }

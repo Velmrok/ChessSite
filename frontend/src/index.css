@@ -1,0 +1,26 @@
+@import "tailwindcss";
+
+
+@font-face {
+  font-family: 'MyFancyFont';
+  src: url('./assets/fonts/zh-cn.ttf') format('truetype');
+}
+body {
+  overflow-x: hidden; 
+  width: 100%;
+}
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+
+@theme {
+  --font-MyFancyFont: "MyFancyFont",cursive;
+}
+

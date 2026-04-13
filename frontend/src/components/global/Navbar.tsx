@@ -1,0 +1,114 @@
+import { Link, useNavigate } from "react-router-dom";
+import ReactCountryFlag from "react-country-flag";
+import type { Language } from "../../translations";
+import useUserStore from "@/stores/useUserStore";
+import useToastStore from "@/stores/useToastStore";
+import { logoutUser } from "@/services/authService";
+import useLanguageStore from "@/stores/useLanguageStore";
+import { formatTimeFromMs, leaveQueue } from "@/services/socket/socketGlobalService";
+import { CiMenuBurger } from "react-icons/ci";
+import { useState } from "react";
+import SmallScreenMenu from "./SmallScreenMenu";
+
+const API_URL = import.meta.env.VITE_API_URL;
+
+
+const GuestMenu = () => {
+     const t = useLanguageStore((state) => state.t);
+    
+    return (
+    
+    <>
+        <Link to="/login" className="text-[8px] md:text-sm hover:text-amber-200 transition-transform duration-300">{t.navbar.login}</Link>
+
+        <Link to="/register" className="text-[8px] md:text-sm hover:text-amber-200 transition-transform duration-300">{t.navbar.register}</Link>
+    </>
+);}
+
+const UserMenu = ({ onLogout }: {onLogout: () => void }) => {
+    const user = useUserStore((state) => state.user);
+   const t = useLanguageStore((state) => state.t);
+    const isInQueue = useUserStore(state => state.user?.isInQueue);
+    const queueTime = useUserStore(state => state.queueTime);
+
+    return (
+    <>
+        {isInQueue && 
+        
+            <div className="text-[13px]  flex flex-col items-center">
+                <div className="flex gap-2 items-center">
+                    <div>{t.navbar.inQueue}</div>
+                    <div >({formatTimeFromMs(queueTime!)})</div></div>
+            <button className="hover:text-amber-200 transition-transform duration-300 text-[13px] text-gray-400" 
+            onClick={()=>leaveQueue()}>
+                {t.navbar.leaveQueue} </button>
+            </div>}
+           
+
+
+
+        <button onClick={onLogout} className="text-xs md:text-sm hover:text-amber-200
+         transition-color duration-300 cursor-pointer bg-transparent border-none font-MyFancyFont">
+            {t.navbar.logout}
+        </button>
+        <Link to={`/users/${user?.nickname}/profile`} className="text-xs md:text-sm hover:text-amber-200
+         transition-color duration-300 rounded-full outline-2 border-2 border-black">
+            <img src={`${API_URL}${user?.avatar}`} alt="Profile" className="h-8 w-8 md:w-11 md:h-11 rounded-full" />
+        </Link>
+    </>
+);}
+
+
+export default function Navbar() {
+   const user = useUserStore((state) => state.user);
+   const setUser = useUserStore((state) => state.setUser);
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const setToast = useToastStore((state) => state.setToast);
+    const navigate = useNavigate();
+
+    const handleLogout = async () => {
+       try{
+        await logoutUser();
+       }catch (error:any){
+        if(error.status ===401) setUser(null);
+        else setToast({ msg: t.toast.error.logout, type: "error" });
+        return;
+       }
+       
+        navigate("/");
+        setToast({ msg: t.toast.success.logout, type: "success" });
+
+    };
+   
+    const t = useLanguageStore((state) => state.t);
+    const setLanguage = useLanguageStore((state) => state.setLanguage);
+    const handleChangeLanguage = (lang: Language) => {
+        localStorage.setItem("language", lang);
+        setLanguage(lang);
+    }
+
+    return (
+        <nav className="bg-gray-800 w-full h-15 shadow-md shadow-black/40 text-3xl text-white flex
+         justify-between items-center px-2 md:px-10 font-MyFancyFont z-100 relative">
+            <Link to="/" className="hidden xl:block text-sm  md:text-3xl hover:text-amber-200 transition-color duration-300">ChessSite</Link>
+            <button onClick={()=>setIsMenuOpen(!isMenuOpen)}
+            className="flex xl:hidden scale-125 "><CiMenuBurger /></button>
+            
+            <SmallScreenMenu isOpen={isMenuOpen} setIsOpen={setIsMenuOpen} />
+           
+            <div className="flex text-lg md:text-2xl text-white gap-4 md:gap-8 items-center">
+                {user ? <UserMenu onLogout={handleLogout} /> : <GuestMenu />}
+
+                
+                <div className="flex gap-4">
+                <button onClick={() => handleChangeLanguage("pl")}>
+                    <ReactCountryFlag countryCode="PL" className="hover:scale-110 transition-transform duration-300 !w-[1.5em]" svg  />
+                </button>
+                <button onClick={() => handleChangeLanguage("en")}>
+                    <ReactCountryFlag countryCode="GB" className="hover:scale-110 transition-transform duration-300 !w-[1.5em]" svg  />
+                </button>
+                </div>
+            </div>
+        </nav>
+    )
+}

@@ -1,0 +1,71 @@
+
+import {create} from 'zustand';
+type UserStore = {
+    user: User | null;
+    isLoggedIn: boolean;
+    friendList: string[];
+    queueTime?: number;
+    queueTimeInterval?: ReturnType<typeof setInterval>;
+    isConnected: boolean;
+    mqttClient: any;
+    setQueueTime: (queueTime: number) => void;
+    setUser: (user: User | null) => void;
+    clearUser: () => void;
+    deleteFriend: (nickname: string) => void;
+    addFriend: (nickname: string) => void;
+    setIsConnected: (isConnected: boolean) => void;
+    setIsInQueue: (isInQueue: boolean) => void;
+    setMqttClient: (client: any) => void;
+
+};
+const useUserStore = create<UserStore>((set, get) => ({
+    user: null,
+    isLoggedIn: false,
+    friendList: [],
+    queueTime: undefined,
+    queueTimeInterval: undefined,
+    isConnected: false,
+    mqttClient: null,
+    setQueueTime: (queueTime: number) =>{
+         set({queueTime})
+         get().queueTimeInterval && clearInterval(get().queueTimeInterval);
+         const intervalId = setInterval(() => {
+            set((state) => ({ queueTime: state.queueTime! + 1000 }));
+
+        },1000);
+        set({queueTimeInterval: intervalId});
+    },
+    setUser: (user: User | null) => set({user, isLoggedIn: user !== null}),
+    clearUser: () => set({user: null, isLoggedIn: false}),
+    deleteFriend: (nickname: string) => set((state) => {
+        if (!state.user) return state;
+        return {
+            user: {
+                ...state.user,
+                friendList: state.user.friendList.filter(friend => friend !== nickname)
+            }
+        };
+    }),
+    addFriend: (nickname: string) => set((state) => {
+        if (!state.user) return state;
+        return {
+            user: {
+                ...state.user,
+                friendList: [...state.user.friendList, nickname]
+            }
+        };
+    }),
+    setIsInQueue: (isInQueue: boolean) => set((state) => {
+        if (!state.user) return state;
+        if(!isInQueue){
+            get().queueTimeInterval && clearInterval(get().queueTimeInterval);
+            set({queueTime: undefined, queueTimeInterval: undefined});
+        }
+        return { ...state, user: { ...state.user, isInQueue } };
+    }),
+    setIsConnected: (isConnected: boolean) => set({isConnected}),
+    setMqttClient: (client: any) => set({mqttClient: client}),
+    
+   
+}));
+export default useUserStore;

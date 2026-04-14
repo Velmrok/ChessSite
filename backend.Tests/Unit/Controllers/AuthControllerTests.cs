@@ -3,7 +3,9 @@ using backend.DTO.Auth;
 using backend.Services.Interfaces;
 using ErrorOr;
 using FluentAssertions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using NSubstitute;
 using Xunit;
 
@@ -21,6 +23,10 @@ public class AuthControllerTests
         _authServiceMock = Substitute.For<IAuthService>();
         
         _controller = new AuthController(_authServiceMock);
+        _controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext()
+        };
     }
 
     [Theory] 
@@ -56,7 +62,7 @@ public class AuthControllerTests
         problemDetails.Detail.Should().Be(errorMessage);
     }
     [Fact]
-    public async Task Register_ShouldReturn200OK_WhenRegistrationIsSuccessful()
+    public async Task Register_ShouldReturn201Created_WhenRegistrationIsSuccessful()
     {
         var request = new RegisterRequest
         {
@@ -66,12 +72,13 @@ public class AuthControllerTests
             Password = "123456"
         };
 
-        _authServiceMock.RegisterAsync(Arg.Any<RegisterRequest>()).Returns(Result.Success);
+        _authServiceMock.RegisterAsync(Arg.Any<RegisterRequest>()).Returns(new AuthResponse("fake-jwt-token"));
 
         var result = await _controller.Register(request);
 
-        result.Should().BeOfType<OkResult>();
+        var statusCodeResult = Assert.IsAssignableFrom<IStatusCodeActionResult>(result);
+        Assert.Equal(201, statusCodeResult.StatusCode);
 
     }
-    
+
 }

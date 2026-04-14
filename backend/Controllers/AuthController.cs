@@ -22,13 +22,21 @@ namespace backend.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterRequest request)
         {
-           var result = await _authService.RegisterAsync(request);
-           if (result.IsError)
+            var result = await _authService.RegisterAsync(request);
+            if (result.IsError)
             {
                 var error = result.FirstError;
                 return Problem(statusCode: error.ToStatusCode(), title: error.Code, detail: error.Description);
             }
-            return Ok();
+            var token = result.Value.Token;
+            Response.Cookies.Append("jwt", token, new CookieOptions
+            {
+                HttpOnly = true,             
+                Secure = false,               
+                SameSite = SameSiteMode.Strict, 
+                Expires = DateTime.UtcNow.AddHours(1)
+            });
+            return StatusCode(StatusCodes.Status201Created);
         }
 
     }

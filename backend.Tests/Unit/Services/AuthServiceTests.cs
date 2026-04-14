@@ -24,7 +24,8 @@ public class AuthServiceTests
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .Options;
         var dbContextMock = new AppDbContext(options);
-        _authService = new AuthService(dbContextMock);
+        var jwtMock = Substitute.For<IJwtGenerator>();
+        _authService = new AuthService(dbContextMock, jwtMock);
 
     }
     [Fact]

@@ -6,6 +6,8 @@ using Microsoft.EntityFrameworkCore;
 using System.Net.Http.Json;
 using Xunit;
 using Microsoft.Extensions.DependencyInjection;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.Extensions.Configuration;
 namespace backend.Tests.Integration;
 
 
@@ -15,27 +17,38 @@ public class AuthEndpointTests : IClassFixture<WebApplicationFactory<Program>>
 
      public AuthEndpointTests(WebApplicationFactory<Program> factory)
     {
-        
+
         var customizedFactory = factory.WithWebHostBuilder(builder =>
         {
-             builder.ConfigureServices(services =>
+            builder.ConfigureAppConfiguration((context, configBuilder) =>
             {
-               
-                var dbContextDescriptors = services.Where(
-                    d => d.ServiceType.Name.Contains("DbContextOptions") ||
-                         d.ServiceType.Name.Contains("DbConnection")).ToList();
-
-                foreach (var descriptor in dbContextDescriptors)
+                var testConfig = new Dictionary<string, string>
                 {
-                    services.Remove(descriptor);
-                }
-
-
-                services.AddDbContext<AppDbContext>(options =>
-                {
-                    options.UseInMemoryDatabase("TestyIntegracyjneDb");
-                });
+                    {"Jwt:Key", "SuperTajnyKluczTestowyKtoryMaOdpowiedniaDlugosc123!"},
+                    {"Jwt:Issuer", "test_issuer"},
+                    {"Jwt:Audience", "test_audience"},
+                    {"Jwt:ExpiryMinutes", "60"}
+                };
+                configBuilder.AddInMemoryCollection(testConfig!);
             });
+            builder.ConfigureServices(services =>
+           {
+
+               var dbContextDescriptors = services.Where(
+                   d => d.ServiceType.Name.Contains("DbContextOptions") ||
+                        d.ServiceType.Name.Contains("DbConnection")).ToList();
+
+               foreach (var descriptor in dbContextDescriptors)
+               {
+                   services.Remove(descriptor);
+               }
+
+
+               services.AddDbContext<AppDbContext>(options =>
+               {
+                   options.UseInMemoryDatabase("TestyIntegracyjneDb");
+               });
+           });
         });
 
 
@@ -43,9 +56,9 @@ public class AuthEndpointTests : IClassFixture<WebApplicationFactory<Program>>
     }
 
     [Fact]
-    public async Task RegisterEndpoint_ShouldReturnOk_WhenUserIsNew()
+    public async Task RegisterEndpoint_ShouldReturnCreated_WhenUserIsNew()
     {
-       
+
         var request = new RegisterRequest
         {
             Email = "nowy@test.com",
@@ -55,7 +68,20 @@ public class AuthEndpointTests : IClassFixture<WebApplicationFactory<Program>>
         };
 
         var response = await _client.PostAsJsonAsync("/auth/register", request);
+
+        response.StatusCode.Should().Be(System.Net.HttpStatusCode.Created);
+
+        var cookies = response.Headers.GetValues("Set-Cookie");
+        var jwtCookie = cookies.First(c => c.StartsWith("jwt="));
+
+        var token = jwtCookie.Split(';')[0].Split('=')[1];
+
+        var handler = new JwtSecurityTokenHandler();
+        var jwt = handler.ReadJwtToken(token);
+
         
-        response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+
+        
+        jwt.Claims.Should().Contain(c => c.Type == "email" && c.Value == "nowy@test.com");
     }
 }

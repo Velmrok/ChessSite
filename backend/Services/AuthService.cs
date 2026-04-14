@@ -9,15 +9,17 @@ using Microsoft.AspNetCore.Mvc;
 using ErrorOr;
 
 namespace backend.Services;
-
+ 
 public class AuthService : IAuthService
 {
     private readonly AppDbContext _dbContext;
-    public AuthService(AppDbContext dbContext)
+    private readonly IJwtGenerator _jwtGenerator;
+    public AuthService(AppDbContext dbContext, IJwtGenerator jwtGenerator)
     {
         _dbContext = dbContext;
+        _jwtGenerator = jwtGenerator;
     }
-    public async Task<ErrorOr<Success>> RegisterAsync(RegisterRequest request)
+    public async Task<ErrorOr<AuthResponse>> RegisterAsync(RegisterRequest request)
     {
 
         var existingUser = await _dbContext.Users.FirstOrDefaultAsync(u =>
@@ -32,19 +34,22 @@ public class AuthService : IAuthService
 
         var hasher = new PasswordHasher<object>();
         var passwordHash = hasher.HashPassword(null!, request.Password);
+            var newUser = new User
+            {
+                Nickname = request.Nickname,
+                Login = request.Login,
+                Email = request.Email,
+                PasswordHash = passwordHash,
+                ProfileBio = "",
+                ProfilePictureUrl = "",
+            };
+        await _dbContext.Users.AddAsync(newUser);
 
-        await _dbContext.Users.AddAsync(new User
-        {
-            Nickname = request.Nickname,
-            Login = request.Login,
-            Email = request.Email,
-            PasswordHash = passwordHash,
-            ProfileBio = "",
-            ProfilePictureUrl = "",
-        });
+        var token = _jwtGenerator.GenerateToken(newUser);
+        
 
         await _dbContext.SaveChangesAsync();
-        return Result.Success;
+        return new AuthResponse(token);
 
     }
 }

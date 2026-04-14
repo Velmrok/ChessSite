@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using NSubstitute;
 using Xunit;
 
-namespace backend.Tests.Controllers;
+namespace backend.Tests.Unit.Controllers;
 
 public class AuthControllerTests
 {
@@ -55,4 +55,23 @@ public class AuthControllerTests
         problemDetails.Title.Should().Be(errorCode);
         problemDetails.Detail.Should().Be(errorMessage);
     }
+    [Fact]
+    public async Task Register_ShouldReturn200OK_WhenRegistrationIsSuccessful()
+    {
+        var request = new RegisterRequest
+        {
+            Email = "test@test.com",
+            Login = "test",
+            Nickname = "test",
+            Password = "123456"
+        };
+
+        _authServiceMock.RegisterAsync(Arg.Any<RegisterRequest>()).Returns(Result.Success);
+
+        var result = await _controller.Register(request);
+
+        result.Should().BeOfType<OkResult>();
+
+    }
+    
 }

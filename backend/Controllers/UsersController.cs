@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using backend.DTO.Users;
+using backend.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -12,18 +14,31 @@ namespace backend.Controllers
     [Route("/users")]
     public class UsersController : ControllerBase
     {
-        private readonly ILogger<UsersController> _logger;
-
-        public UsersController(ILogger<UsersController> logger)
+        private readonly IUsersService _usersService;
+        public UsersController(IUsersService usersService)
         {
-            _logger = logger;
-            
+            _usersService = usersService;
         }
         [HttpGet]
-        public IActionResult GetUsers()
+        public async Task<IActionResult> GetUsers()
         {
+            var users = await _usersService.GetAllUsersAsync();
+            var usersResponse = users.Select(u => new UserResponse
+            (
+                u.Nickname,
+                u.Login,
+                u.Email,
+                u.ProfileBio,
+                u.ProfilePictureUrl,
+                u.CreatedAt,
+                u.LastActive,
+                u.RapidRating,
+                u.BlitzRating,
+                u.BulletRating,
+                u.Role
+            )).ToList();
             
-            return Ok(new { Name = "Jan" });
+            return Ok(usersResponse);
         }
 
     }

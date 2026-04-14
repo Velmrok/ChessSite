@@ -11,48 +11,11 @@ using Microsoft.Extensions.Configuration;
 namespace backend.Tests.Integration;
 
 
-public class AuthEndpointTests : IClassFixture<WebApplicationFactory<Program>>
+public class AuthEndpointTests : TestBase
 {
-    private readonly HttpClient _client;
-
-     public AuthEndpointTests(WebApplicationFactory<Program> factory)
+    
+    public AuthEndpointTests(WebApplicationFactory<Program> factory) : base(factory)
     {
-
-        var customizedFactory = factory.WithWebHostBuilder(builder =>
-        {
-            builder.ConfigureAppConfiguration((context, configBuilder) =>
-            {
-                var testConfig = new Dictionary<string, string>
-                {
-                    {"Jwt:Key", "SuperTajnyKluczTestowyKtoryMaOdpowiedniaDlugosc123!"},
-                    {"Jwt:Issuer", "test_issuer"},
-                    {"Jwt:Audience", "test_audience"},
-                    {"Jwt:ExpiryMinutes", "60"}
-                };
-                configBuilder.AddInMemoryCollection(testConfig!);
-            });
-            builder.ConfigureServices(services =>
-           {
-
-               var dbContextDescriptors = services.Where(
-                   d => d.ServiceType.Name.Contains("DbContextOptions") ||
-                        d.ServiceType.Name.Contains("DbConnection")).ToList();
-
-               foreach (var descriptor in dbContextDescriptors)
-               {
-                   services.Remove(descriptor);
-               }
-
-
-               services.AddDbContext<AppDbContext>(options =>
-               {
-                   options.UseInMemoryDatabase("TestyIntegracyjneDb");
-               });
-           });
-        });
-
-
-        _client = customizedFactory.CreateClient();
     }
 
     [Fact]

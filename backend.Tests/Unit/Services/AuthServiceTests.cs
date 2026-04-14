@@ -14,18 +14,14 @@ using Xunit;
 namespace backend.Tests.Unit.Services;
 
 
-public class AuthServiceTests
+public class AuthServiceTests : TestBase
 {
     private readonly AuthService _authService;
     
     public AuthServiceTests()
     {
-       var options = new DbContextOptionsBuilder<AppDbContext>()
-            .UseInMemoryDatabase(Guid.NewGuid().ToString())
-            .Options;
-        var dbContextMock = new AppDbContext(options);
         var jwtMock = Substitute.For<IJwtGenerator>();
-        _authService = new AuthService(dbContextMock, jwtMock);
+        _authService = new AuthService(DbContext, jwtMock);
 
     }
     [Fact]

@@ -17,7 +17,7 @@ public class AuthService : IAuthService
     {
         _dbContext = dbContext;
     }
-    public async Task<ErrorOr<string>> RegisterAsync(RegisterRequest request)
+    public async Task<ErrorOr<Success>> RegisterAsync(RegisterRequest request)
     {
 
         var existingUser = await _dbContext.Users.FirstOrDefaultAsync(u =>
@@ -44,7 +44,7 @@ public class AuthService : IAuthService
         });
 
         await _dbContext.SaveChangesAsync();
-        return "User registered successfully";
+        return Result.Success;
 
     }
 }

@@ -28,7 +28,7 @@ namespace backend.Controllers
                 var error = result.FirstError;
                 return Problem(statusCode: error.ToStatusCode(), title: error.Code, detail: error.Description);
             }
-            return Ok(new { Message = "Registration successful" });
+            return Ok();
         }
 
     }

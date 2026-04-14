@@ -56,15 +56,17 @@ public class AuthServiceTests
             PasswordHash = "hashedpassword",
         };
 
-        var options = new DbContextOptionsBuilder<AppDbContext>()
-            .UseInMemoryDatabase(databaseName: "TestDb")
-            .Options;
-        using (var dbContext = new AppDbContext(options))
+         var existingRequest = new RegisterRequest
         {
-            await dbContext.Users.AddAsync(existingUser);
-            await dbContext.SaveChangesAsync();
-        }
-
+            Nickname = existingNickname,
+            Login = existingLogin,
+            Email = existingEmail,
+            Password = "Password123!"
+        };
+        var result = await _authService.RegisterAsync(existingRequest);
+        result.IsError.Should().BeFalse();
+    
+        
         var request = new RegisterRequest
         {
             Nickname = expectedErrorCode == "nicknameTaken" ? existingNickname : "newuser",
@@ -73,7 +75,8 @@ public class AuthServiceTests
             Password = "Password123!"
         };
             
-        var result = await _authService.RegisterAsync(request);
+        result = await _authService.RegisterAsync(request);
+
         result.IsError.Should().BeTrue();
         var error = result.FirstError;
         error.Code.Should().Be(expectedErrorCode);

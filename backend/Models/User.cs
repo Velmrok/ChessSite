@@ -9,8 +9,8 @@ public class User
     public required string Login { get; set; }
     public required string Email { get; set; }
     public required string PasswordHash { get; set; }
-    public required string ProfileBio { get; set; }
-    public required string ProfilePictureUrl { get; set; }
+    public  string ProfileBio { get; set; } = "";
+    public  string ProfilePictureUrl { get; set; } = "";
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime LastActive { get; set; } = DateTime.UtcNow;
     public int RapidRating { get; set; }

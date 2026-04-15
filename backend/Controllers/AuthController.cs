@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using backend.DTO.Auth;
 using backend.Errors;
+using backend.Helpers.Auth;
 using backend.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -29,15 +30,21 @@ namespace backend.Controllers
                 return Problem(statusCode: error.ToStatusCode(), title: error.Code, detail: error.Description);
             }
             var token = result.Value.Token;
-            Response.Cookies.Append("jwt", token, new CookieOptions
-            {
-                HttpOnly = true,             
-                Secure = false,               
-                SameSite = SameSiteMode.Strict, 
-                Expires = DateTime.UtcNow.AddHours(1)
-            });
+            CookieService.SetJwtCookie(Response, token);
             return StatusCode(StatusCodes.Status201Created);
         }
-
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginRequest request)
+        {
+            var result = await _authService.LoginAsync(request); 
+            if (result.IsError)
+            {
+                var error = result.FirstError;
+                return Problem(statusCode: error.ToStatusCode(), title: error.Code, detail: error.Description);
+            }
+            var token = result.Value.Token;
+            CookieService.SetJwtCookie(Response, token);
+            return Ok();
+        }
     }
 }

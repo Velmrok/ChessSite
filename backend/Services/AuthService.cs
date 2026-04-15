@@ -14,10 +14,12 @@ public class AuthService : IAuthService
 {
     private readonly AppDbContext _dbContext;
     private readonly IJwtGenerator _jwtGenerator;
-    public AuthService(AppDbContext dbContext, IJwtGenerator jwtGenerator)
+    private readonly IPasswordHasher<User> _passwordHasher;
+    public AuthService(AppDbContext dbContext, IJwtGenerator jwtGenerator, IPasswordHasher<User> passwordHasher)
     {
         _dbContext = dbContext;
         _jwtGenerator = jwtGenerator;
+        _passwordHasher = passwordHasher;
     }
     public async Task<ErrorOr<AuthResponse>> RegisterAsync(RegisterRequest request)
     {
@@ -32,8 +34,7 @@ public class AuthService : IAuthService
             return Error.Conflict("loginTaken", "Login is already taken.");
         }
 
-        var hasher = new PasswordHasher<object>();
-        var passwordHash = hasher.HashPassword(null!, request.Password);
+        var passwordHash = _passwordHasher.HashPassword(null!, request.Password);
             var newUser = new User
             {
                 Nickname = request.Nickname,
@@ -51,5 +52,24 @@ public class AuthService : IAuthService
         await _dbContext.SaveChangesAsync();
         return new AuthResponse(token);
 
+    }
+    public async Task<ErrorOr<AuthResponse>> LoginAsync(LoginRequest request)
+    {
+        var user = await _dbContext.Users.FirstOrDefaultAsync(u =>
+            u.Login == request.Login || u.Email == request.Email);
+
+        if (user == null)
+        {
+            return Error.NotFound("userNotFound", "User not found with the provided login or email.");
+        }
+
+        var verificationResult = _passwordHasher.VerifyHashedPassword(null!, user.PasswordHash, request.Password);
+        if (verificationResult == PasswordVerificationResult.Failed)
+        {
+            return Error.Unauthorized("invalidCredentials", "Invalid password.");
+        }
+
+        var token = _jwtGenerator.GenerateToken(user);
+        return new AuthResponse(token);
     }
 }

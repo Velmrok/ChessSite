@@ -12,5 +12,6 @@ namespace backend.Services.Interfaces
     public interface IAuthService
     {
         public Task<ErrorOr<AuthResponse>> RegisterAsync(RegisterRequest request);
+        public Task<ErrorOr<AuthResponse>> LoginAsync(LoginRequest request);
     }
 }

@@ -35,13 +35,15 @@ public class AuthEndpointTests : TestBase
         response.StatusCode.Should().Be(System.Net.HttpStatusCode.Created);
 
         var cookies = response.Headers.GetValues("Set-Cookie");
-        var jwtCookie = cookies.First(c => c.StartsWith("jwt="));
+        var accessCookie = cookies.First(c => c.StartsWith("accessToken="));
 
-        var token = jwtCookie.Split(';')[0].Split('=')[1];
+        var accessToken = accessCookie.Split(';')[0].Split('=')[1];
 
         var handler = new JwtSecurityTokenHandler();
-        var jwt = handler.ReadJwtToken(token);
+        var jwt = handler.ReadJwtToken(accessToken);
 
+        var refreshCookie = cookies.FirstOrDefault(c => c.StartsWith("refreshToken="));
+        refreshCookie.Should().NotBeNull();
         
 
         

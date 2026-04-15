@@ -1,12 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using backend.DTO.Auth;
 using backend.Errors;
-using backend.Helpers.Auth;
+using backend.Services.Helpers.Auth;
 using backend.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace backend.Controllers
 {
@@ -29,8 +31,10 @@ namespace backend.Controllers
                 var error = result.FirstError;
                 return Problem(statusCode: error.ToStatusCode(), title: error.Code, detail: error.Description);
             }
-            var token = result.Value.Token;
-            CookieService.SetJwtCookie(Response, token);
+            var accessToken = result.Value.AccessToken;
+            var refreshToken = result.Value.RefreshToken;
+            CookieService.SetJwtCookie(Response, accessToken);
+            CookieService.SetRefreshTokenCookie(Response, refreshToken!);
             return StatusCode(StatusCodes.Status201Created);
         }
         [HttpPost("login")]
@@ -42,9 +46,29 @@ namespace backend.Controllers
                 var error = result.FirstError;
                 return Problem(statusCode: error.ToStatusCode(), title: error.Code, detail: error.Description);
             }
-            var token = result.Value.Token;
-            CookieService.SetJwtCookie(Response, token);
-            return Ok();
+            var accessToken = result.Value.AccessToken;
+            CookieService.SetJwtCookie(Response, accessToken);
+            if (result.Value.RefreshToken != null)
+            {
+                var refreshToken = result.Value.RefreshToken;
+                CookieService.SetRefreshTokenCookie(Response, refreshToken);
+            }
+           return StatusCode(StatusCodes.Status201Created);
+        }
+        [HttpPost("refresh")]
+        public async Task<IActionResult> Refresh()
+        {
+            var refreshToken = Request.Cookies["refreshToken"];
+            var result = await _authService.RefreshAsync(refreshToken);
+            if (result.IsError)
+            {
+                var error = result.FirstError;
+                return Problem(statusCode: error.ToStatusCode(), title: error.Code, detail: error.Description);
+            }
+            var accessToken = result.Value.AccessToken;
+            CookieService.SetJwtCookie(Response, accessToken);
+    
+            return StatusCode(StatusCodes.Status201Created);
         }
     }
 }

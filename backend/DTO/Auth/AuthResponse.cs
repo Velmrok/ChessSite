@@ -1,4 +1,4 @@
 
 
 namespace backend.DTO.Auth;
-public record AuthResponse(string Token);
+public record AuthResponse(string AccessToken, string? RefreshToken = null);

@@ -15,11 +15,14 @@ public class AuthService : IAuthService
     private readonly AppDbContext _dbContext;
     private readonly IJwtGenerator _jwtGenerator;
     private readonly IPasswordHasher<User> _passwordHasher;
-    public AuthService(AppDbContext dbContext, IJwtGenerator jwtGenerator, IPasswordHasher<User> passwordHasher)
+    private readonly IRefreshTokenService _refreshTokenService;
+
+    public AuthService(AppDbContext dbContext, IJwtGenerator jwtGenerator, IPasswordHasher<User> passwordHasher, IRefreshTokenService refreshTokenService)
     {
         _dbContext = dbContext;
         _jwtGenerator = jwtGenerator;
         _passwordHasher = passwordHasher;
+        _refreshTokenService = refreshTokenService;
     }
     public async Task<ErrorOr<AuthResponse>> RegisterAsync(RegisterRequest request)
     {
@@ -46,11 +49,13 @@ public class AuthService : IAuthService
             };
         await _dbContext.Users.AddAsync(newUser);
 
-        var token = _jwtGenerator.GenerateToken(newUser);
+         var accessToken = _jwtGenerator.GenerateToken(newUser);
+        var refreshToken = await _refreshTokenService.CreateRefreshTokenAsync(newUser);
+         
         
 
         await _dbContext.SaveChangesAsync();
-        return new AuthResponse(token);
+        return new AuthResponse(accessToken, refreshToken);
 
     }
     public async Task<ErrorOr<AuthResponse>> LoginAsync(LoginRequest request)
@@ -69,7 +74,34 @@ public class AuthService : IAuthService
             return Error.Unauthorized("invalidCredentials", "Invalid password.");
         }
 
-        var token = _jwtGenerator.GenerateToken(user);
-        return new AuthResponse(token);
+        var accessToken = _jwtGenerator.GenerateToken(user);
+        var refreshToken = await _refreshTokenService.CreateRefreshTokenAsync(user);
+        return new AuthResponse(accessToken, refreshToken);
     }
+    public async Task<ErrorOr<AuthResponse>> RefreshAsync(string refreshToken)
+    {
+        if (string.IsNullOrEmpty(refreshToken))
+        {
+            return Error.Unauthorized("noRefreshToken", "Refresh token is missing.");
+        }
+
+        var refreshTokenEntity = await _dbContext.RefreshTokens.Include(rt => rt.User)
+            .FirstOrDefaultAsync(rt => rt.Token == refreshToken);
+
+        if (refreshTokenEntity == null || refreshTokenEntity.ExpiresAt < DateTime.UtcNow)
+        {
+            return Error.Unauthorized("invalidRefreshToken", "Refresh token is invalid or has expired.");
+        }
+
+        var user = refreshTokenEntity.User;
+        var newAccessToken = _jwtGenerator.GenerateToken(user);
+
+        return new AuthResponse(newAccessToken);
+    }
+    public async Task<ErrorOr<bool>> LogoutAsync()
+    {
+        
+        return true;
+    }
+
 }

@@ -22,8 +22,10 @@ public class AuthServiceTests : TestBase
     public AuthServiceTests()
     {
         var jwtMock = Substitute.For<IJwtGenerator>();
+        var refreshTokenServiceMock = Substitute.For<IRefreshTokenService>();
         jwtMock.GenerateToken(Arg.Any<User>()).Returns("mocked-jwt-token");
-        _authService = new AuthService(DbContext, jwtMock, new PasswordHasher<User>());
+        refreshTokenServiceMock.CreateRefreshTokenAsync(Arg.Any<User>()).Returns("mocked-refresh-token");
+        _authService = new AuthService(DbContext, jwtMock, new PasswordHasher<User>(), refreshTokenServiceMock);
         _passwordHasher = new PasswordHasher<User>();
 
     }
@@ -40,8 +42,14 @@ public class AuthServiceTests : TestBase
 
         var result = await _authService.RegisterAsync(request);
         result.IsError.Should().BeFalse();
-         result.Value.Token.Should().NotBeNullOrEmpty();
-        result.Value.Token.Should().StartWith("mocked-jwt-token");
+
+        result.Value.AccessToken.Should().NotBeNullOrEmpty();
+        result.Value.AccessToken.Should().StartWith("mocked-jwt-token");
+
+        result.Value.RefreshToken.Should().NotBeNullOrEmpty();
+        result.Value.RefreshToken.Should().StartWith("mocked-refresh-token");
+
+
         var userInDb = await DbContext.Users.FirstOrDefaultAsync(u => u.Login == request.Login);
         userInDb.Should().NotBeNull();
     }
@@ -101,8 +109,12 @@ public class AuthServiceTests : TestBase
         };
         var result = await _authService.RegisterAsync(existingRequest);
         result.IsError.Should().BeFalse();
-        result.Value.Token.Should().NotBeNullOrEmpty();
-        result.Value.Token.Should().StartWith("mocked-jwt-token");
+
+        result.Value.AccessToken.Should().NotBeNullOrEmpty();
+        result.Value.AccessToken.Should().StartWith("mocked-jwt-token");
+
+        result.Value.RefreshToken.Should().NotBeNullOrEmpty();
+        result.Value.RefreshToken.Should().StartWith("mocked-refresh-token");
     }
 
 
@@ -129,8 +141,11 @@ public class AuthServiceTests : TestBase
 
         var result = await _authService.LoginAsync(request);
         result.IsError.Should().BeFalse();
-        result.Value.Token.Should().NotBeNullOrEmpty();
-        result.Value.Token.Should().StartWith("mocked-jwt-token");
+        result.Value.AccessToken.Should().NotBeNullOrEmpty();
+        result.Value.AccessToken.Should().StartWith("mocked-jwt-token");
+
+        result.Value.RefreshToken.Should().NotBeNullOrEmpty();
+        result.Value.RefreshToken.Should().StartWith("mocked-refresh-token");
     }
     [Fact]
     public async Task LoginAsync_ShouldReturnOK_WhenLoginWithEmailIsSuccessful()
@@ -154,8 +169,11 @@ public class AuthServiceTests : TestBase
 
         var result = await _authService.LoginAsync(request);
         result.IsError.Should().BeFalse();
-        result.Value.Token.Should().NotBeNullOrEmpty();
-        result.Value.Token.Should().StartWith("mocked-jwt-token");
+        result.Value.AccessToken.Should().NotBeNullOrEmpty();
+        result.Value.AccessToken.Should().StartWith("mocked-jwt-token");
+
+        result.Value.RefreshToken.Should().NotBeNullOrEmpty();
+        result.Value.RefreshToken.Should().StartWith("mocked-refresh-token");
     }
 
     [Fact]

@@ -1,4 +1,5 @@
 using backend.Models;
+using backend.Services.Helpers.Auth;
 using backend.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 
@@ -11,7 +12,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IUsersService, UsersService>();
         services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
-
+        services.AddScoped<IRefreshTokenService, RefreshTokenService>();
         services.AddSingleton<IJwtGenerator,JwtGenerator>();
         return services;
     }

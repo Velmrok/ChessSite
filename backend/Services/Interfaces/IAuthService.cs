@@ -13,7 +13,7 @@ namespace backend.Services.Interfaces
     {
         public Task<ErrorOr<AuthResponse>> RegisterAsync(RegisterRequest request);
         public Task<ErrorOr<AuthResponse>> LoginAsync(LoginRequest request);
-        public Task<ErrorOr<bool>> LogoutAsync();
+        public Task<ErrorOr<Success>> LogoutAsync(string refreshToken);
         public Task<ErrorOr<AuthResponse>> RefreshAsync(string refreshToken);
     }
 }

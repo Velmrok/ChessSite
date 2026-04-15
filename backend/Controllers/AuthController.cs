@@ -59,7 +59,7 @@ namespace backend.Controllers
         public async Task<IActionResult> Refresh()
         {
             var refreshToken = Request.Cookies["refreshToken"];
-            var result = await _authService.RefreshAsync(refreshToken);
+            var result = await _authService.RefreshAsync(refreshToken!);
             if (result.IsError)
             {
                 var error = result.FirstError;
@@ -69,6 +69,18 @@ namespace backend.Controllers
             CookieService.SetJwtCookie(Response, accessToken);
     
             return StatusCode(StatusCodes.Status201Created);
+        }
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout()
+        {
+            var refreshToken = Request.Cookies["refreshToken"];
+            var result = await _authService.LogoutAsync(refreshToken!);
+            if (result.IsError)
+            {
+                var error = result.FirstError;
+                return Problem(statusCode: error.ToStatusCode(), title: error.Code, detail: error.Description);
+            }
+            return StatusCode(StatusCodes.Status200OK);
         }
     }
 }

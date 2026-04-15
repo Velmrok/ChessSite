@@ -61,7 +61,7 @@ public class AuthService : IAuthService
     public async Task<ErrorOr<AuthResponse>> LoginAsync(LoginRequest request)
     {
         var user = await _dbContext.Users.FirstOrDefaultAsync(u =>
-            u.Login == request.Login || u.Email == request.Email);
+            u.Login == request.Login || u.Email == request.Login);
 
         if (user == null)
         {
@@ -98,10 +98,15 @@ public class AuthService : IAuthService
 
         return new AuthResponse(newAccessToken);
     }
-    public async Task<ErrorOr<bool>> LogoutAsync()
+    public async Task<ErrorOr<Success>> LogoutAsync(string refreshToken)
     {
-        
-        return true;
+       if (string.IsNullOrEmpty(refreshToken))
+        {
+            return Error.Unauthorized("noRefreshToken", "Refresh token is missing.");
+        }
+        await _refreshTokenService.RemoveRefreshTokenAsync(refreshToken);
+
+        return new Success();
     }
 
 }

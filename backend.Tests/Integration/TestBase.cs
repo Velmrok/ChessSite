@@ -1,4 +1,5 @@
 
+using System.Net;
 using backend.Data;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
@@ -47,7 +48,13 @@ public class TestBase : IClassFixture<WebApplicationFactory<Program>>
            });
         });
 
+   
 
-        _client = customizedFactory.CreateClient();
+
+        _client = customizedFactory.CreateClient(new WebApplicationFactoryClientOptions
+        {
+            AllowAutoRedirect = false,
+            HandleCookies = true
+        });
     }
 }

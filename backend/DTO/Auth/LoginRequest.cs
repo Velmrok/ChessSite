@@ -8,8 +8,7 @@ using backend.CustomAttributes;
 public class LoginRequest
 {
     public string Login { get; set; } = string.Empty;
-    [EmailAddress]
-    public string Email { get; set; } = string.Empty;
+   
     [Required]
     public required string Password { get; set; }
  

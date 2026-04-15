@@ -163,7 +163,7 @@ public class AuthServiceTests : TestBase
 
         var request = new LoginRequest
         {
-            Email = "test@example.com",
+            Login = "test@example.com",
             Password = "Password123!"
         };
 
@@ -190,7 +190,7 @@ public class AuthServiceTests : TestBase
         var error = result.FirstError;
         error.Code.Should().Be("userNotFound");
 
-        var user = await DbContext.Users.FirstOrDefaultAsync(u => u.Login == request.Login || u.Email == request.Email);
+        var user = await DbContext.Users.FirstOrDefaultAsync(u => u.Login == request.Login || u.Email == request.Login);
         user.Should().BeNull();
     }
     [Fact]

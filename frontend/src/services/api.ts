@@ -6,18 +6,21 @@ export default async function apiFetch(url: string, method:string, verifyToken: 
         const headers = contentType? {
             "Content-Type": contentType,
         } : undefined;
-  const response = await fetch(`${API_URL}${url}`, {
+  const response = await fetch(`/api${url}`, {
     method: method,
-   headers: headers,
+    headers: headers,
     credentials: verifyToken ? "include" : "same-origin",
     body: body ? body : null,
   });
-    if (!response.ok) {
+  if (!response.ok) {
+    const data = await response.json();
+    console.error("API Error:", data);
+    const errorCode = data.title || "generic";
+    const error = new Error(errorCode);
 
-        const errorData = await response.json();
-        throw new Error(errorData.message);
-    }
- 
+    throw error;
+  }
+
 
   return response;
 }

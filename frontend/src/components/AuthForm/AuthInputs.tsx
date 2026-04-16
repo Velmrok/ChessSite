@@ -1,12 +1,9 @@
 import React, { useEffect, useState} from "react";
 import { useContext } from "react";
 import useLanguageStore from "@/stores/useLanguageStore";
+import type { formType } from "./AuthForm";
 
-type formType = {
-    login: string;
-    nickname: string;
-    password: string;
-}
+
 type Props = {
     isLogin: boolean;
     handleSubmit: (e: React.FormEvent,
@@ -16,6 +13,7 @@ export default function AuthInputs({ isLogin, handleSubmit }: Props) {
    
     const [form, setForm] = useState({
         login: "",
+        email: "",
         nickname: "",
         password: ""
     });
@@ -35,6 +33,17 @@ export default function AuthInputs({ isLogin, handleSubmit }: Props) {
                     onChange={(e) => setForm({ ...form, login: e.target.value })}
                     className="border border-gray-300 p-2 rounded focus:outline-none focus:border-blue-500"
                 /></div>
+                {!isLogin && (
+                <div className="flex flex-col">
+                <span>{t.auth.email}</span>
+                <input
+                    type="text"
+                    placeholder={t.auth.email}
+                    value={form.email}
+                    onChange={(e) => setForm({ ...form, email: e.target.value })}
+                    className="border border-gray-300 p-2 rounded focus:outline-none focus:border-blue-500"
+                /></div>
+                )}
 
                 <div className="flex flex-col">
                 <span>{t.auth.password}</span>

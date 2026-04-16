@@ -65,13 +65,13 @@ public class AuthService : IAuthService
 
         if (user == null)
         {
-            return Error.NotFound("userNotFound", "User not found with the provided login or email.");
+            return Error.Unauthorized("invalidLoginOrPassword", "Invalid login or password.");
         }
 
         var verificationResult = _passwordHasher.VerifyHashedPassword(null!, user.PasswordHash, request.Password);
         if (verificationResult == PasswordVerificationResult.Failed)
         {
-            return Error.Unauthorized("invalidCredentials", "Invalid password.");
+            return Error.Unauthorized("invalidLoginOrPassword", "Invalid login or password.");
         }
 
         var accessToken = _jwtGenerator.GenerateToken(user);

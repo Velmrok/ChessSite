@@ -6,6 +6,7 @@ import useUserStore from "@/stores/useUserStore";
 const API_URL = import.meta.env.VITE_API_URL;
 type UserData = {
     login: string;
+    email?: string;
     nickname?: string;
     password: string;
 };

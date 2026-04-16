@@ -7,10 +7,10 @@ using backend.CustomAttributes;
 [RequireOneOf("Login", "Email")]
 public class LoginRequest
 {
-    [Required]
+    [Required(ErrorMessage = "requiredLogin")]
     public string Login { get; set; } = string.Empty;
    
-    [Required]
+    [Required(ErrorMessage = "requiredPassword")]
     public required string Password { get; set; }
  
 

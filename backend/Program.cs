@@ -2,6 +2,7 @@ using System.Text;
 using backend.Data;
 using backend.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
@@ -48,6 +49,26 @@ builder.Services.AddAuthentication("Bearer")
             }
         };
     });
+
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.InvalidModelStateResponseFactory = context =>
+    {
+        var errors = context.ModelState
+            .Where(x => x.Value.Errors.Count > 0)
+            .ToDictionary(
+                kvp => kvp.Key,
+                kvp => kvp.Value.Errors.Select(e => e.ErrorMessage).ToArray()
+            );
+
+        return new BadRequestObjectResult(new
+        {
+            title = errors.FirstOrDefault().Value.FirstOrDefault() ?? "Invalid request",
+            status = StatusCodes.Status400BadRequest,
+            errors
+        });
+    };
+});
 var app = builder.Build();
 
 app.UseGlobalErrorHandling();

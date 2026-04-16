@@ -4,14 +4,16 @@ import AuthInputs from "./AuthInputs";
 import { getMe, loginUser, registerUser } from "../../services/authService";
 import useToastStore from "@/stores/useToastStore";
 import useLanguageStore from "@/stores/useLanguageStore";
+import { useApi } from "@/hooks/useApi";
 
 type Props = {
     initialisLogin: boolean;
     setUser: (user: User) => void;
     
 };
-type formType = {
+export type formType = {
     login: string;
+    email: string;
     nickname: string;
     password: string;
 }
@@ -21,6 +23,7 @@ export default function AuthForm({initialisLogin, setUser}: Props) {
     const [isLogin, setIsLogin] = useState(initialisLogin);
     const [error, setError] = useState("");
     const setToast = useToastStore((state) => state.setToast);
+    const { request, loading } = useApi();
     useEffect(() => {
         setIsLogin(initialisLogin);
     }, [initialisLogin]);
@@ -29,37 +32,25 @@ export default function AuthForm({initialisLogin, setUser}: Props) {
         e.preventDefault();
         setError("");
 
-        try {
-            const response = isLogin
-                ? await loginUser({ login: form.login, password: form.password })
-                : await registerUser({ login: form.login, password: form.password, nickname: form.nickname });
+        const fn = isLogin
+            ? async () => await loginUser({ login: form.login, password: form.password })
+            : async () => await registerUser({ login: form.login, email: form.email, password: form.password, nickname: form.nickname });
+        await request(fn,
+            {
+                onError: (message: string) => setError(message),
+                showToast: (message: string) => setToast({ msg: message, type: "error" })
+            }
+        );
 
-
-            if (isLogin) {
-                const me = await getMe();
-                setUser(me);
-                setToast({ msg: t.toast.success.login, type: "success" });
-            }else setToast({ msg: t.toast.success.register, type: "success" });
-            navigate("/");
+        if (isLogin) {
+            const me = await getMe();
+            setUser(me);
+            setToast({ msg: t.toast.success.login, type: "success" });
+    }else setToast({ msg: t.toast.success.register, type: "success" });
+    navigate("/");
             
 
-        } catch (error: any) {
-            console.log(error);
-            if(error.message === "InvalidLoginOrPassword" ){
-                setError(t.auth.errors.invalidLoginOrPassword);
-            }
-            else if(!isLogin && error.message === "MissingFields"){
-                setError(t.auth.errors.missingFields);
-            }else if(!isLogin && error.message === "LoginTaken"){
-                setError(t.auth.errors.loginTaken);
-            }else if(!isLogin && error.message === "NicknameTaken"){
-                setError(t.auth.errors.nicknameTaken);
-            }else if(!isLogin && error.message === "NicknameTooLong"){
-                setError(t.auth.errors.nicknameTooLong);
-            }
-            
-            setToast({ msg: isLogin ? t.toast.error.login : t.toast.error.register, type: "error" });
-        }
+        
     };
     
     return (

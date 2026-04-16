@@ -9,6 +9,14 @@ export default defineConfig({
     host: true,
     watch: {
       usePolling: true
+    },
+    proxy: {
+      '/api': {
+        target: 'http://backend:5062',
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^\/api/, '')
+      }
     }
   },
   resolve: {

@@ -3,19 +3,19 @@ using System.ComponentModel.DataAnnotations;
 namespace backend.DTO.Auth;
 public class RegisterRequest
 {
-    [Required]
-    [MinLength(3)]
+    [Required(ErrorMessage = "requiredNickname")]
+    [MinLength(3, ErrorMessage = "nicknameTooShort")]
     public required string Nickname { get; set; }
-    [Required]
-    [MinLength(3)]
+    [Required(ErrorMessage = "requiredLogin")]
+    [MinLength(3, ErrorMessage = "loginTooShort")]
     public required string Login { get; set; }
 
-    [Required]
-    [EmailAddress]
+    [Required(ErrorMessage = "requiredEmail")]
+    [EmailAddress(ErrorMessage = "invalidEmail")]
     public required string Email { get; set; }
 
-    [Required]
-    [MinLength(6)]
+    [Required(ErrorMessage = "requiredPassword")]
+    [MinLength(6, ErrorMessage = "passwordTooShort")]
     public required string Password { get; set; }
 
     

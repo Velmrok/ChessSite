@@ -61,6 +61,7 @@ const UserMenu = ({ onLogout }: {onLogout: () => void }) => {
 
 export default function Navbar() {
    const user = useUserStore((state) => state.user);
+
    const setUser = useUserStore((state) => state.setUser);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const setToast = useToastStore((state) => state.setToast);
@@ -101,9 +102,9 @@ export default function Navbar() {
 
                 
                 <div className="flex gap-4">
-                <button onClick={() => handleChangeLanguage("pl")}>
+                {/* <button onClick={() => handleChangeLanguage("pl")}>
                     <ReactCountryFlag countryCode="PL" className="hover:scale-110 transition-transform duration-300 !w-[1.5em]" svg  />
-                </button>
+                </button> */}
                 <button onClick={() => handleChangeLanguage("en")}>
                     <ReactCountryFlag countryCode="GB" className="hover:scale-110 transition-transform duration-300 !w-[1.5em]" svg  />
                 </button>

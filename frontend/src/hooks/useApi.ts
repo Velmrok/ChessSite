@@ -1,31 +1,33 @@
 import useLanguageStore from "@/stores/useLanguageStore";
+import useToastStore from "@/stores/useToastStore";
 import { useState } from "react";
 
 export function useApi() {
     const [loading, setLoading] = useState(false);
     const t = useLanguageStore((state) => state.t);
+    const setToast = useToastStore((state) => state.setToast);
     const request = async <T>(
         fn: () => Promise<T>,
         options?: {
-            onError?: (message: string) => void;
-            showToast?: (message: string) => void;
+            useToast?: boolean;
         }
+
     ): Promise<T | undefined> => {
         setLoading(true);
 
         try {
-            const result = await fn();
-            return result;
+            
+            return await fn();
         } catch (err: any) {
-            const message = t.toast.error[err.message as keyof typeof t.toast.error] ?? t.toast.error.generic;
+            const message =
+                t.toast.error[err.message as keyof typeof t.toast.error] ??
+                t.toast.error.generic;
 
-            options?.onError?.(message);
-
-            if (options?.showToast) {
-                options.showToast(message);
+            if (options?.useToast) {
+                setToast({ msg: message, type: "error" });
             }
-
-            throw err;
+            
+            throw new Error(message);
         } finally {
             setLoading(false);
         }

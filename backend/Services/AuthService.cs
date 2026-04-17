@@ -7,6 +7,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using ErrorOr;
+using System.IdentityModel.Tokens.Jwt;
+using System.Net;
+using backend.Services.Helpers.Auth;
 
 namespace backend.Services;
  
@@ -82,7 +85,7 @@ public class AuthService : IAuthService
     {
         if (string.IsNullOrEmpty(refreshToken))
         {
-            return Error.Unauthorized("noRefreshToken", "Refresh token is missing.");
+            return Error.Unauthorized("invalidRefreshToken", "Refresh token is missing.");
         }
 
         var refreshTokenEntity = await _dbContext.RefreshTokens.Include(rt => rt.User)
@@ -102,11 +105,48 @@ public class AuthService : IAuthService
     {
        if (string.IsNullOrEmpty(refreshToken))
         {
-            return Error.Unauthorized("noRefreshToken", "Refresh token is missing.");
+            return Error.Unauthorized("invalidRefreshToken", "Refresh token is missing.");
         }
         await _refreshTokenService.RemoveRefreshTokenAsync(refreshToken);
-
+        
         return new Success();
     }
 
+    public async Task<ErrorOr<GetMeResponse>> GetMeAsync(string accessToken)
+    {
+        if (string.IsNullOrEmpty(accessToken))
+        {
+            return Error.Unauthorized("invalidAccessToken", "Access token is missing.");
+        }
+    
+
+
+        var handler = new JwtSecurityTokenHandler();
+        var jwt = handler.ReadJwtToken(accessToken);
+
+        if (jwt == null || jwt.Claims.FirstOrDefault(c => c.Type == "nickname") == null)
+        {
+            return Error.Unauthorized("invalidAccessToken", "Access token is invalid.");
+        }
+        
+
+        var nickname = jwt.Claims.First(c => c.Type == "nickname").Value;
+        var userEntity = await _dbContext.Users.FirstOrDefaultAsync(u => u.Nickname == nickname);
+        if (userEntity == null)
+        {
+            return Error.Unauthorized("invalidAccessToken", "Access token is invalid.");
+        }
+        return new GetMeResponse(
+            userEntity.Nickname,
+            userEntity.Login,
+            userEntity.Email,
+            userEntity.ProfileBio,
+            userEntity.ProfilePictureUrl,
+            userEntity.CreatedAt,
+            userEntity.LastActive,
+            userEntity.RapidRating,
+            userEntity.BlitzRating,
+            userEntity.BulletRating
+        );
+    }
 }

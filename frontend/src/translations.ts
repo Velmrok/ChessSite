@@ -408,6 +408,7 @@ export const translations = {
         missingFields: "Please fill in all required fields.",
         loginTaken: "This login is already taken.",
         nicknameTaken: "This nickname is already taken.",
+        emailTaken: "This email is already taken.",
         nicknameTooLong: "Nickname is too long. (Max 15 characters)",
         invalidEmail: "Invalid email address.",
         requiredNickname: "Nickname is required.",

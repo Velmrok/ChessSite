@@ -21,9 +21,15 @@ export const registerUser = async (userData: UserData) => {
     return response.json();
 };
 
-export const getMe = async (): Promise<User> => {
+export const getMe = async () => {
+   
     const response = await apiFetch(`/auth/me`, 'GET', true, 'application/json');
-    return response.json() as Promise<User>;
+
+    console.log("getMe response:", response);
+
+    return response.json();
+
+
 };
 
 

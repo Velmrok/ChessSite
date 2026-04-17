@@ -7,38 +7,38 @@ import { getMe } from './services/authService'
 import UserProfilePage from './pages/UserProfilePage'
 import Loading from './components/global/Loading'
 import GamePage from './pages/GamePage'
-import AuthPage from './pages/AuthPage'
 import useUserStore from './stores/useUserStore'
 import ToastContainer from './components/global/ToastContainer'
 import FindGame from './pages/FindGame'
 import {connectSocket, disconnectSocket} from './services/socket/socketService'
 import SearchPage from './pages/SearchPage'
 import {OnlyLoggedInRoute,OnlyAdminsRoute} from './components/global/ProtectedRoute'
-import { useGlobalSocket } from './hooks/useGlobalSocket'
-import { rejoinQueue } from './services/socket/socketGlobalService'
 import SearchGamePage from './pages/SearchGamePage'
 import { connectToBroker, disconnectFromBroker } from './services/socket/mqttService'
-import useGlobalMQTT from './hooks/useGlobalMQTT'
-import { connect } from 'http2'
-import AddUserPage from './pages/UserActionPage'
 import UserActionPage from './pages/UserActionPage'
+import { useApi } from './hooks/useApi'
+import RegisterPage from './pages/RegisterPage'
+import LoginPage from './pages/LoginPage'
 
 function App() {
   const [loading, setLoading] = useState(true);
   const user = useUserStore((state) => state.user);
   const setUser = useUserStore((state) => state.setUser);
   const setMqttClient = useUserStore((state) => state.setMqttClient);
-  useGlobalSocket();
-  useGlobalMQTT();
+  const { request } = useApi();
+  //useGlobalSocket();
+  //useGlobalMQTT();
+
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const userData = await getMe();
+        const userData = await request(getMe);
+        if(!userData) throw new Error("Not authenticated");
         console.log("Authenticated user:", userData);
         setUser(userData);
-        connectSocket();
-        setMqttClient(connectToBroker());
-        rejoinQueue();
+        // connectSocket();
+        // setMqttClient(connectToBroker());
+        // rejoinQueue();
         
       } catch (error) {
         setUser(null);
@@ -67,8 +67,8 @@ function App() {
     {loading ? <Loading /> :
       <Routes>
         <Route path="/" element={<Home />} />
-            <Route path="/login" element={<AuthPage initialisLogin={true} />} />
-            <Route path="/register" element={<AuthPage initialisLogin={false} />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
             <Route path="/users/:nickname/profile" element={<UserProfilePage />} />
            
             <Route element={<OnlyLoggedInRoute />}>

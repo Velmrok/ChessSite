@@ -35,7 +35,7 @@ namespace backend.Controllers
             var refreshToken = result.Value.RefreshToken;
             CookieService.SetJwtCookie(Response, accessToken);
             CookieService.SetRefreshTokenCookie(Response, refreshToken!);
-            return StatusCode(StatusCodes.Status201Created);
+            return Created("/auth/register", new { message = "User registered successfully" });
         }
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
@@ -53,7 +53,7 @@ namespace backend.Controllers
                 var refreshToken = result.Value.RefreshToken;
                 CookieService.SetRefreshTokenCookie(Response, refreshToken);
             }
-           return StatusCode(StatusCodes.Status201Created);
+           return Created("/auth/login", new { message = "User logged in successfully" });
         }
         [HttpPost("refresh")]
         public async Task<IActionResult> Refresh()
@@ -68,7 +68,7 @@ namespace backend.Controllers
             var accessToken = result.Value.AccessToken;
             CookieService.SetJwtCookie(Response, accessToken);
     
-            return StatusCode(StatusCodes.Status201Created);
+            return Created("/auth/refresh", new { message = "Token refreshed successfully" });
         }
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()
@@ -80,7 +80,23 @@ namespace backend.Controllers
                 var error = result.FirstError;
                 return Problem(statusCode: error.ToStatusCode(), title: error.Code, detail: error.Description);
             }
-            return StatusCode(StatusCodes.Status200OK);
+            CookieService.DeleteJwtCookie(Response);
+            CookieService.DeleteRefreshTokenCookie(Response);
+            return Ok(new { message = "User logged out successfully" });
+        }
+        [HttpGet("me")]
+        public async Task<IActionResult> GetMe()
+        {
+            var accessToken = Request.Cookies["accessToken"];
+           
+            var result = await _authService.GetMeAsync(accessToken!);
+            if (result.IsError)
+            {
+                var error = result.FirstError;
+                return Problem(statusCode: error.ToStatusCode(), title: error.Code, detail: error.Description);
+            }
+            var user = result.Value;
+            return Ok(user);
         }
     }
 }

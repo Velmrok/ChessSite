@@ -188,7 +188,7 @@ public class AuthServiceTests : TestBase
         var result = await _authService.LoginAsync(request);
         result.IsError.Should().BeTrue();
         var error = result.FirstError;
-        error.Code.Should().Be("userNotFound");
+        error.Code.Should().Be("invalidLoginOrPassword");
 
         var user = await DbContext.Users.FirstOrDefaultAsync(u => u.Login == request.Login || u.Email == request.Login);
         user.Should().BeNull();
@@ -214,7 +214,7 @@ public class AuthServiceTests : TestBase
         var result = await _authService.LoginAsync(request);
         result.IsError.Should().BeTrue();
         var error = result.FirstError;
-        error.Code.Should().Be("invalidCredentials");
+        error.Code.Should().Be("invalidLoginOrPassword");
         result.Value.Should().BeNull();
     }
     

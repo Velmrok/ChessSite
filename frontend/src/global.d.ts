@@ -8,11 +8,9 @@ declare global {
         login: string;
         nickname: string;
         avatar: string;
-        rating: {
-            rapid: number;
-            blitz: number;
-            bullet: number;
-        } | number;
+        ratingRapid: number;
+        ratingBlitz: number;
+        ratingBullet: number;
         onlineStatus: 'online' | 'offline';
         lastActive: string;
         friendList: Array<string>;

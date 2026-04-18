@@ -19,35 +19,48 @@ public class UsersService : IUsersService
 
     private static readonly Dictionary<UsersSortBy, Expression<Func<User, object>>> SortMap = new()
     {
-        [UsersSortBy.RatingRapid] = u => u.RapidRating,
-        [UsersSortBy.RatingBlitz] = u => u.BlitzRating,
-        [UsersSortBy.RatingBullet] = u => u.BulletRating,
-        [UsersSortBy.LastActive] = u => u.LastActive,
-       // [UsersSortBy.OnlineStatus] = (u => u.IsOnline, true), TODO: add online status via redis
-        [UsersSortBy.Nickname] = u => u.Nickname,
-        [UsersSortBy.CreatedAt] = u => u.CreatedAt,
+
+
+
     };
-     private static IQueryable<User> ApplySort(IQueryable<User> users, UsersSortBy sortBy, bool descending = true)
+
+    private static IQueryable<User> ApplySort(IQueryable<User> users, UsersSortBy sortBy, RatingType ratingType, bool descending)
     {
-        var keySelector = SortMap[sortBy];
-        return descending ? users.OrderByDescending(keySelector) : users.OrderBy(keySelector);
+        if (sortBy == UsersSortBy.Rating)
+            return ratingType switch
+            {
+                RatingType.Blitz => users.OrderByField(u => u.BlitzRating, descending),
+                RatingType.Bullet => users.OrderByField(u => u.BulletRating, descending),
+                _ => users.OrderByField(u => u.RapidRating, descending),
+            };
+
+        return sortBy switch
+        {
+            UsersSortBy.Nickname => users.OrderByField(u => u.Nickname, descending),
+            UsersSortBy.LastActive => users.OrderByField(u => u.LastActive, descending),
+            //UsersSortBy.OnlineStatus => users.OrderByField(u => u.OnlineStatus, descending),
+            _ => users.OrderByField(u => u.CreatedAt, descending),
+        };
     }
-    public async Task<List<UserResponse>> GetAllUsersAsync(GetUsersQuery query)
+    public async Task<UsersResponse> GetAllUsersAsync(GetUsersQuery query)
     {
         var users = _context.Users.AsQueryable();
-
+        
+       
         if (!string.IsNullOrEmpty(query.Search))
         {
             users = users.Where(u => u.Nickname.Contains(query.Search));
         }
 
-        users = ApplySort(users, query.SortBy, query.SortDescending);
+        users = ApplySort(users, query.SortBy, query.RatingType, query.SortDescending);
 
-        var result = users
+        var result = await users
             .Skip((query.Page - 1) * query.Limit)
             .Take(query.Limit)
             .Select(u => u.ToUserResponse())
             .ToListAsync();
-        return await result;
+        var totalCount = await users.CountAsync();
+        var totalPages = (int)Math.Ceiling(totalCount / (double)query.Limit);
+        return new UsersResponse(result, totalPages);
     }
 }

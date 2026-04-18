@@ -4,7 +4,7 @@ import { getMe, loginUser, registerUser } from "../../services/authService";
 import useToastStore from "@/stores/useToastStore";
 import useLanguageStore from "@/stores/useLanguageStore";
 import { useApi } from "@/hooks/useApi";
-import type { RegisterFormType } from "@/types/Auth";
+import type { RegisterFormType } from "../../types/auth";
 import RegisterInputs from "./RegisterInputs";
 import useUserStore from "@/stores/useUserStore";
 

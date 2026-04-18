@@ -27,8 +27,7 @@ export default async function apiFetch(options:{
 
     if (responseContentType?.includes("json")) {
       const data = await response.json();
-      console.error("API Error JSON:", data);
-
+      console.error("API Error Details:", data);
       errorCode = data.title || "generic";
     }
 

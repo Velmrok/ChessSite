@@ -1,7 +1,6 @@
 import { useDebounce } from "@/hooks/useDebounce";
 import useLanguageStore from "@/stores/useLanguageStore";
-import useSearchStore from "@/stores/useSearchStore";
-import { useUserProfileStore } from "@/stores/useUserProfileStore";
+import useSearchStore from "../../stores/useUsersSearchStore";
 import useUserStore from "@/stores/useUserStore";
 import { useFormik } from "formik";
 import { useEffect } from "react";
@@ -20,7 +19,7 @@ export default function FilterMenu() {
         initialValues: {
             minRating:  0,
             maxRating:  3000,
-            ratingType: 'ratingRapid',
+            ratingType: 'Rapid',
             onlyActive:  false,
             limit: 10,
         },
@@ -36,8 +35,8 @@ export default function FilterMenu() {
         setFilters({
             ...params,
             limit: Number(formik.values.limit),
-            onlyActive: formik.values.onlyActive,
-            ratingType: formik.values.ratingType as 'ratingRapid' | 'ratingBlitz' | 'ratingBullet',
+            online: formik.values.onlyActive,
+            ratingType: formik.values.ratingType as 'Rapid' | 'Blitz' | 'Bullet',
             minRating: debouncedMin ?? 0,
             maxRating: debouncedMax ?? 3000,
         });
@@ -120,22 +119,22 @@ export default function FilterMenu() {
           <div className="flex gap-2 md:gap-3">
             <button
               type="button"
-              className={`hover:scale-110 flex items-center ${formik.values.ratingType === 'ratingRapid' ? ' border-b-3 border-green-500' : ''}`}
-              onClick={() => formik.setFieldValue('ratingType', 'ratingRapid')}
+              className={`hover:scale-110 flex items-center ${formik.values.ratingType === 'Rapid' ? ' border-b-3 border-green-500' : ''}`}
+              onClick={() => formik.setFieldValue('ratingType', 'Rapid')}
             >
               <MdAccessTime className="text-green-500 text-base md:text-xl inline" />
             </button> 
             <button
               type="button"
-              className={`hover:scale-110 flex items-center ${formik.values.ratingType === 'ratingBlitz' ? ' border-b-3 border-yellow-300' : ''}`}
-              onClick={() => formik.setFieldValue('ratingType', 'ratingBlitz')}
+              className={`hover:scale-110 flex items-center ${formik.values.ratingType === 'Blitz' ? ' border-b-3 border-yellow-300' : ''}`}
+              onClick={() => formik.setFieldValue('ratingType', 'Blitz')}
             >
               <SiStackblitz className="text-yellow-300 text-base md:text-xl inline" />
             </button>
             <button
               type="button"
-              className={`hover:scale-110 flex items-center ${formik.values.ratingType === 'ratingBullet' ? ' border-b-3 border-red-500' : ''}`}
-              onClick={() => formik.setFieldValue('ratingType', 'ratingBullet')}
+              className={`hover:scale-110 flex items-center ${formik.values.ratingType === 'Bullet' ? ' border-b-3 border-red-500' : ''}`}
+              onClick={() => formik.setFieldValue('ratingType', 'Bullet')}
             >
               <SiPushbullet className="text-red-500 text-base md:text-xl" />
             </button>

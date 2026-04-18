@@ -7,8 +7,5 @@ public enum UsersSortBy
     Nickname ,
     OnlineStatus,
     LastActive,
-    RatingRapid,
-    RatingBlitz,
-    RatingBullet
-
+    Rating
 }

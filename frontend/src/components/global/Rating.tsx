@@ -1,12 +1,9 @@
 import { MdAccessTime } from "react-icons/md";
 import { SiPushbullet, SiStackblitz } from "react-icons/si";
+import type { Rating } from "@/types/User";
 
 type Props = {
-    rating: {
-        rapid: number;
-        blitz: number;
-        bullet: number;
-    }| number;
+    rating: Rating;
     className?: string;
 }
 

@@ -1,6 +1,6 @@
 import {  useEffect, useRef, useState } from "react";
 import { useDebounce } from "@/hooks/useDebounce";
-import useSearchStore from "@/stores/useSearchStore";
+import useSearchStore from "../../stores/useUsersSearchStore";
 import { FaSearch } from "react-icons/fa";
 import useLanguageStore from "@/stores/useLanguageStore";
 

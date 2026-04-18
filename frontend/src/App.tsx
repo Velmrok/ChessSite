@@ -7,13 +7,13 @@ import Loading from './components/global/Loading'
 import GamePage from './pages/GamePage'
 import ToastContainer from './components/global/ToastContainer'
 import FindGame from './pages/FindGame'
-import SearchPage from './pages/SearchPage'
 import {OnlyLoggedInRoute,OnlyAdminsRoute} from './components/global/ProtectedRoute'
 import SearchGamePage from './pages/SearchGamePage'
 import UserActionPage from './pages/UserActionPage'
 import RegisterPage from './pages/RegisterPage'
 import LoginPage from './pages/LoginPage'
 import { useAuth } from './hooks/useAuth'
+import UsersSearchPage from './pages/UsersSearchPage'
 
 function App() {
   
@@ -41,7 +41,7 @@ function App() {
            
             <Route element={<OnlyLoggedInRoute />}>
               <Route path="/find-game" element={<FindGame />} />
-              <Route path="/search" element={<SearchPage />} />
+              <Route path="/search" element={<UsersSearchPage />} />
                <Route path="/game/:gameId" element={<GamePage />} />
                <Route path ="/games" element={<SearchGamePage/>} />
             

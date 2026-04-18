@@ -1,13 +1,14 @@
 
 import { Link } from "react-router-dom";
 import AddFriendButton from "../global/AddFriendButton";
-import useSearchStore from "@/stores/useSearchStore";
+import useSearchStore from "../../stores/useUsersSearchStore";
 import SortArrows from "./SortArrows";
 import Rating from "../global/Rating";
 import useLanguageStore from "@/stores/useLanguageStore";
 import DeleteAccountButton from "../global/DeleteAccountButton";
 import { useEffect, useState } from "react";
 import EditAccountButton from "../global/EditAccountButton";
+import type { User } from "@/types/User";
 
 const API_URL = import.meta.env.VITE_API_URL;
 type Props = {
@@ -17,7 +18,6 @@ type Props = {
 export default function UserList({ users}: Props) {
     const t = useLanguageStore((state) => state.t);
     const setOrder = useSearchStore((state) => state.setOrder);
-    const params = useSearchStore((state) => state.params);
     const [deletedAccounts, setDeletedAccounts] = useState<string[]>([]);
     useEffect(() => {
         setDeletedAccounts([]);
@@ -39,39 +39,36 @@ export default function UserList({ users}: Props) {
         setDeletedAccounts([...deletedAccounts, nickname]);
     }
   
-   const getSortOrderForColumn = (columnName: string) => {
-    return params.sortBy === columnName ? params.sortOrder?'asc': 'desc' : null;
-};
-
+ 
 
     return (
         <>
             <div className="flex flex-row w-full bg-black/[50%] md:gap-5 
                   text-white py-1 sm:py-4 rounded-lg shadow-lg justify-between font-MyFancyFont px-2 md:px-5 lg:px-10 ">
-                <button className="text-[10px] md:text-lg flex items-center" onClick={() => setOrder('nickname')}>
+                <button className="text-[10px] md:text-lg flex items-center" onClick={() => setOrder('Nickname')}>
                     {t.search.nickname}
-                    <SortArrows sortOrder={getSortOrderForColumn('nickname')} />
+                    <SortArrows   sortBy="Nickname"/>
                     </button>
                     
                     
-                <button className="text-[10px] md:text-lg flex items-center" onClick={() => setOrder('rating')}>
+                <button className="text-[10px] md:text-lg flex items-center" onClick={() => setOrder('Rating')}>
                     {t.search.rating}
-                    <SortArrows sortOrder={getSortOrderForColumn('rating')} />
+                    <SortArrows   sortBy="Rating"/>
                     </button>
                     
-                <button className="text-[10px] md:text-lg flex items-center" onClick={() => setOrder('onlineStatus')}>
+                <button className="text-[10px] md:text-lg flex items-center" onClick={() => setOrder('OnlineStatus')}>
                     {t.search.status}
-                    <SortArrows sortOrder={getSortOrderForColumn('onlineStatus')} />
+                    <SortArrows   sortBy="OnlineStatus"/>
                     </button>
-                <button className="flex flex-row items-center"  onClick={() => setOrder('lastActive')}>
+                <button className="flex flex-row items-center"  onClick={() => setOrder('LastActive')}>
                     <div className="text-[10px] md:text-lg flex flex-col items-center"> 
                     <h3>{t.search.last}</h3>
                     <h3>{t.search.active}</h3>
                     </div>
-                    <SortArrows sortOrder={getSortOrderForColumn('lastActive')} />
+                    <SortArrows  sortBy="LastActive"/>
                     </button>
             </div>
-            {users.map((user) => {
+            {users && users.map((user) => {
                 const isDeleted = deletedAccounts.includes(user.nickname);
                 return(
                 <div key={user.nickname}

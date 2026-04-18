@@ -11,6 +11,18 @@ public record GetUsersQuery(
     string Search = "",
 
     UsersSortBy SortBy = UsersSortBy.CreatedAt,
-    
-    bool SortDescending = true
+
+    bool SortDescending = true,
+
+    [Range(0, 3000)]
+    int MinRating = 0,
+
+    [Range(0, 3000)]
+    int MaxRating = 3000,
+
+    bool Online = false,
+
+    RatingType RatingType = RatingType.Rapid
+
+
 );

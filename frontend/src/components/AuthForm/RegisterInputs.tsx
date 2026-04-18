@@ -1,7 +1,7 @@
 import React, { useEffect, useState} from "react";
 import { useContext } from "react";
 import useLanguageStore from "@/stores/useLanguageStore";
-import type { RegisterFormType } from "@/types/Auth";
+import type { RegisterFormType } from "../../types/auth";
 
 type Props = {
     handleSubmit: (e: React.FormEvent,

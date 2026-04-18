@@ -11,4 +11,9 @@ namespace backend.DTO.Users
         DateTime LastActive,
         RoleType Role,
         RatingResponse Rating);
+
+    public record UsersResponse(
+        List<UserResponse> Users,
+        int TotalPages
+        );
 }

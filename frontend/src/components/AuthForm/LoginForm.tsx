@@ -5,7 +5,7 @@ import useToastStore from "@/stores/useToastStore";
 import useLanguageStore from "@/stores/useLanguageStore";
 import { useApi } from "@/hooks/useApi";
 
-import type { LoginFormType } from "@/types/Auth";
+import type { LoginFormType } from "../../types/auth";
 import LoginInputs from "./LoginInputs";
 import useUserStore from "@/stores/useUserStore";
 

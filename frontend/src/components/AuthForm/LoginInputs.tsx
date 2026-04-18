@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useContext } from "react";
 import useLanguageStore from "@/stores/useLanguageStore";
-import type { LoginFormType } from "@/types/Auth";
+import type { LoginFormType } from "../../types/auth";
 
 
 

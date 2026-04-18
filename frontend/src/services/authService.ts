@@ -1,4 +1,4 @@
-import type { LoginFormType, RegisterFormType } from "@/types/Auth";
+import type { LoginFormType, RegisterFormType } from "../types/auth";
 import apiFetch from "./api";
 import { disconnectSocket,connectSocket } from "./socket/socketService";
 import useUserStore from "@/stores/useUserStore";

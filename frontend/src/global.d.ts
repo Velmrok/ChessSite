@@ -4,19 +4,7 @@ export { };
 declare global {
 
 
-    type User = {
-        login: string;
-        nickname: string;
-        avatar: string;
-        ratingRapid: number;
-        ratingBlitz: number;
-        ratingBullet: number;
-        onlineStatus: 'online' | 'offline';
-        lastActive: string;
-        friendList: Array<string>;
-        isInQueue: boolean;
-        role: 'user' | 'admin';
-    }
+    
     type UserInfo = {
         rating: {
             rapid: number;

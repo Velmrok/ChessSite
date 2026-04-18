@@ -90,9 +90,14 @@ namespace backend.Controllers
         public async Task<IActionResult> GetMe()
         {
             var nickname = User.FindFirst("nickname")?.Value;
-            if (nickname == null) return Unauthorized();
-            var user = await _authService.GetMeAsync(nickname);
-            return Ok(user);
+            var result = await _authService.GetMeAsync(nickname!);
+            if (result.IsError)
+            {
+                var error = result.FirstError;
+                return Problem(statusCode: error.ToStatusCode(), title: error.Code, detail: error.Description);
+            }
+
+            return Ok(result.Value);
         }
     }
 }

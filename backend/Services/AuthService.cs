@@ -117,6 +117,10 @@ public class AuthService : IAuthService
 
     public async Task<ErrorOr<GetMeResponse>> GetMeAsync(string nickname)
     {
+        if (string.IsNullOrEmpty(nickname))
+        {
+            return Error.Unauthorized("invalidAccessToken", "Access token is invalid.");
+        }
         var userEntity = await _dbContext.Users.FirstOrDefaultAsync(u => u.Nickname == nickname);
         if (userEntity == null)
         {

@@ -10,7 +10,7 @@ export function useApi() {
     const request = async <T>(
         fn: () => Promise<T>,
         options?: {
-            onError?: (message: string) => void; 
+            onError?: (message: string, status?: number) => void; 
             useToast?: boolean;                   
         }
     ): Promise<T | undefined> => {
@@ -23,9 +23,9 @@ export function useApi() {
                 t.toast.error.generic;
 
             if (options?.useToast) setToast({ msg: message, type: "error" });
-            if (options?.onError) options.onError(message);
+            if (options?.onError) options.onError(message, err.status);
 
-            return undefined; 
+            return undefined;
         } finally {
             setLoading(false);
         }

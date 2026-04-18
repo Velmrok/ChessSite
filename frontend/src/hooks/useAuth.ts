@@ -13,23 +13,25 @@ export function useAuth() {
 
     useEffect(() => {
         const checkAuth = async () => {
-            try {
-                const userData = await request(getMe);
-                if (!userData) {
-                    const refreshed = await request(refresh);
-                    if (refreshed) {
-                        setUser(refreshed);
-                    }
-                } else {
-                    setUser(userData);
+            let shouldRefresh = false;
+            const me = await request(getMe, {
+                onError: (message, status) => {
+                    setLoading(false);
+                    if (status === 401) shouldRefresh = true;
                 }
-            } finally {
-                setLoading(false);
+            });
+            if (me) {
+                setUser(me);
+               
+            } else if (shouldRefresh) {
+                const refreshResult = await request(refresh, { onError: () => setLoading(false) });
+                if (refreshResult) setUser(refreshResult);
             }
-        };
-        if (!user) checkAuth();
+        }
+            if (!user) checkAuth();
+            setLoading(false);
 
-
+        
     }, [user]);
 
     useEffect(() => {

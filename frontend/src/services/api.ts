@@ -28,7 +28,7 @@ export default async function apiFetch(url: string, method:string, verifyToken: 
       errorCode =  data.title || "generic";
     } 
 
-    throw new Error(errorCode);
+    throw Object.assign(new Error(errorCode), { status: response.status });
   }
 
 

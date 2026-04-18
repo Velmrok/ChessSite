@@ -6,6 +6,6 @@ type AllUsers = {
   totalPages: number;
 }
 export const fetchAllUsers = async (url: string) : Promise<AllUsers> => {
-    const response = await apiFetch(`/users/all${url}`, 'GET', true, 'application/json');
+    const response = await apiFetch({ url: `/users/all${url}`, method: 'GET', includeCredentials: true, contentType: 'application/json' });
     return response.json()as Promise<AllUsers>;
 }

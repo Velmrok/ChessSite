@@ -33,15 +33,6 @@ public class AuthService : IAuthService
     public async Task<ErrorOr<AuthResult>> RegisterAsync(RegisterRequest request)
     {
 
-        var existingUser = await _dbContext.Users.FirstOrDefaultAsync(u =>
-            u.Nickname == request.Nickname || u.Email == request.Email || u.Login == request.Login);
-
-        if (existingUser != null)
-        {
-            if (existingUser.Nickname == request.Nickname) return Error.Conflict("nicknameTaken", "Nickname is already taken.");
-            if (existingUser.Email == request.Email) return Error.Conflict("emailTaken", "Email is already taken.");
-            return Error.Conflict("loginTaken", "Login is already taken.");
-        }
 
         var passwordHash = _passwordHasher.HashPassword(null!, request.Password);
             var newUser = new User

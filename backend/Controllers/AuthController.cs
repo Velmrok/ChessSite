@@ -7,6 +7,7 @@ using backend.DTO.Auth;
 using backend.Errors;
 using backend.Services.Helpers.Auth;
 using backend.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
@@ -84,18 +85,13 @@ namespace backend.Controllers
             CookieService.DeleteRefreshTokenCookie(Response);
             return Ok(new { message = "User logged out successfully" });
         }
+        [Authorize]
         [HttpGet("me")]
         public async Task<IActionResult> GetMe()
         {
-            var accessToken = Request.Cookies["accessToken"];
-           
-            var result = await _authService.GetMeAsync(accessToken!);
-            if (result.IsError)
-            {
-                var error = result.FirstError;
-                return Problem(statusCode: error.ToStatusCode(), title: error.Code, detail: error.Description);
-            }
-            var user = result.Value;
+            var nickname = User.FindFirst("nickname")?.Value;
+            if (nickname == null) return Unauthorized();
+            var user = await _authService.GetMeAsync(nickname);
             return Ok(user);
         }
     }

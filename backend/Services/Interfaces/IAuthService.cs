@@ -15,6 +15,6 @@ namespace backend.Services.Interfaces
         public Task<ErrorOr<AuthResponse>> LoginAsync(LoginRequest request);
         public Task<ErrorOr<Success>> LogoutAsync(string refreshToken);
         public Task<ErrorOr<AuthResponse>> RefreshAsync(string refreshToken);
-        public Task<ErrorOr<GetMeResponse>> GetMeAsync(string accessToken);
+        public Task<ErrorOr<GetMeResponse>> GetMeAsync(string nickname);
     }
 }

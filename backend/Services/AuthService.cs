@@ -112,25 +112,8 @@ public class AuthService : IAuthService
         return new Success();
     }
 
-    public async Task<ErrorOr<GetMeResponse>> GetMeAsync(string accessToken)
+    public async Task<ErrorOr<GetMeResponse>> GetMeAsync(string nickname)
     {
-        if (string.IsNullOrEmpty(accessToken))
-        {
-            return Error.Unauthorized("invalidAccessToken", "Access token is missing.");
-        }
-    
-
-
-        var handler = new JwtSecurityTokenHandler();
-        var jwt = handler.ReadJwtToken(accessToken);
-
-        if (jwt == null || jwt.Claims.FirstOrDefault(c => c.Type == "nickname") == null)
-        {
-            return Error.Unauthorized("invalidAccessToken", "Access token is invalid.");
-        }
-        
-
-        var nickname = jwt.Claims.First(c => c.Type == "nickname").Value;
         var userEntity = await _dbContext.Users.FirstOrDefaultAsync(u => u.Nickname == nickname);
         if (userEntity == null)
         {

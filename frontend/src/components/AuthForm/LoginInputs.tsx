@@ -15,9 +15,8 @@ export default function LoginInputs({ handleSubmit }: Props) {
         login: "",
         password: ""
     });
-    const [error, setError] = useState("");
-    const t = useLanguageStore((state) => state.t);
-    useEffect(() => { setError("") }, []);
+ const t = useLanguageStore((state) => state.t);
+
 
     return (
         <>

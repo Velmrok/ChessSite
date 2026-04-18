@@ -15,9 +15,8 @@ export default function RegisterInputs({handleSubmit }: Props) {
         nickname: "",
         password: ""
     });
-    const [error, setError] = useState("");
     const t = useLanguageStore((state) => state.t);
-    useEffect(() => {setError("")}, []);
+  
    
     return (
         <>

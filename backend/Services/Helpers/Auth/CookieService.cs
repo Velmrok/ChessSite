@@ -35,12 +35,27 @@ namespace backend.Services.Helpers.Auth
         }
          public  void DeleteRefreshTokenCookie(HttpResponse response)
         {
-            response.Cookies.Delete("refreshToken");
+            CookieOptions refreshTokenCookieOptions = new()
+            {
+                HttpOnly = true,
+                Secure = _env.IsProduction(),
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTime.UtcNow.AddDays(7)
+            };
+            
+            response.Cookies.Delete("refreshToken", refreshTokenCookieOptions);
         }
         public  void DeleteJwtCookie(HttpResponse response)
         {
+            CookieOptions jwtCookieOptions = new()
+            {
+                HttpOnly = true,
+                Secure = _env.IsProduction(),
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTime.UtcNow.AddHours(1)
+            };
     
-            response.Cookies.Delete("accessToken");
+            response.Cookies.Delete("accessToken", jwtCookieOptions);
         }
        
     }

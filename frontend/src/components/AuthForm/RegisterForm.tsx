@@ -16,23 +16,21 @@ export default function RegisterForm({ setUser }: Props) {
     const navigate = useNavigate();
     const setToast = useToastStore((state) => state.setToast);
 
-    const [error,setError] = useState("");
+    const [error, setError] = useState("");
     const { request, loading } = useApi();
 
     const handleSubmit = async (e: React.FormEvent, form: RegisterFormType) => {
         e.preventDefault();
 
-        await request(async () => await registerUser({
-            login: form.login,
-            password: form.password,
-            email: form.email,
-            nickname: form.nickname
-        }), { useToast: false, onError: (msg) => setError(msg) });
+        const user = await request(
+            () => registerUser(form),
+         { useToast: false, onError: (msg) => setError(msg) });
 
-        const me = await getMe();
-        setUser(me);
-        setToast({ msg: t.toast.success.register, type: "success" });
-        navigate("/");
+        if (user) {
+            setUser(user);
+            setToast({ msg: t.toast.success.register, type: "success" });
+            navigate("/");
+        }
 
 
     };

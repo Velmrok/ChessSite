@@ -36,7 +36,5 @@ export const getMe = async () => {
 export const logoutUser = async () => {
     
     const response = await apiFetch(`/auth/logout`, 'POST', true, 'application/json');
-    disconnectSocket();
-    useUserStore.getState().setUser(null);
     return response.json();
 }

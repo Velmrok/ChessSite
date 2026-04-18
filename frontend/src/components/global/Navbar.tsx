@@ -9,6 +9,7 @@ import { formatTimeFromMs, leaveQueue } from "@/services/socket/socketGlobalServ
 import { CiMenuBurger } from "react-icons/ci";
 import { useState } from "react";
 import SmallScreenMenu from "./SmallScreenMenu";
+import { disconnectSocket } from "@/services/socket/socketService";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -68,14 +69,17 @@ export default function Navbar() {
     const navigate = useNavigate();
 
     const handleLogout = async () => {
-       try{
-        await logoutUser();
-       }catch (error:any){
-        if(error.status ===401) setUser(null);
-        else setToast({ msg: t.toast.error.logout, type: "error" });
-        return;
-       }
-       
+        try {
+            await logoutUser();
+            disconnectSocket();           
+            useUserStore.getState().setUser(null); 
+            navigate('/login');
+        } catch (error: any) {
+            if (error.status === 401) setUser(null);
+            else setToast({ msg: t.toast.error.logout, type: "error" });
+            return;
+        }
+
         navigate("/");
         setToast({ msg: t.toast.success.logout, type: "success" });
 

@@ -9,7 +9,7 @@ public class RefreshToken
     public DateTime ExpiresAt { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public bool IsRevoked { get; set; } = false;
-    public Guid UserId { get; set; }
+    public required Guid UserId { get; set; }
     public required User User { get; set; }
 
 }

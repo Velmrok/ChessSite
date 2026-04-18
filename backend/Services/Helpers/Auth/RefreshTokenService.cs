@@ -18,7 +18,7 @@ public class RefreshTokenService : IRefreshTokenService
     public async Task<string> CreateRefreshTokenAsync(User user)
     {
         var oldTokens = await _dbContext.RefreshTokens
-            .Where(rt => rt.User.Id == user.Id && !rt.IsRevoked)
+            .Where(rt => rt.UserId == user.Id && !rt.IsRevoked)
             .ToListAsync();
 
         foreach (var oldToken in oldTokens)
@@ -33,7 +33,8 @@ public class RefreshTokenService : IRefreshTokenService
         {
             Token = refreshToken,
             ExpiresAt = DateTime.UtcNow.AddDays(7),
-            User = user
+            User = user,
+            UserId = user.Id
         };
 
 
@@ -46,7 +47,7 @@ public class RefreshTokenService : IRefreshTokenService
     {
         return await _dbContext.RefreshTokens.AnyAsync(rt => rt.Token == refreshToken);
     }
-    public async Task RemoveRefreshTokenAsync(string refreshToken)
+    public async Task RevokeRefreshTokenAsync(string refreshToken)
     {
         var refreshTokenEntity = await _dbContext.RefreshTokens.FirstOrDefaultAsync(rt => rt.Token == refreshToken);
         if (refreshTokenEntity != null)

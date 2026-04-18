@@ -108,7 +108,7 @@ public class AuthService : IAuthService
         var refreshTokenEntity = await _dbContext.RefreshTokens.Include(rt => rt.User)
             .FirstOrDefaultAsync(rt => rt.Token == refreshToken);
 
-        if (refreshTokenEntity == null || refreshTokenEntity.ExpiresAt < DateTime.UtcNow)
+        if (refreshTokenEntity == null || refreshTokenEntity.ExpiresAt < DateTime.UtcNow || refreshTokenEntity.IsRevoked)
         {
             return Error.Unauthorized("invalidRefreshToken", "Refresh token is invalid or has expired.");
         }
@@ -117,7 +117,7 @@ public class AuthService : IAuthService
         var newAccessToken = _jwtGenerator.GenerateToken(user);
 
         var newRefreshToken = await _refreshTokenService.CreateRefreshTokenAsync(user);
-        _dbContext.RefreshTokens.Remove(refreshTokenEntity);
+        await _refreshTokenService.RevokeRefreshTokenAsync(refreshToken);
 
         await _dbContext.SaveChangesAsync();
 
@@ -129,7 +129,7 @@ public class AuthService : IAuthService
         {
             return Error.Unauthorized("invalidRefreshToken", "Refresh token is missing.");
         }
-        await _refreshTokenService.RemoveRefreshTokenAsync(refreshToken);
+        await _refreshTokenService.RevokeRefreshTokenAsync(refreshToken);
         await _dbContext.SaveChangesAsync();
         return new Success();
     }

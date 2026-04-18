@@ -46,8 +46,20 @@ builder.Services.AddAuthentication("Bearer")
                     context.Token = token;
                 }
                 return Task.CompletedTask;
+            },
+            OnChallenge = async context =>
+            {
+                context.HandleResponse();
+                context.Response.StatusCode = 401;
+                context.Response.ContentType = "application/json";
+                await context.Response.WriteAsJsonAsync(new ProblemDetails
+                {
+                    Title = "unauthorized",
+                    Status = 401
+                });
             }
         };
+
     });
 
 builder.Services.Configure<ApiBehaviorOptions>(options =>

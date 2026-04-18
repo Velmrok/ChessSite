@@ -46,11 +46,15 @@ export default function FilterMenu() {
         formik.values.ratingType, 
         debouncedMin, 
         debouncedMax
-    ]);
+    ] );
+
+
+
 
     const handleResetFilters = (e: any) => {
         e.preventDefault();
         resetFilters();
+        formik.resetForm();
     }
     const handleGoToUsersCreate = (e: any) => { 
       e.preventDefault();

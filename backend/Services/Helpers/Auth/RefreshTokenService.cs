@@ -17,11 +17,14 @@ public class RefreshTokenService : IRefreshTokenService
 
     public async Task<string> CreateRefreshTokenAsync(User user)
     {
-        var oldToken = await _dbContext.RefreshTokens
-            .FirstOrDefaultAsync(rt => rt.User.Id == user.Id);
+        var oldTokens = await _dbContext.RefreshTokens
+            .Where(rt => rt.User.Id == user.Id && !rt.IsRevoked)
+            .ToListAsync();
 
-        if (oldToken != null)
-            _dbContext.RefreshTokens.Remove(oldToken);
+        foreach (var oldToken in oldTokens)
+        {
+            oldToken.IsRevoked = true;
+        }
 
         var bytes = RandomNumberGenerator.GetBytes(64);
         var refreshToken = Convert.ToBase64String(bytes);
@@ -48,7 +51,8 @@ public class RefreshTokenService : IRefreshTokenService
         var refreshTokenEntity = await _dbContext.RefreshTokens.FirstOrDefaultAsync(rt => rt.Token == refreshToken);
         if (refreshTokenEntity != null)
         {
-            _dbContext.RefreshTokens.Remove(refreshTokenEntity);
+            refreshTokenEntity.IsRevoked = true;
+           
         }
     }
 }

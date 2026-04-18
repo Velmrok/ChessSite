@@ -54,7 +54,7 @@ namespace backend.Controllers
                 var refreshToken = result.Value.RefreshToken;
                 CookieService.SetRefreshTokenCookie(Response, refreshToken);
             }
-           return Created("/auth/login", new { message = "User logged in successfully" });
+           return Ok(new { message = "User logged in successfully" });
         }
         [HttpPost("refresh")]
         public async Task<IActionResult> Refresh()

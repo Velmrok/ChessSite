@@ -38,7 +38,7 @@ namespace backend.Controllers
             var refreshToken = result.Value.RefreshToken;
             _cookieService.SetJwtCookie(Response, accessToken);
             _cookieService.SetRefreshTokenCookie(Response, refreshToken!);
-            return Created("/auth/register", result.Value.User);
+            return Created($"/users/{result.Value.User.Nickname}/profile", result.Value.User);
         }
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
@@ -90,7 +90,7 @@ namespace backend.Controllers
                 return Problem(statusCode: error.ToStatusCode(), title: error.Code, detail: error.Description);
             }
             
-            return Ok(new { message = "User logged out successfully" });
+            return NoContent();
         }
         [Authorize]
         [HttpGet("me")]

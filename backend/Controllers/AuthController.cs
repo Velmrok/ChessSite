@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -18,10 +19,11 @@ namespace backend.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
-
-        public AuthController(IAuthService authService)
+        private readonly ICookieService _cookieService;
+        public AuthController(IAuthService authService, ICookieService cookieService)
         {
             _authService = authService;
+            _cookieService = cookieService;
         }
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterRequest request)
@@ -34,8 +36,8 @@ namespace backend.Controllers
             }
             var accessToken = result.Value.AccessToken;
             var refreshToken = result.Value.RefreshToken;
-            CookieService.SetJwtCookie(Response, accessToken);
-            CookieService.SetRefreshTokenCookie(Response, refreshToken!);
+            _cookieService.SetJwtCookie(Response, accessToken);
+            _cookieService.SetRefreshTokenCookie(Response, refreshToken!);
             return Created("/auth/register", result.Value.User);
         }
         [HttpPost("login")]
@@ -48,11 +50,11 @@ namespace backend.Controllers
                 return Problem(statusCode: error.ToStatusCode(), title: error.Code, detail: error.Description);
             }
             var accessToken = result.Value.AccessToken;
-            CookieService.SetJwtCookie(Response, accessToken);
+            _cookieService.SetJwtCookie(Response, accessToken);
             if (result.Value.RefreshToken != null)
             {
                 var refreshToken = result.Value.RefreshToken;
-                CookieService.SetRefreshTokenCookie(Response, refreshToken);
+                _cookieService.SetRefreshTokenCookie(Response, refreshToken);
             }
            return Ok(result.Value.User);
         }
@@ -68,9 +70,9 @@ namespace backend.Controllers
             }
             var accessToken = result.Value.AccessToken;
             var newRefreshToken = result.Value.RefreshToken;
-            
-            CookieService.SetJwtCookie(Response, accessToken);
-            CookieService.SetRefreshTokenCookie(Response, newRefreshToken);
+
+            _cookieService.SetJwtCookie(Response, accessToken);
+            _cookieService.SetRefreshTokenCookie(Response, newRefreshToken);
 
             return Ok(result.Value.User);
         }
@@ -84,16 +86,16 @@ namespace backend.Controllers
                 var error = result.FirstError;
                 return Problem(statusCode: error.ToStatusCode(), title: error.Code, detail: error.Description);
             }
-            CookieService.DeleteJwtCookie(Response);
-            CookieService.DeleteRefreshTokenCookie(Response);
+            _cookieService.DeleteJwtCookie(Response);
+            _cookieService.DeleteRefreshTokenCookie(Response);
             return Ok(new { message = "User logged out successfully" });
         }
         [Authorize]
         [HttpGet("me")]
         public async Task<IActionResult> GetMe()
         {
-            var nickname = User.FindFirst("nickname")?.Value;
-            var result = await _authService.GetMeAsync(nickname!);
+            var sub = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+            var result = await _authService.GetMeAsync(sub!);
             if (result.IsError)
             {
                 var error = result.FirstError;

@@ -13,6 +13,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IUsersService, UsersService>();
         services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
         services.AddScoped<IRefreshTokenService, RefreshTokenService>();
+        services.AddScoped<ICookieService, CookieService>();
         services.AddSingleton<IJwtGenerator,JwtGenerator>();
         return services;
     }

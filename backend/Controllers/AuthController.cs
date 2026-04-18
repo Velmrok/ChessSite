@@ -67,9 +67,12 @@ namespace backend.Controllers
                 return Problem(statusCode: error.ToStatusCode(), title: error.Code, detail: error.Description);
             }
             var accessToken = result.Value.AccessToken;
+            var newRefreshToken = result.Value.RefreshToken;
+            
             CookieService.SetJwtCookie(Response, accessToken);
-    
-            return Ok(new { message = "Token refreshed successfully" });
+            CookieService.SetRefreshTokenCookie(Response, newRefreshToken);
+
+            return Ok(result.Value.User);
         }
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()

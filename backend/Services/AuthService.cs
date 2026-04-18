@@ -12,6 +12,7 @@ using System.Net;
 using backend.Services.Helpers.Auth;
 using backend.DTO.Users;
 using backend.Services.Mappers;
+using backend.Services.Results;
 
 namespace backend.Services;
  
@@ -29,7 +30,7 @@ public class AuthService : IAuthService
         _passwordHasher = passwordHasher;
         _refreshTokenService = refreshTokenService;
     }
-    public async Task<ErrorOr<AuthResponse>> RegisterAsync(RegisterRequest request)
+    public async Task<ErrorOr<AuthResult>> RegisterAsync(RegisterRequest request)
     {
 
         var existingUser = await _dbContext.Users.FirstOrDefaultAsync(u =>
@@ -79,10 +80,10 @@ public class AuthService : IAuthService
             return Error.Conflict("loginTaken", "Login is already taken.");
         }
 
-        return new AuthResponse(accessToken, refreshToken, newUser.ToGetMeResponse());
+        return new AuthResult(accessToken, refreshToken, newUser.ToGetMeResponse());
 
     }
-    public async Task<ErrorOr<AuthResponse>> LoginAsync(LoginRequest request)
+    public async Task<ErrorOr<AuthResult>> LoginAsync(LoginRequest request)
     {
         var user = await _dbContext.Users.FirstOrDefaultAsync(u =>
             u.Login == request.Login || u.Email == request.Login);
@@ -102,9 +103,9 @@ public class AuthService : IAuthService
         var refreshToken = await _refreshTokenService.CreateRefreshTokenAsync(user);
         await _dbContext.SaveChangesAsync();
         
-        return new AuthResponse(accessToken, refreshToken, user.ToGetMeResponse());
+        return new AuthResult(accessToken, refreshToken, user.ToGetMeResponse());
     }
-    public async Task<ErrorOr<AuthResponse>> RefreshAsync(string refreshToken)
+    public async Task<ErrorOr<AuthResult>> RefreshAsync(string refreshToken)
     {
         if (string.IsNullOrEmpty(refreshToken))
         {
@@ -122,7 +123,12 @@ public class AuthService : IAuthService
         var user = refreshTokenEntity.User;
         var newAccessToken = _jwtGenerator.GenerateToken(user);
 
-        return new AuthResponse(newAccessToken);
+        var newRefreshToken = await _refreshTokenService.CreateRefreshTokenAsync(user);
+        _dbContext.RefreshTokens.Remove(refreshTokenEntity);
+
+        await _dbContext.SaveChangesAsync();
+
+        return new AuthResult(newAccessToken, newRefreshToken, user.ToGetMeResponse());
     }
     public async Task<ErrorOr<Success>> LogoutAsync(string refreshToken)
     {

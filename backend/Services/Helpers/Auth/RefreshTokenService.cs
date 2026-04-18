@@ -1,5 +1,6 @@
 
 
+using System.Security.Cryptography;
 using backend.Data;
 using backend.Models;
 using backend.Services.Interfaces;
@@ -22,10 +23,11 @@ public class RefreshTokenService : IRefreshTokenService
         if (oldToken != null)
             _dbContext.RefreshTokens.Remove(oldToken);
 
-        var refreshToken = Guid.NewGuid().ToString();
+        var refreshToken = RandomNumberGenerator.GetBytes(64).ToString();
+
         var refreshTokenEntity = new RefreshToken
         {
-            Token = refreshToken,
+            Token = refreshToken!,
             ExpiresAt = DateTime.UtcNow.AddDays(7),
             User = user
         };

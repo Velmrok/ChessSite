@@ -67,7 +67,7 @@ public class AuthEndpointTests : TestBase
             Password = "123456"
         };
         var response2 = await _client.PostAsJsonAsync("/auth/login", loginRequest);
-        response2.StatusCode.Should().Be(System.Net.HttpStatusCode.Created);
+        response2.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
         var cookies = response2.Headers.GetValues("Set-Cookie");
         var refreshCookie = cookies.FirstOrDefault(c => c.StartsWith("refreshToken="));
         refreshCookie.Should().NotBeNull();
@@ -78,7 +78,7 @@ public class AuthEndpointTests : TestBase
         jwt.Claims.Should().Contain(c => c.Type == "email" && c.Value == "test@test.com");
 
         var response3 = await _client.PostAsync("/auth/logout", null);
-        response3.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+        response3.StatusCode.Should().Be(System.Net.HttpStatusCode.NoContent);
 
         var response4 = await _client.PostAsync("/auth/refresh", null);
         response4.StatusCode.Should().Be(System.Net.HttpStatusCode.Unauthorized);

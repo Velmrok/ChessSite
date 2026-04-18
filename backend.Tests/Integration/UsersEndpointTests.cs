@@ -19,7 +19,9 @@ public class UsersEndpointTests : TestBase
         var response = await _client.GetAsync("/users");
 
         response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
-        var users = await response.Content.ReadFromJsonAsync<List<UserResponse>>();
+        var jsonData = await response.Content.ReadFromJsonAsync<UsersResponse>();
+        jsonData.Should().NotBeNull();
+        var users = jsonData.Users;
         users.Should().NotBeNull();
     }
 
@@ -41,7 +43,11 @@ public class UsersEndpointTests : TestBase
         response = await _client.GetAsync("/users");
 
         response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
-        var users = await response.Content.ReadFromJsonAsync<List<UserResponse>>();
+        var jsonData = await response.Content.ReadFromJsonAsync<UsersResponse>();
+
+        jsonData.Should().NotBeNull();
+        var users = jsonData.Users;
+
         users.Should().NotBeNull();
         users.Should().HaveCount(1);
         users[0].Nickname.Should().Be("nowyKozak");

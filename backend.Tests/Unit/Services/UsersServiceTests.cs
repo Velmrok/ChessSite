@@ -28,12 +28,15 @@ public class UsersServiceTests : TestBase
         DbContext.Users.Add(user2);
         await DbContext.SaveChangesAsync();
 
-        var result = await _usersService.GetAllUsersAsync();
-
+        var result = await _usersService.GetAllUsersAsync(new GetUsersQuery());
+        var users = result.Users;
+        var totalPages = result.TotalPages;
 
         result.Should().NotBeNull();
-        result.Should().HaveCount(2);
-        result[0].Nickname.Should().Be("user1");
-        result[1].Nickname.Should().Be("user2");
+        users.Should().NotBeNull();
+        users.Should().HaveCount(2);
+        users[0].Nickname.Should().Be("user2");
+        users[1].Nickname.Should().Be("user1");
+        totalPages.Should().Be(1);
     }
 }

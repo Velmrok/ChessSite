@@ -2,7 +2,6 @@
 import {create} from 'zustand';
 type UserStore = {
     user: User | null;
-    isLoggedIn: boolean;
     friendList: string[];
     queueTime?: number;
     queueTimeInterval?: ReturnType<typeof setInterval>;
@@ -20,7 +19,6 @@ type UserStore = {
 };
 const useUserStore = create<UserStore>((set, get) => ({
     user: null,
-    isLoggedIn: false,
     friendList: [],
     queueTime: undefined,
     queueTimeInterval: undefined,
@@ -35,8 +33,8 @@ const useUserStore = create<UserStore>((set, get) => ({
         },1000);
         set({queueTimeInterval: intervalId});
     },
-    setUser: (user: User | null) => set({user, isLoggedIn: user !== null}),
-    clearUser: () => set({user: null, isLoggedIn: false}),
+    setUser: (user: User | null) => set({user}),
+    clearUser: () => set({user: null}),
     deleteFriend: (nickname: string) => set((state) => {
         if (!state.user) return state;
         return {

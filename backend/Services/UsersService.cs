@@ -49,12 +49,14 @@ public class UsersService : IUsersService
        
         if (!string.IsNullOrEmpty(query.Search))
         {
-            users = users.Where(u => u.Nickname.Contains(query.Search));
+            users = users.Where(u => u.Nickname.ToLower().Contains(query.Search.ToLower()));
         }
+       
 
         users = ApplySort(users, query.SortBy, query.RatingType, query.SortDescending);
 
         var result = await users
+            
             .Skip((query.Page - 1) * query.Limit)
             .Take(query.Limit)
             .Select(u => u.ToUserResponse())

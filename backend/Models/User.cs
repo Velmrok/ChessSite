@@ -21,17 +21,5 @@ public class User
     public RoleType Role { get; set; } = RoleType.User;
 
 
-    public GetMeResponse ToGetMeResponse()
-    {
-        return new GetMeResponse(
-            Nickname: Nickname,
-            Login: Login,
-            Email: Email,
-            ProfileBio: ProfileBio,
-            ProfilePictureUrl: ProfilePictureUrl,
-            CreatedAt: CreatedAt,
-            LastActive: LastActive,
-            Rating: new RatingResponse(RapidRating, BlitzRating, BulletRating)
-        );
-    }
+    
 }

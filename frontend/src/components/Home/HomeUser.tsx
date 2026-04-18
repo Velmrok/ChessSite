@@ -11,8 +11,6 @@ import Lobby from "./Lobby";
 import useLanguageStore from "@/stores/useLanguageStore";
 import { useHomeSocket } from "@/hooks/useHomeSocket";
 import { useNavigate } from "react-router-dom";
-
-import AdminPanel from "./AdminPanel";
 import useUserStore from "@/stores/useUserStore";
 
 export default function HomeUser() {
@@ -49,7 +47,7 @@ export default function HomeUser() {
 
     return (
         <div className="w-full min-h-screen flex flex-col justify-center gap-5   items-center relative">
-           {user?.role === 'admin' && <AdminPanel />}
+          
             <div className="mt-5 flex justify-between w-full  md:w-[80%] lg:w-[83%] max-w-[1300px] px-4">
             <div className="w-[33%] text-[10px] md:text-base text-white text-center font-MyFancyFont">{usersOnline} {t.home.playersOnline}</div>
             <div className="w-[33%] text-[10px] md:text-base text-white text-center font-MyFancyFont">{matchesInProgress} {t.home.matchesInProgress}</div>

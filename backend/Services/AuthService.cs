@@ -79,6 +79,7 @@ public class AuthService : IAuthService
 
         var accessToken = _jwtGenerator.GenerateToken(user);
         var refreshToken = await _refreshTokenService.CreateRefreshTokenAsync(user);
+        await _dbContext.SaveChangesAsync();
         return new AuthResponse(accessToken, refreshToken);
     }
     public async Task<ErrorOr<AuthResponse>> RefreshAsync(string refreshToken)
@@ -108,7 +109,7 @@ public class AuthService : IAuthService
             return Error.Unauthorized("invalidRefreshToken", "Refresh token is missing.");
         }
         await _refreshTokenService.RemoveRefreshTokenAsync(refreshToken);
-        
+        await _dbContext.SaveChangesAsync();
         return new Success();
     }
 

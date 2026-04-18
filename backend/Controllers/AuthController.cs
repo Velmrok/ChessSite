@@ -81,13 +81,15 @@ namespace backend.Controllers
         {
             var refreshToken = Request.Cookies["refreshToken"];
             var result = await _authService.LogoutAsync(refreshToken!);
+            _cookieService.DeleteJwtCookie(Response);
+            _cookieService.DeleteRefreshTokenCookie(Response);
             if (result.IsError)
             {
                 var error = result.FirstError;
+                
                 return Problem(statusCode: error.ToStatusCode(), title: error.Code, detail: error.Description);
             }
-            _cookieService.DeleteJwtCookie(Response);
-            _cookieService.DeleteRefreshTokenCookie(Response);
+            
             return Ok(new { message = "User logged out successfully" });
         }
         [Authorize]

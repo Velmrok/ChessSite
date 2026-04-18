@@ -1,3 +1,5 @@
+using backend.DTO.Auth;
+using backend.DTO.Common;
 using backend.Enums;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,5 +20,18 @@ public class User
     public int BulletRating { get; set; }
     public RoleType Role { get; set; } = RoleType.User;
 
-   
+
+    public GetMeResponse ToGetMeResponse()
+    {
+        return new GetMeResponse(
+            Nickname: Nickname,
+            Login: Login,
+            Email: Email,
+            ProfileBio: ProfileBio,
+            ProfilePictureUrl: ProfilePictureUrl,
+            CreatedAt: CreatedAt,
+            LastActive: LastActive,
+            Rating: new RatingResponse(RapidRating, BlitzRating, BulletRating)
+        );
+    }
 }

@@ -1,13 +1,16 @@
+using backend.DTO.Common;
+
+namespace backend.DTO.Auth;
+
 
 
 public record GetMeResponse(
- string Nickname,
-  string Login,
-   string Email,
+    string Nickname,
+    string Login,
+    string Email,
     string ProfileBio,
-     string ProfilePictureUrl,
-      DateTime CreatedAt,
-       DateTime LastActive,
-        int RapidRating,
-        int BlitzRating,
-        int BulletRating);
+    string ProfilePictureUrl,
+    DateTime CreatedAt,
+    DateTime LastActive,
+    RatingResponse Rating  
+);

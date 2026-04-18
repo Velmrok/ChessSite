@@ -82,19 +82,7 @@ public class AuthService : IAuthService
         var refreshToken = await _refreshTokenService.CreateRefreshTokenAsync(user);
         await _dbContext.SaveChangesAsync();
         
-        return new AuthResponse(accessToken, refreshToken, new UserResponse(
-            user.Nickname,
-            user.Login,
-            user.Email,
-            user.ProfileBio,
-            user.ProfilePictureUrl,
-            user.CreatedAt,
-            user.LastActive,
-            user.RapidRating,
-            user.BlitzRating,
-            user.BulletRating,
-            user.Role
-        ));
+        return new AuthResponse(accessToken, refreshToken, user.ToGetMeResponse());
     }
     public async Task<ErrorOr<AuthResponse>> RefreshAsync(string refreshToken)
     {
@@ -134,17 +122,6 @@ public class AuthService : IAuthService
         {
             return Error.Unauthorized("invalidAccessToken", "Access token is invalid.");
         }
-        return new GetMeResponse(
-            userEntity.Nickname,
-            userEntity.Login,
-            userEntity.Email,
-            userEntity.ProfileBio,
-            userEntity.ProfilePictureUrl,
-            userEntity.CreatedAt,
-            userEntity.LastActive,
-            userEntity.RapidRating,
-            userEntity.BlitzRating,
-            userEntity.BulletRating
-        );
+        return userEntity.ToGetMeResponse();
     }
 }

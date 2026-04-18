@@ -5,6 +5,6 @@ namespace backend.Services.Interfaces
 {
     public interface IUsersService
     {
-        public Task<List<UserResponse>> GetAllUsersAsync();
+        public Task<List<UserResponse>> GetAllUsersAsync(GetUsersQuery query);
     }
 }

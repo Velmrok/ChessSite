@@ -20,9 +20,9 @@ namespace backend.Controllers
             _usersService = usersService;
         }
         [HttpGet]
-        public async Task<IActionResult> GetUsers()
+        public async Task<IActionResult> GetUsers([FromQuery] GetUsersQuery query)
         {
-            var users = await _usersService.GetAllUsersAsync();
+            var users = await _usersService.GetAllUsersAsync(query);
            
             return Ok(users);
         }

@@ -10,8 +10,6 @@ public static class UserMappers
     {
         return new GetMeResponse(
             Nickname: user.Nickname,
-            Login: user.Login,
-            Email: user.Email,
             ProfileBio: user.ProfileBio,
             ProfilePictureUrl: user.ProfilePictureUrl,
             CreatedAt: user.CreatedAt,

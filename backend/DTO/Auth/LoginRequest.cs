@@ -11,7 +11,7 @@ public class LoginRequest
     public string Login { get; set; } = string.Empty;
    
     [Required(ErrorMessage = "requiredPassword")]
-    public string Password { get; set; }
+    public string Password { get; set; } = string.Empty;
  
 
 

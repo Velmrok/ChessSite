@@ -23,11 +23,12 @@ public class RefreshTokenService : IRefreshTokenService
         if (oldToken != null)
             _dbContext.RefreshTokens.Remove(oldToken);
 
-        var refreshToken = RandomNumberGenerator.GetBytes(64).ToString();
+        var bytes = RandomNumberGenerator.GetBytes(64);
+        var refreshToken = Convert.ToBase64String(bytes);
 
         var refreshTokenEntity = new RefreshToken
         {
-            Token = refreshToken!,
+            Token = refreshToken,
             ExpiresAt = DateTime.UtcNow.AddDays(7),
             User = user
         };

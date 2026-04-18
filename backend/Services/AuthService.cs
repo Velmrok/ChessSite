@@ -124,9 +124,7 @@ public class AuthService : IAuthService
         }
         var userEntity = await _dbContext.Users.FirstOrDefaultAsync(u => u.Nickname == nickname);
         if (userEntity == null)
-        {
-            return Error.Unauthorized("invalidAccessToken", "Access token is invalid.");
-        }
+            return Error.NotFound("userNotFound", "User account no longer exists.");
         return userEntity.ToGetMeResponse();
     }
 }

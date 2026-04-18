@@ -56,10 +56,29 @@ public class AuthService : IAuthService
 
          var accessToken = _jwtGenerator.GenerateToken(newUser);
         var refreshToken = await _refreshTokenService.CreateRefreshTokenAsync(newUser);
-         
-        
 
-        await _dbContext.SaveChangesAsync();
+
+        try
+        {
+            await _dbContext.SaveChangesAsync();
+        }
+        catch (DbUpdateException)
+        {
+            var conflictingUser = await _dbContext.Users
+                .Where(u => u.Nickname == request.Nickname ||
+                            u.Email == request.Email ||
+                            u.Login == request.Login)
+                .Select(u => new { u.Nickname, u.Email, u.Login })
+                .FirstOrDefaultAsync();
+
+            if (conflictingUser == null)
+                return Error.Failure("registrationFailed", "Registration failed due to a database error.");
+
+            if (conflictingUser.Nickname == request.Nickname) return Error.Conflict("nicknameTaken", "Nickname is already taken.");
+            if (conflictingUser.Email == request.Email) return Error.Conflict("emailTaken", "Email is already taken.");
+            return Error.Conflict("loginTaken", "Login is already taken.");
+        }
+
         return new AuthResponse(accessToken, refreshToken, newUser.ToGetMeResponse());
 
     }

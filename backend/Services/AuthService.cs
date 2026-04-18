@@ -55,8 +55,7 @@ public class AuthService : IAuthService
             };
         await _dbContext.Users.AddAsync(newUser);
 
-         var accessToken = _jwtGenerator.GenerateToken(newUser);
-        var refreshToken = await _refreshTokenService.CreateRefreshTokenAsync(newUser);
+        
 
 
         try
@@ -79,6 +78,9 @@ public class AuthService : IAuthService
             if (conflictingUser.Email == request.Email) return Error.Conflict("emailTaken", "Email is already taken.");
             return Error.Conflict("loginTaken", "Login is already taken.");
         }
+        var accessToken = _jwtGenerator.GenerateToken(newUser);
+        var refreshToken = await _refreshTokenService.CreateRefreshTokenAsync(newUser);
+        await _dbContext.SaveChangesAsync();
 
         return new AuthResult(accessToken, refreshToken, newUser.ToGetMeResponse());
 

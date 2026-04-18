@@ -1,7 +1,9 @@
 
 using backend.Data;
+using backend.DTO.Users;
 using backend.Models;
 using backend.Services.Interfaces;
+using backend.Services.Mappers;
 using Microsoft.EntityFrameworkCore;
 
 namespace backend.Services;
@@ -13,9 +15,9 @@ public class UsersService : IUsersService
     {
         _context = context;
     }
-    public Task<List<User>> GetAllUsersAsync()
+    public Task<List<UserResponse>> GetAllUsersAsync()
     {
-        var result = _context.Users.ToListAsync();
+        var result = _context.Users.Select(u => u.ToUserResponse()).ToListAsync();
         return result;
     }
 }

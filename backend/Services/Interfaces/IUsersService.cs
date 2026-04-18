@@ -1,13 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using backend.Models;
+using backend.DTO.Users;
+
 
 namespace backend.Services.Interfaces
 {
     public interface IUsersService
     {
-        public Task<List<User>> GetAllUsersAsync();
+        public Task<List<UserResponse>> GetAllUsersAsync();
     }
 }

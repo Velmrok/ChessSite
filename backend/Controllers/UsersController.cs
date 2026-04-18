@@ -23,22 +23,8 @@ namespace backend.Controllers
         public async Task<IActionResult> GetUsers()
         {
             var users = await _usersService.GetAllUsersAsync();
-            var usersResponse = users.Select(u => new UserResponse
-            (
-                u.Nickname,
-                u.Login,
-                u.Email,
-                u.ProfileBio,
-                u.ProfilePictureUrl,
-                u.CreatedAt,
-                u.LastActive,
-                u.RapidRating,
-                u.BlitzRating,
-                u.BulletRating,
-                u.Role
-            )).ToList();
-            
-            return Ok(usersResponse);
+           
+            return Ok(users);
         }
 
     }

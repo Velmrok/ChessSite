@@ -1,7 +1,5 @@
-using backend.DTO.Auth;
-using backend.DTO.Common;
 using backend.Enums;
-using Microsoft.EntityFrameworkCore;
+
 
 namespace backend.Models;
 public class User

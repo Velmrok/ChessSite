@@ -1,3 +1,4 @@
+using backend.DTO.Common;
 using backend.Enums;
 
 namespace backend.DTO.Users
@@ -10,9 +11,6 @@ namespace backend.DTO.Users
         string ProfilePictureUrl,
         DateTime CreatedAt,
         DateTime LastActive,
-        int RapidRating,
-        int BlitzRating,
-        int BulletRating,
-        RoleType Role
-    );
+        RoleType Role,
+        RatingResponse Rating);
 }

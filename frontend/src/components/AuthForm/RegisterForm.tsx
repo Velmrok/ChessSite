@@ -20,9 +20,14 @@ export default function RegisterForm() {
     const handleSubmit = async (e: React.FormEvent, form: RegisterFormType) => {
         e.preventDefault();
 
-        const user = await request(
-            () => registerUser(form),
-         { useToast: false, onError: (msg) => setError(msg) });
+        const user = await request(() => registerUser(form), {
+            onError: (message) => {
+                const translation =
+                    t.toast.error[message as keyof typeof t.toast.error] ??
+                    t.toast.error.generic;
+                setError(translation);
+            }
+        });
 
         if (user) {
             setUser(user);

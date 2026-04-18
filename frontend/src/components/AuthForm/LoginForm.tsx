@@ -21,7 +21,14 @@ export default function LoginForm() {
     const handleSubmit = async (e: React.FormEvent, form: LoginFormType) => {
         e.preventDefault();
 
-        const user = await request(() => loginUser(form), { useToast: false, onError: (message) => setError(message) });
+        const user = await request(() => loginUser(form), {
+            onError: (message) => {
+                const translation =
+                    t.toast.error[message as keyof typeof t.toast.error] ??
+                    t.toast.error.generic;
+                setError(translation);
+            }
+        });
         if (user) {
 
             setUser(user);

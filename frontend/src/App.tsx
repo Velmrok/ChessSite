@@ -48,16 +48,18 @@ function App() {
       }
     };
     if(!user)checkAuth();
-    else {
-      setMqttClient(connectToBroker());
-      connectSocket();
-     setLoading(false);}
+    // else {
+    //   setMqttClient(connectToBroker());
+    //   connectSocket();
+    //  setLoading(false);}
     
-    return () => {
-      disconnectSocket();
-      disconnectFromBroker();
-    }
   }, [user]);
+
+  useEffect(() => {
+    if (!user) return;
+    connectSocket();
+    return () => disconnectSocket();
+}, [user?.nickname]);
 
   return (
     <>

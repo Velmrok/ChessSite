@@ -26,7 +26,7 @@ public class RefreshTokenService : IRefreshTokenService
         await RemoveRefreshTokenAsync(refreshToken);
 
         _dbContext.RefreshTokens.Add(refreshTokenEntity);
-        await _dbContext.SaveChangesAsync();
+      
 
         return refreshToken;
     }

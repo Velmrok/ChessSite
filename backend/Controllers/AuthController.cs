@@ -36,7 +36,7 @@ namespace backend.Controllers
             var refreshToken = result.Value.RefreshToken;
             CookieService.SetJwtCookie(Response, accessToken);
             CookieService.SetRefreshTokenCookie(Response, refreshToken!);
-            return Created("/auth/register", new { message = "User registered successfully" });
+            return Created("/auth/register", result.Value.User);
         }
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
@@ -69,7 +69,7 @@ namespace backend.Controllers
             var accessToken = result.Value.AccessToken;
             CookieService.SetJwtCookie(Response, accessToken);
     
-            return Created("/auth/refresh", new { message = "Token refreshed successfully" });
+            return Ok(new { message = "Token refreshed successfully" });
         }
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()

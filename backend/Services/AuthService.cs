@@ -59,7 +59,7 @@ public class AuthService : IAuthService
         
 
         await _dbContext.SaveChangesAsync();
-        return new AuthResponse(accessToken, refreshToken);
+        return new AuthResponse(accessToken, refreshToken, newUser.ToGetMeResponse());
 
     }
     public async Task<ErrorOr<AuthResponse>> LoginAsync(LoginRequest request)

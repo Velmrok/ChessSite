@@ -6,7 +6,6 @@ type UserStore = {
     queueTime?: number;
     queueTimeInterval?: ReturnType<typeof setInterval>;
     isConnected: boolean;
-    mqttClient: any;
     setQueueTime: (queueTime: number) => void;
     setUser: (user: User | null) => void;
     clearUser: () => void;
@@ -14,7 +13,7 @@ type UserStore = {
     addFriend: (nickname: string) => void;
     setIsConnected: (isConnected: boolean) => void;
     setIsInQueue: (isInQueue: boolean) => void;
-    setMqttClient: (client: any) => void;
+
 
 };
 const useUserStore = create<UserStore>((set, get) => ({
@@ -23,7 +22,6 @@ const useUserStore = create<UserStore>((set, get) => ({
     queueTime: undefined,
     queueTimeInterval: undefined,
     isConnected: false,
-    mqttClient: null,
     setQueueTime: (queueTime: number) =>{
          set({queueTime})
          get().queueTimeInterval && clearInterval(get().queueTimeInterval);
@@ -62,7 +60,6 @@ const useUserStore = create<UserStore>((set, get) => ({
         return { ...state, user: { ...state.user, isInQueue } };
     }),
     setIsConnected: (isConnected: boolean) => set({isConnected}),
-    setMqttClient: (client: any) => set({mqttClient: client}),
     
    
 }));

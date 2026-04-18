@@ -18,7 +18,7 @@ public class RefreshTokenService : IRefreshTokenService
     {
         var oldToken = await _dbContext.RefreshTokens
             .FirstOrDefaultAsync(rt => rt.User.Id == user.Id);
-            
+
         if (oldToken != null)
             _dbContext.RefreshTokens.Remove(oldToken);
 
@@ -46,7 +46,6 @@ public class RefreshTokenService : IRefreshTokenService
         if (refreshTokenEntity != null)
         {
             _dbContext.RefreshTokens.Remove(refreshTokenEntity);
-            await _dbContext.SaveChangesAsync();
         }
     }
 }

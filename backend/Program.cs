@@ -60,10 +60,11 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
                 .Select(e => e.ErrorMessage)
                 .FirstOrDefault() ?? "invalidRequest";
 
-            return new BadRequestObjectResult(new
+            return new BadRequestObjectResult(new ProblemDetails
             {
-                title = firstErrorCode,  
-                status = 400
+                Title = firstErrorCode,
+                Status = StatusCodes.Status400BadRequest,
+                Detail = "Validation failed"
             });
         };
 });

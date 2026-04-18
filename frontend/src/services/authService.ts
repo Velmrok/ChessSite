@@ -36,6 +36,5 @@ export const refresh = async () => {
 
 export const logoutUser = async () => {
     
-    const response = await apiFetch({ url: `/auth/logout`, method: 'POST', includeCredentials: true, contentType: 'application/json' });
-    return response.json();
+    await apiFetch({ url: `/auth/logout`, method: 'POST', includeCredentials: true, contentType: 'application/json' });
 }

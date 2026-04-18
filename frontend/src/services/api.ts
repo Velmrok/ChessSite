@@ -35,6 +35,9 @@ export default async function apiFetch(options:{
     throw Object.assign(new Error(errorCode), { status: response.status });
   }
 
+  if (response.status === 204 || response.headers.get("content-length") === "0") {
+    return response;
+  }
 
-  return response;
+  return await response.json();
 }

@@ -75,11 +75,12 @@ app.UseGlobalErrorHandling();
 
 app.UseHttpsRedirection();
 
-app.MapControllers();
+
 
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.MapControllers();
 
 app.Run();
 

@@ -6,7 +6,6 @@ import { useEffect, useState } from "react";
 export default function LoginPage() {
     const user = useUserStore((state) => state.user);
     const navigate = useNavigate();
-    const setUser = useUserStore((state) => state.setUser);
 
     useEffect (() => {
         
@@ -16,7 +15,7 @@ export default function LoginPage() {
     }, [user, navigate]);
     return (
         <div className="bg-cyan-800 w-full min-h-screen flex justify-center items-center">
-           <LoginForm setUser={setUser} />
+           <LoginForm />
         </div>
     );
 }

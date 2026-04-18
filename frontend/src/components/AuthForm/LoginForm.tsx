@@ -7,13 +7,11 @@ import { useApi } from "@/hooks/useApi";
 
 import type { LoginFormType } from "@/types/Auth";
 import LoginInputs from "./LoginInputs";
+import useUserStore from "@/stores/useUserStore";
 
-type Props = {
-    setUser: (user: User) => void;
-};
-export default function LoginForm({ setUser }: Props) {
+export default function LoginForm() {
     const t = useLanguageStore((state) => state.t);
-
+    const setUser = useUserStore((state) => state.setUser);
     const navigate = useNavigate();
     const setToast = useToastStore((state) => state.setToast);
 

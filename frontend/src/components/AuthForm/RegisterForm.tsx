@@ -6,13 +6,11 @@ import useLanguageStore from "@/stores/useLanguageStore";
 import { useApi } from "@/hooks/useApi";
 import type { RegisterFormType } from "@/types/Auth";
 import RegisterInputs from "./RegisterInputs";
+import useUserStore from "@/stores/useUserStore";
 
-type Props = {
-    setUser: (user: User) => void;
-};
-export default function RegisterForm({ setUser }: Props) {
+export default function RegisterForm() {
     const t = useLanguageStore((state) => state.t);
-
+    const setUser = useUserStore((state) => state.setUser);
     const navigate = useNavigate();
     const setToast = useToastStore((state) => state.setToast);
 

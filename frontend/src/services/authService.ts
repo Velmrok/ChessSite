@@ -25,12 +25,14 @@ export const getMe = async () => {
    
     const response = await apiFetch(`/auth/me`, 'GET', true, 'application/json');
 
-    console.log("getMe response:", response);
-
     return response.json();
 
 
 };
+export const refresh = async () => {
+    const response = await apiFetch(`/auth/refresh`, 'POST', true, 'application/json');
+    return response.json();
+}
 
 
 export const logoutUser = async () => {

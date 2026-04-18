@@ -19,9 +19,9 @@ export default async function apiFetch(url: string, method:string, verifyToken: 
 
     let errorCode = "generic";
 
-    const contentType = response.headers.get("content-type");
+    const responseContentType = response.headers.get("content-type");
 
-    if (contentType?.includes("json")) {
+    if (responseContentType?.includes("json")) {
       const data = await response.json();
       console.error("API Error JSON:", data);
 

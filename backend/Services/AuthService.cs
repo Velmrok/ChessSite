@@ -141,13 +141,13 @@ public class AuthService : IAuthService
         return new Success();
     }
 
-    public async Task<ErrorOr<GetMeResponse>> GetMeAsync(string nickname)
+    public async Task<ErrorOr<GetMeResponse>> GetMeAsync(string sub)
     {
-        if (string.IsNullOrEmpty(nickname))
+        if (string.IsNullOrEmpty(sub))
         {
             return Error.Unauthorized("invalidAccessToken", "Access token is invalid.");
         }
-        var userEntity = await _dbContext.Users.FirstOrDefaultAsync(u => u.Nickname == nickname);
+        var userEntity = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id.ToString() == sub);
         if (userEntity == null)
             return Error.NotFound("userNotFound", "User account no longer exists.");
         return userEntity.ToGetMeResponse();

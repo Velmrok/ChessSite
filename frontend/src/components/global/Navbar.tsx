@@ -79,8 +79,6 @@ export default function Navbar() {
             else setToast({ msg: t.toast.error.logout, type: "error" });
             return;
         }
-
-        navigate("/");
         setToast({ msg: t.toast.success.logout, type: "success" });
 
     };

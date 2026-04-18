@@ -53,21 +53,19 @@ builder.Services.AddAuthentication("Bearer")
 builder.Services.Configure<ApiBehaviorOptions>(options =>
 {
     options.InvalidModelStateResponseFactory = context =>
-    {
-        var errors = context.ModelState
-            .Where(x => x.Value.Errors.Count > 0)
-            .ToDictionary(
-                kvp => kvp.Key,
-                kvp => kvp.Value.Errors.Select(e => e.ErrorMessage).ToArray()
-            );
-
-        return new BadRequestObjectResult(new
         {
-            title = errors.FirstOrDefault().Value.FirstOrDefault() ?? "Invalid request",
-            status = StatusCodes.Status400BadRequest,
-            errors
-        });
-    };
+            var firstErrorCode = context.ModelState
+                .Where(x => x.Value!.Errors.Count > 0)
+                .SelectMany(x => x.Value!.Errors)
+                .Select(e => e.ErrorMessage)
+                .FirstOrDefault() ?? "invalidRequest";
+
+            return new BadRequestObjectResult(new
+            {
+                title = firstErrorCode,  
+                status = 400
+            });
+        };
 });
 var app = builder.Build();
 

@@ -10,15 +10,13 @@ public static class WebApplicationExtensions
         app.UseExceptionHandler("/error");
         app.Map("/error", (HttpContext httpContext, IWebHostEnvironment env) =>
         {
-            var exceptionHandlerFeature = httpContext.Features.Get<IExceptionHandlerFeature>();
-            var exception = exceptionHandlerFeature?.Error;
+            var exception = httpContext.Features.Get<IExceptionHandlerFeature>()?.Error;
 
             if (env.IsDevelopment())
-            {
-                return Results.Problem(detail: exception?.ToString(), title: exception?.Message);
-            }
+                return Results.Problem(statusCode: 500, title: exception?.Message, detail: exception?.ToString());
 
-            return Results.Problem(detail: "An unexpected error occurred.", statusCode: 500);
+            return Results.Problem(statusCode: 500, title: "internalError");
+            
         });
         return app;
     }

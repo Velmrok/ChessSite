@@ -10,6 +10,7 @@ using ErrorOr;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using backend.Services.Helpers.Auth;
+using backend.DTO.Users;
 
 namespace backend.Services;
  
@@ -80,7 +81,20 @@ public class AuthService : IAuthService
         var accessToken = _jwtGenerator.GenerateToken(user);
         var refreshToken = await _refreshTokenService.CreateRefreshTokenAsync(user);
         await _dbContext.SaveChangesAsync();
-        return new AuthResponse(accessToken, refreshToken);
+        
+        return new AuthResponse(accessToken, refreshToken, new UserResponse(
+            user.Nickname,
+            user.Login,
+            user.Email,
+            user.ProfileBio,
+            user.ProfilePictureUrl,
+            user.CreatedAt,
+            user.LastActive,
+            user.RapidRating,
+            user.BlitzRating,
+            user.BulletRating,
+            user.Role
+        ));
     }
     public async Task<ErrorOr<AuthResponse>> RefreshAsync(string refreshToken)
     {

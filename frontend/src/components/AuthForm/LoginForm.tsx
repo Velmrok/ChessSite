@@ -23,10 +23,8 @@ export default function LoginForm({ setUser }: Props) {
     const handleSubmit = async (e: React.FormEvent, form: LoginFormType) => {
         e.preventDefault();
         try{
-        await request(async () => await loginUser({ login: form.login, password: form.password }),{ useToast: false });
-
-        const me = await getMe();
-        setUser(me);
+        const user = await request(() => loginUser(form),{ useToast: false });
+        setUser(user);
         setToast({ msg: t.toast.success.login, type: "success" });
         navigate("/");
         } catch (err: any) {

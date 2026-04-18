@@ -16,6 +16,12 @@ public class RefreshTokenService : IRefreshTokenService
 
     public async Task<string> CreateRefreshTokenAsync(User user)
     {
+        var oldToken = await _dbContext.RefreshTokens
+            .FirstOrDefaultAsync(rt => rt.User.Id == user.Id);
+            
+        if (oldToken != null)
+            _dbContext.RefreshTokens.Remove(oldToken);
+
         var refreshToken = Guid.NewGuid().ToString();
         var refreshTokenEntity = new RefreshToken
         {
@@ -23,10 +29,10 @@ public class RefreshTokenService : IRefreshTokenService
             ExpiresAt = DateTime.UtcNow.AddDays(7),
             User = user
         };
-        await RemoveRefreshTokenAsync(refreshToken);
+
 
         _dbContext.RefreshTokens.Add(refreshTokenEntity);
-      
+
 
         return refreshToken;
     }

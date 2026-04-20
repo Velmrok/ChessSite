@@ -7,30 +7,30 @@ type Props = {
 }
 
 export default function useArrowKeys({ onLeft, onRight, onfKey }: Props) {
-    const [onleftTimeoutId, setOnLeftTimeoutId] = useState<number|null>(null);
-    const [onRightTimeoutId, setOnRightTimeoutId] = useState<number|null>(null);
+    const [onleftTimeoutId, setOnLeftTimeoutId] = useState<number | null>(null);
+    const [onRightTimeoutId, setOnRightTimeoutId] = useState<number | null>(null);
     useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
             if (
                 event.target instanceof HTMLInputElement ||
-                event.target instanceof HTMLTextAreaElement 
-                
+                event.target instanceof HTMLTextAreaElement
+
             ) {
                 return;
             }
             if (event.key === "ArrowLeft") {
-                if(onleftTimeoutId)return;
+                if (onleftTimeoutId) return;
                 setOnLeftTimeoutId(setTimeout(() => {
-                onLeft();
-                setOnLeftTimeoutId(null);
-                },5)
+                    onLeft();
+                    setOnLeftTimeoutId(null);
+                }, 5)
                 )
             } else if (event.key === "ArrowRight") {
-                if(onRightTimeoutId)return;
+                if (onRightTimeoutId) return;
                 setOnRightTimeoutId(setTimeout(() => {
-                onRight();
-                setOnRightTimeoutId(null);
-                },5)
+                    onRight();
+                    setOnRightTimeoutId(null);
+                }, 5)
                 )
             }
             else if (event.key === "f") {

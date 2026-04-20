@@ -9,7 +9,6 @@ import ToastContainer from './components/global/ToastContainer'
 import FindGame from './pages/FindGame'
 import {OnlyLoggedInRoute,OnlyAdminsRoute} from './components/global/ProtectedRoute'
 import SearchGamePage from './pages/SearchGamePage'
-import UserActionPage from './pages/UserActionPage'
 import RegisterPage from './pages/RegisterPage'
 import LoginPage from './pages/LoginPage'
 import { useAuth } from './hooks/useAuth'
@@ -45,10 +44,6 @@ function App() {
                <Route path="/game/:gameId" element={<GamePage />} />
                <Route path ="/games" element={<SearchGamePage/>} />
             
-            <Route element={<OnlyAdminsRoute />}>
-               <Route path ="/users/create" element={<UserActionPage mode="add"/>} />
-                <Route path ="/users/:nickname/edit" element={<UserActionPage mode="edit"/>} />
-            </Route>
             </Route>
             <Route path="*" element={<NotFound whatIsMissing='page'/>} />
             

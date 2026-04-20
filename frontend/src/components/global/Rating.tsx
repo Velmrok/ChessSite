@@ -7,8 +7,8 @@ type Props = {
     className?: string;
 }
 
-export default function Rating({ rating, className="flex flex-col" }: Props){
-    
+export default function Rating({ rating, className = "flex flex-col" }: Props) {
+
     if (typeof rating === 'number') {
         throw new Error("Rating component received a number instead of an object.");
     }
@@ -18,5 +18,5 @@ export default function Rating({ rating, className="flex flex-col" }: Props){
             <div className="flex items-center gap-2"> <SiStackblitz className="text-yellow-300 text-base md:text-2xl" />{rating.blitz}</div>
             <div className="flex items-center gap-2"> <SiPushbullet className="text-red-500 text-base md:text-2xl" />{rating.bullet}</div>
         </div>
-    )  
+    )
 }

@@ -1,11 +1,13 @@
 
-import useLanguageStore from "@/stores/useLanguageStore";
-import {  useState } from "react";
+import type { User } from "@/types/User";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { MdAccessTime } from "react-icons/md";
 import { SiPushbullet, SiStackblitz } from "react-icons/si";
 import { TfiCup } from "react-icons/tfi";
 import { Link } from "react-router-dom";
-const API_URL = import.meta.env.VITE_API_URL;
+
+
 type Props = {
   leaderboard: {
     rapid: Array<User>;
@@ -15,21 +17,21 @@ type Props = {
 };
 
 export default function LeaderBoard({ leaderboard }: Props) {
-    const t = useLanguageStore((state) => state.t);
-    const [gameType, setGameType] = useState<"rapid" | "blitz" | "bullet">("rapid");
-    
+  const { t } = useTranslation("home");
+  const [gameType, setGameType] = useState<"rapid" | "blitz" | "bullet">("rapid");
 
-  const handleChangeGameType = (e:any,type: "rapid" | "blitz" | "bullet") => {
+
+  const handleChangeGameType = (e: any, type: "rapid" | "blitz" | "bullet") => {
     e.preventDefault();
     setGameType(type);
   };
-    
+
   if (!leaderboard || leaderboard[gameType].length === 0) {
     return (
       <div className="bg-gray-900/20 shadow-md text-white font-MyFancyFont p-4 rounded-md w-full flex 
       items-center justify-center flex-col">
-        <div className="text-2xl ">{t.home.leaderboard.title}</div>
-        <div className="mt-4">{t.home.leaderboard.noData}</div>
+        <div className="text-2xl ">{t('leaderboardTitle')}</div>
+        <div className="mt-4">{t('noData')}</div>
       </div>
     );
   }
@@ -38,26 +40,26 @@ export default function LeaderBoard({ leaderboard }: Props) {
     blitz: <SiStackblitz className="text-yellow-300 text-base md:text-xl inline" />,
     bullet: <SiPushbullet className="text-red-500 text-base md:text-xl inline" />,
   }
- 
+
 
   return (
     <div className="bg-gray-900/20 shadow-md text-white  font-MyFancyFont p-4 rounded-md w-full
      flex flex-col items-center">
       <div className="flex flex-col gap-3 items-center justify-between items-center mb-4">
-        <div className="text-2xl">{t.home.leaderboard.title}</div>
+        <div className="text-2xl">{t('leaderboardTitle')}</div>
         <div className="flex gap-2 md:gap-3">
-                <button className={`hover:scale-110 ${gameType === 'rapid' ? 'scale-80 border-b-3 border-green-500' : ''}`}
-                onClick={(e)=>handleChangeGameType(e,'rapid')}>
-                  {gameTypeIcon.rapid}</button>
-                  <button className={`hover:scale-110 ${gameType === 'blitz' ? 'scale-80 border-b-3 border-yellow-300' : ''}`}
-                 onClick={(e)=>handleChangeGameType(e,'blitz')}>
-                  {gameTypeIcon.blitz}</button>
-                <button className={`hover:scale-110 ${gameType === 'bullet' ? 'scale-80 border-b-3 border-red-500' : ''}`}
-                onClick={(e)=>handleChangeGameType(e,'bullet')}>
-                  {gameTypeIcon.bullet}</button>
-                
-                
-              </div>
+          <button className={`hover:scale-110 ${gameType === 'rapid' ? 'scale-80 border-b-3 border-green-500' : ''}`}
+            onClick={(e) => handleChangeGameType(e, 'rapid')}>
+            {gameTypeIcon.rapid}</button>
+          <button className={`hover:scale-110 ${gameType === 'blitz' ? 'scale-80 border-b-3 border-yellow-300' : ''}`}
+            onClick={(e) => handleChangeGameType(e, 'blitz')}>
+            {gameTypeIcon.blitz}</button>
+          <button className={`hover:scale-110 ${gameType === 'bullet' ? 'scale-80 border-b-3 border-red-500' : ''}`}
+            onClick={(e) => handleChangeGameType(e, 'bullet')}>
+            {gameTypeIcon.bullet}</button>
+
+
+        </div>
       </div>
 
       <div className="w-full overflow-x-auto">
@@ -65,16 +67,15 @@ export default function LeaderBoard({ leaderboard }: Props) {
           <thead>
             <tr>
               <th className="px-4 py-2 w-12">#</th>
-              <th className="px-4 py-2">{t.home.leaderboard.player}</th>
-              <th className="px-4 py-2 w-28">{t.home.leaderboard.rating}</th>
+              <th className="px-4 py-2">{t('player')}</th>
+              <th className="px-4 py-2 w-28">{t('rating')}</th>
             </tr>
           </thead>
 
           <tbody className="divide-y divide-gray-800">
-            {leaderboard[gameType].map((user, idx) => 
-            {
+            {leaderboard[gameType].map((user, idx) => {
               if (typeof user.rating !== "number") {
-                
+
                 throw new Error("Invalid rating type in leaderboard user");
               }
               const rank = idx + 1;
@@ -92,7 +93,7 @@ export default function LeaderBoard({ leaderboard }: Props) {
                 <tr
                   key={key}
                   className={idx == 0 ? "bg-yellow-600/25 " : idx == 1 ? "bg-zinc-700/40" :
-                    idx==2? "bg-yellow-800/30" : "even:bg-white/2"}
+                    idx == 2 ? "bg-yellow-800/30" : "even:bg-white/2"}
                 >
                   <td className="px-4 py-3 align-middle">
                     <div className="flex items-center gap-2">
@@ -104,15 +105,15 @@ export default function LeaderBoard({ leaderboard }: Props) {
                     <div >
                       <Link to={`/users/${user.nickname}/profile`} className="flex items-center gap-2 hover:text-amber-200
                        transition-color duration-200">
-                      <img
-                        src={`${API_URL}${user.avatar}`}
-                        alt={user.nickname}
-                        className="w-8 h-8 rounded-full mb-1 outline-2"
-                      />
-                      <span className="font-MyFancyFont">{user.nickname}</span>
+                        <img
+                          src={`${user.avatar}`}
+                          alt={user.nickname}
+                          className="w-8 h-8 rounded-full mb-1 outline-2"
+                        />
+                        <span className="font-MyFancyFont">{user.nickname}</span>
                       </Link>
                     </div>
-                    
+
                   </td>
 
                   <td className="px-4 py-3 align-middle font-MyFancyFont">

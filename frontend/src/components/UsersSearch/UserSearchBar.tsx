@@ -1,14 +1,15 @@
-import {  useEffect, useRef, useState } from "react";
+import {  useEffect, useState } from "react";
 import { useDebounce } from "@/hooks/useDebounce";
 import useSearchStore from "../../stores/useUsersSearchStore";
 import { FaSearch } from "react-icons/fa";
-import useLanguageStore from "@/stores/useLanguageStore";
+import { useTranslation } from "react-i18next";
+
 
 export default function UserSearchBar() {
    const [inputValue, setInputValue] = useState("");
    const setQuery = useSearchStore((state) => state.setQuery);
    const debouncedValue = useDebounce(inputValue, 500);
-    const t = useLanguageStore((state) => state.t);
+    const {t} = useTranslation("search");
    useEffect(() => {
    
        setQuery(debouncedValue);
@@ -21,7 +22,7 @@ export default function UserSearchBar() {
                 type="text"
                 className="w-full p-2 rounded-md  text-white font-MyFancyFont border-none 
                   outline-none"
-                placeholder={t.search.placeholder}
+                placeholder={t('placeholder')}
                 onChange={(e:any) => setInputValue(e.target.value)}
             ></input>
         </div>

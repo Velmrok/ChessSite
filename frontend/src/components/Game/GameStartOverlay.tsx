@@ -12,7 +12,7 @@ export default function GameStartOverlay({ whitePlayer, blackPlayer, onAnimation
 
     useEffect(() => {
         const timer = setTimeout(() => {
-            setIsVisible(false);      
+            setIsVisible(false);
             setTimeout(onAnimationEnd, 1000);
         }, 1500);
 
@@ -45,19 +45,19 @@ export default function GameStartOverlay({ whitePlayer, blackPlayer, onAnimation
                 VS
             </div>
 
-                <div
-                    className={`flex flex-col items-center justify-center bg-gray-900/80 h-full w-1/2 transition-transform duration-1000 ease-in-out pointer-events-auto 
+            <div
+                className={`flex flex-col items-center justify-center bg-gray-900/80 h-full w-1/2 transition-transform duration-1000 ease-in-out pointer-events-auto 
                         ${isVisible ? "translate-x-0" : "translate-x-full"
-                        }`}
-                >
-                    <img
-                        src={API_URL + blackPlayer.avatar}
-                        alt={blackPlayer.nickname}
-                        className="w-32 h-32 rounded-full outline-12 text-black shadow-lg mb-4"
-                    />
-                    <h2 className="text-3xl font-bold text-white">{blackPlayer.nickname}</h2>
-                    <p className="text-gray-400 text-xl">{blackPlayer.rating}</p>
-                </div>
+                    }`}
+            >
+                <img
+                    src={API_URL + blackPlayer.avatar}
+                    alt={blackPlayer.nickname}
+                    className="w-32 h-32 rounded-full outline-12 text-black shadow-lg mb-4"
+                />
+                <h2 className="text-3xl font-bold text-white">{blackPlayer.nickname}</h2>
+                <p className="text-gray-400 text-xl">{blackPlayer.rating}</p>
+            </div>
         </div>
     );
 }

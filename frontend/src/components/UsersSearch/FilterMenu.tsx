@@ -1,5 +1,4 @@
 import { useDebounce } from "@/hooks/useDebounce";
-import useLanguageStore from "@/stores/useLanguageStore";
 import useSearchStore from "../../stores/useUsersSearchStore";
 import useUserStore from "@/stores/useUserStore";
 import { useFormik } from "formik";
@@ -7,13 +6,14 @@ import { useEffect } from "react";
 import { MdAccessTime } from "react-icons/md";
 import { SiPushbullet, SiStackblitz } from "react-icons/si";
 import { useNavigate } from "react-router";
+import { useTranslation } from "react-i18next";
 
 export default function FilterMenu() {
   const user = useUserStore((state) => state.user);
     const params = useSearchStore((state) => state.params);
     const setFilters = useSearchStore((state) => state.setFilters);
     const resetFilters = useSearchStore((state) => state.resetFilters);
-    const t = useLanguageStore((state) => state.t);
+    const {t} = useTranslation("search");
     const navigate = useNavigate();
     const formik = useFormik({
         initialValues: {
@@ -67,7 +67,7 @@ export default function FilterMenu() {
         {/* LIMIT//////////////////////////////////////////////////// */}
         <div className="flex flex-col gap-1">
           <label htmlFor="limit-select" className="text-xs text-gray-400 uppercase font-bold">
-            {t.search.entriesPerPage}
+            {t('entriesPerPage')}
           </label>
           <select
             id="limit-select"
@@ -84,12 +84,12 @@ export default function FilterMenu() {
 
         {/* RATING MIN/MAX //////////////////////////////////////////////////// */}
         <div className="flex flex-col gap-1">
-          <span className="text-xs text-gray-400 uppercase font-bold">{t.search.rankingMinMax}</span>
+          <span className="text-xs text-gray-400 uppercase font-bold">{t('rankingMinMax')}</span>
           <div className="flex gap-2">
             <input
               type="number"
               name="minRating"
-              placeholder={t.search.min}
+              placeholder={t('min')}
               className="w-full bg-gray-800 text-white p-2 rounded border border-gray-700"
               value={formik.values.minRating}
               onChange={formik.handleChange}
@@ -97,7 +97,7 @@ export default function FilterMenu() {
             <input
               type="number"
               name="maxRating"
-              placeholder={t.search.max}
+              placeholder={t('max')}
               className="w-full bg-gray-800 text-white p-2 rounded border border-gray-700"
               value={formik.values.maxRating}
               onChange={formik.handleChange}
@@ -117,7 +117,7 @@ export default function FilterMenu() {
               onChange={formik.handleChange}
             />
             <label htmlFor="active-check" className="text-sm text-white cursor-pointer select-none">
-              {t.search.onlyActive}
+              {t('onlyActive')}
             </label>
           </div>
           <div className="flex gap-2 md:gap-3">
@@ -151,13 +151,13 @@ export default function FilterMenu() {
           className="bg-green-600 hover:bg-green-700 text-white p-1 rounded transition font-MyFancyFont w-full"
           onClick={(e) => handleGoToUsersCreate(e)}
         >
-          {t.search.createUser}
+          {t('createUser')}
         </button>}
         <button
           className="bg-red-600 hover:bg-red-700 text-white p-1 rounded transition font-MyFancyFont w-full"
           onClick={(e) => handleResetFilters(e)}
         >
-          {t.search.resetFilters}
+          {t('resetFilters')}
         </button>
         </div>
 

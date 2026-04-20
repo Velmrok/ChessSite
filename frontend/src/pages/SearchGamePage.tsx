@@ -1,14 +1,9 @@
 import { useEffect, useState } from "react";
 import useGameSearchStore from "@/stores/useGameSearchStore";
-// import { searchGames } from "@/services/gameService"; // Będziesz musiał to stworzyć
-import Loading from "@/components/global/Loading";
 import FilterMenu from "@/components/SearchGame/FilterMenu";
 import { getAllGames } from "@/services/gameService";
 import GameList from "@/components/SearchGame/GameList";
-import useLanguageStore from "@/stores/useLanguageStore";
-import PaginationButtons from "@/components/global/Pagination_buttons";
-
-
+import { useTranslation } from "react-i18next";
 
 
 export default function SearchGamePage() {
@@ -17,10 +12,8 @@ export default function SearchGamePage() {
     const getParamsLink = useGameSearchStore((state) => state.getParamsLink);
     const [games, setGames] = useState<Array<GameSummary>>([]);
     const [isLoading, setIsLoading] = useState(false);
-    const t = useLanguageStore((state) => state.t);
+    const { t } = useTranslation('search');
     const [totalPages, setTotalPages] = useState(1);
-        const setFilters = useGameSearchStore((state) => state.setFilters);
-        const page = useGameSearchStore((state) => state.params.page);
     useEffect(() => {
         resetFilters();
     }, []);
@@ -50,7 +43,7 @@ export default function SearchGamePage() {
    
     return (
         <div className="flex flex-col items-center w-full min-h-screen bg-cyan-900 text-white p-4 overflow-x-auto gap-6">
-            <h1 className="text-3xl font-bold mb-6">{t.search.findGame}</h1>
+            <h1 className="text-3xl font-bold mb-6">{t('findGame')}</h1>
 
             <FilterMenu />
             

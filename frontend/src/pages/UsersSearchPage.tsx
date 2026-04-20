@@ -1,7 +1,7 @@
 
 import UserSearchBar from "../components/UsersSearch/UserSearchBar";
 import UserList from "../components/UsersSearch/UserList";
-import {  useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { fetchAllUsers } from "../services/searchUsersService";
 import FilterMenu from "../components/UsersSearch/FilterMenu";
 import Loading from "../components/global/Loading";
@@ -45,7 +45,7 @@ export default function UsersSearchPage() {
         if (newPage < 1 || newPage > totalPagesCount.current) return;
         setFilters({ page: newPage });
     }
-   
+
 
     return (
         <>

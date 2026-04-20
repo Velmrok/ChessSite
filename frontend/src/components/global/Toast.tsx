@@ -10,11 +10,11 @@ type ToastProps = {
 
 export default function Toast({ message, type = "info", onClose }: ToastProps) {
     const [isVisible, setIsVisible] = useState(true);
-    const {playNotify} = useSounds();
+    const { playNotify } = useSounds();
     useEffect(() => {
         setIsVisible(true);
-        if(type==='info')playNotify();
-        
+        if (type === 'info') playNotify();
+
         const fadeOutTimer = setTimeout(() => setIsVisible(false), 2500);
         const timer = setTimeout(onClose, 3000);
         return () => {
@@ -40,7 +40,7 @@ export default function Toast({ message, type = "info", onClose }: ToastProps) {
         </div>
     );
 
-    
+
     const portalRoot = document.getElementById("toast-root") || document.body;
     return createPortal(content, portalRoot);
 }

@@ -4,11 +4,11 @@ import AddFriendButton from "../global/AddFriendButton";
 import useSearchStore from "../../stores/useUsersSearchStore";
 import SortArrows from "./SortArrows";
 import Rating from "../global/Rating";
-import useLanguageStore from "@/stores/useLanguageStore";
 import DeleteAccountButton from "../global/DeleteAccountButton";
 import { useEffect, useState } from "react";
 import EditAccountButton from "../global/EditAccountButton";
 import type { User } from "@/types/User";
+import { useTranslation } from "react-i18next";
 
 const API_URL = import.meta.env.VITE_API_URL;
 type Props = {
@@ -16,7 +16,7 @@ type Props = {
 };
 
 export default function UserList({ users}: Props) {
-    const t = useLanguageStore((state) => state.t);
+    const {t} = useTranslation("search");
     const setOrder = useSearchStore((state) => state.setOrder);
     const [deletedAccounts, setDeletedAccounts] = useState<string[]>([]);
     useEffect(() => {
@@ -30,10 +30,10 @@ export default function UserList({ users}: Props) {
         const hours = Math.floor(minutes / 60);
         const days = Math.floor(hours / 24);
         
-        if (days > 0) return `${days}d `+t.search.ago;
-        if (hours > 0) return `${hours}`+t.search.hour+' '+t.search.ago;
-        if (minutes > 0) return `${minutes}m `+t.search.ago;
-        return t.search.now;
+        if (days > 0) return `${days}d `+t('ago');
+        if (hours > 0) return `${hours}`+t('hour')+' '+t('ago');
+        if (minutes > 0) return `${minutes}m `+t('ago');
+        return t('now');
     }
     const handleDeleteAccount = (nickname:string) => {
         setDeletedAccounts([...deletedAccounts, nickname]);
@@ -46,24 +46,24 @@ export default function UserList({ users}: Props) {
             <div className="flex flex-row w-full bg-black/[50%] md:gap-5 
                   text-white py-1 sm:py-4 rounded-lg shadow-lg justify-between font-MyFancyFont px-2 md:px-5 lg:px-10 ">
                 <button className="text-[10px] md:text-lg flex items-center" onClick={() => setOrder('Nickname')}>
-                    {t.search.nickname}
+                    {t('nickname')}
                     <SortArrows   sortBy="Nickname"/>
                     </button>
                     
                     
                 <button className="text-[10px] md:text-lg flex items-center" onClick={() => setOrder('Rating')}>
-                    {t.search.rating}
+                    {t('rating')}
                     <SortArrows   sortBy="Rating"/>
                     </button>
                     
                 <button className="text-[10px] md:text-lg flex items-center" onClick={() => setOrder('OnlineStatus')}>
-                    {t.search.status}
+                    {t('status')}
                     <SortArrows   sortBy="OnlineStatus"/>
                     </button>
                 <button className="flex flex-row items-center"  onClick={() => setOrder('LastActive')}>
                     <div className="text-[10px] md:text-lg flex flex-col items-center"> 
-                    <h3>{t.search.last}</h3>
-                    <h3>{t.search.active}</h3>
+                    <h3>{t('last')}</h3>
+                    <h3>{t('active')}</h3>
                     </div>
                     <SortArrows  sortBy="LastActive"/>
                     </button>

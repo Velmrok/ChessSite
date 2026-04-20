@@ -1,12 +1,13 @@
 import { joinGame, leaveQueue } from "@/services/socket/socketGlobalService";
-import useLanguageStore from "@/stores/useLanguageStore";
 import useToastStore from "@/stores/useToastStore";
 import useUserStore from "@/stores/useUserStore";
+import { useTransition } from "react";
+import { useTranslation } from "react-i18next";
 
 
 export default function useQueue() {
     const setToast = useToastStore((state) => state.setToast);
-    const t = useLanguageStore((state) => state.t);
+    const {t} = useTranslation('toast')
     const setIsInQueue = useUserStore((state) => state.setIsInQueue);
     const handleJoinGame = joinGame;
 
@@ -14,7 +15,7 @@ export default function useQueue() {
 
         setIsInQueue(false);
         leaveQueue();
-        setToast({ msg: t.toast.info.leftQueue, type: "info" });
+        setToast({ msg: t('info.leftQueue'), type: "info" });
 
     }
     return { handleJoinGame, handleCancelGame };

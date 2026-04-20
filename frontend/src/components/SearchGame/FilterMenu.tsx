@@ -1,8 +1,8 @@
 import { useDebounce } from "@/hooks/useDebounce";
 import useGameSearchStore from "@/stores/useGameSearchStore";
-import useLanguageStore from "@/stores/useLanguageStore";
 import { useFormik } from "formik";
 import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { IoIosInfinite } from "react-icons/io";
 import { MdAccessTime } from "react-icons/md";
 import { SiPushbullet, SiStackblitz } from "react-icons/si";
@@ -12,8 +12,7 @@ export default function FilterMenu() {
 
     const params = useGameSearchStore((state) => state.params);
     const setFilters = useGameSearchStore((state) => state.setFilters);
-    const setQuery = useGameSearchStore((state) => state.setQuery);
-    const t = useLanguageStore((state) => state.t);
+    const {t} = useTranslation("search");
     const formik = useFormik({
         initialValues: {
             query: '',
@@ -47,7 +46,7 @@ export default function FilterMenu() {
                 <input
                     type="text"
                     name="query"
-                    placeholder={t.search.gamePlaceHolder}
+                    placeholder={t('placeholder')}
                     className="p-2 rounded bg-cyan-700 text-white placeholder-cyan-300 border border-cyan-600 focus:outline-none focus:border-cyan-400 flex-grow"
                     value={formik.values.query}
                     onChange={formik.handleChange}
@@ -91,9 +90,9 @@ export default function FilterMenu() {
                     value={formik.values.status}
                     onChange={formik.handleChange}
                 >
-                    <option value="all">{t.search.all}</option>
-                    <option value="active">{t.search.active}</option>
-                    <option value="finished">{t.search.finished}</option>
+                    <option value="all">{t('all')}</option>
+                    <option value="active">{t('active')}</option>
+                    <option value="finished">{t('finished')}</option>
                 </select>
             </div>
     )

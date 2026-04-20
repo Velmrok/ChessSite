@@ -3,7 +3,7 @@ import useGameStore from "@/stores/useGameStore";
 import useUserStore from "@/stores/useUserStore";
 import { FindPiece } from "@/utils/findPiece";
 import { Chess } from "chess.js";
-import { use, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { PieceDropHandlerArgs } from "react-chessboard";
 import { useSounds } from "./useSounds";
 

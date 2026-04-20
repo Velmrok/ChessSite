@@ -8,14 +8,14 @@ import FriendsOnline from "./FriendsOnline";
 import LeaderBoard from "./Leaderboard";
 import { getHomeInfo } from "@/services/homeService";
 import Lobby from "./Lobby";
-import useLanguageStore from "@/stores/useLanguageStore";
 import { useHomeSocket } from "@/hooks/useHomeSocket";
 import { useNavigate } from "react-router-dom";
-import useUserStore from "@/stores/useUserStore";
+import { useTranslation } from "react-i18next";
+import type { User } from "@/types/User";
 
 export default function HomeUser() {
-    const t = useLanguageStore((state) => state.t);
-    const user = useUserStore((state) => state.user);
+    const {t} = useTranslation("home");
+  
     const usersOnline = useHomeStore((state) => state.usersOnline);
     const matchesInProgress = useHomeStore((state) => state.matchesInProgress);
     const createdAccounts = useHomeStore((state) => state.createdAccounts);
@@ -49,33 +49,33 @@ export default function HomeUser() {
         <div className="w-full min-h-screen flex flex-col justify-center gap-5   items-center relative">
           
             <div className="mt-5 flex justify-between w-full  md:w-[80%] lg:w-[83%] max-w-[1300px] px-4">
-            <div className="w-[33%] text-[10px] md:text-base text-white text-center font-MyFancyFont">{usersOnline} {t.home.playersOnline}</div>
-            <div className="w-[33%] text-[10px] md:text-base text-white text-center font-MyFancyFont">{matchesInProgress} {t.home.matchesInProgress}</div>
-            <div className="w-[33%] text-[10px] md:text-base text-white text-center font-MyFancyFont">{createdAccounts} {t.home.createdAccounts}</div>
-            <div className="w-[33%] text-[10px] md:text-base text-white text-center font-MyFancyFont">{queueSize} {t.home.queueSize}</div>
+            <div className="w-[33%] text-[10px] md:text-base text-white text-center font-MyFancyFont">{usersOnline} {t('playersOnline')}</div>
+            <div className="w-[33%] text-[10px] md:text-base text-white text-center font-MyFancyFont">{matchesInProgress} {t('matchesInProgress')}</div>
+            <div className="w-[33%] text-[10px] md:text-base text-white text-center font-MyFancyFont">{createdAccounts} {t('createdAccounts')}</div>
+            <div className="w-[33%] text-[10px] md:text-base text-white text-center font-MyFancyFont">{queueSize} {t('queueSize')}</div>
             </div>
             <div className="grid xl:grid-cols-2 gap-6 mb-10 min-h-screen w-[90%]  md:w-[80%] lg:w-[83%]
                  max-w-[1300px]  bg-cyan-900 rounded-lg shadow-lg p-6 relative
                 transition-all duration-500 ">
                 <div className="hidden xl:grid w-full my-5  grid-cols-1 grid-rows-10 place-items-center text-white font-MyFancyFont gap-10">          
-                    <span className="text-4xl">{t.home.welcome}</span>
+                    <span className="text-4xl">{t('welcome')}</span>
                     <div className="flex flex-col items-center gap-4">
-                        <span>{t.home.wantToPlay}</span>
+                        <span>{t('wantToPlay')}</span>
                         <button onClick={()=>navigate('/find-game')}
-                         className="bg-cyan-500/60 px-8 py-2 rounded hover:bg-cyan-500 hover:scale-105 transition-all">{t.home.findMatch}</button>
+                         className="bg-cyan-500/60 px-8 py-2 rounded hover:bg-cyan-500 hover:scale-105 transition-all">{t('findMatch')}</button>
                     </div>
                     <div className="flex flex-col items-center gap-4">
-                        <span>{t.home.lookingForSomeone}</span>
+                        <span>{t('lookingForSomeone')}</span>
                         <button onClick={()=>navigate('/search')}
                          className="bg-cyan-500/60 px-8 py-2 rounded hover:bg-cyan-500
-                         hover:scale-105 transition-all">{t.home.findMatch}</button>
+                         hover:scale-105 transition-all">{t('findMatch')}</button>
                          
                     </div>
                     <div className="flex flex-col items-center gap-4">
-                        <span>{t.home.wantToFindGame}</span>
+                        <span>{t('wantToFindGame')}</span>
                         <button onClick={()=>navigate('/games')}
                          className="bg-cyan-500/60 px-8 py-2 rounded hover:bg-cyan-500
-                         hover:scale-105 transition-all">{t.home.find}</button>
+                         hover:scale-105 transition-all">{t('find')}</button>
                          
                     </div>
                     

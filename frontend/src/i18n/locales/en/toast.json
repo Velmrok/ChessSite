@@ -1,0 +1,47 @@
+{
+      "error": {
+        "generic": "An error occurred. Please try again.",
+        "changedAvatar": "Failed to change avatar.",
+        "changedBio": "Failed to change bio.",
+        "login": "Failed to log in.",
+        "register": "Failed to register.",
+        "avatarNoFile": "Please select an avatar file.",
+        "logout": "Failed to log out.",
+        "bioTooLong": "Bio is too long.",
+        "alreadyInGame": "You are already in a game.",
+        "alreadyInQueue": "You are already in the queue.",
+        "didntLeaveQueue": "Failed to leave the queue.",
+        "unableToJoinGame": "Unable to join the game.",
+        "pgnCopied": "Failed to copy PGN to clipboard.",
+        "deleteAccount": "Failed to delete account.",
+        "changedPassword": "Failed to change password.",
+        "wrongPassword": "Wrong current password.",
+        "friendAddError": "Failed to change friend status.",
+        "friendDeleted": "Failed to delete friend.",
+        "friendAdded": "Failed to add friend."
+      },
+      "success": {
+        "generic": "Operation completed successfully.",
+        "changedAvatar": "Avatar changed successfully!",
+        "changedBio": "Bio changed successfully!",
+        "login": "Logged in successfully!",
+        "register": "Registered successfully!",
+        "logout": "Logged out successfully!",
+        "leftQueue": "Left the queue successfully!",
+        "pgnCopied": "PGN copied to clipboard!",
+        "deleteAccount": "Account deleted successfully!",
+        "accountCreated": "Account created successfully!",
+        "changedPassword": "Password changed successfully!",
+        "friendDeleted": "Friend deleted successfully!",
+        "friendAdded": "Friend added successfully!"
+
+      },
+      "info": {
+        "addedToQueue": "You have been added to the queue.",
+        "leftQueue": "You have left the queue.",
+        "drawOffered": "A draw has been offered.",
+        "isOnline": "Your friend {{nickname}} is now online.",
+        "isOffline": "Your friend {{nickname}} is now offline.",
+        "logoutBySystem": "You have been logged out"
+      }
+    }

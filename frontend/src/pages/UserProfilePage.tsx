@@ -8,13 +8,12 @@ import NotFound from "./NotFound";
 import useUserStore from '@/stores/useUserStore';
 import AddFriendButton from "../components/global/AddFriendButton";
 import FriendList from "@/components/UserProfile/FriendList";
-
 import { useUserProfileStore } from "@/stores/useUserProfileStore";
-import useLanguageStore from "@/stores/useLanguageStore";
 import Loading from "../components/global/Loading";
 import DeleteAccountButton from "../components/global/DeleteAccountButton";
 import EloChart from "@/components/UserProfile/EloChart";
 import ChangePasswordForm from "@/components/UserProfile/ChangePasswordForm";
+import { useTranslation } from "react-i18next";
 export default function UserProfilePage() {
     const nickname = useParams<{ nickname: string }>().nickname;
     const profile = useUserProfileStore(s => s.profile);
@@ -24,7 +23,7 @@ export default function UserProfilePage() {
     const [isLoading, setIsLoading] = useState(true);
     const [activeTab, setActiveTab] = useState<'history' | 'friends'|'elo'>('history');
     const user = useUserStore((state) => state.user);
-    const t = useLanguageStore((state) => state.t);
+    const { t } = useTranslation('profile');
     const loggedUserFriendList = useUserStore((state) => state.friendList);
     const [isDeleted, setIsDeleted] = useState(false);
     useEffect( () => {
@@ -59,7 +58,7 @@ export default function UserProfilePage() {
         return(
         <div className="flex justify-center items-center text-white font-MyFancyFont text-4xl
          min-h-screen bg-cyan-800 pt-10 pb-10 ">
-            {t.profile.delete}
+            {t('delete')}
         </div>
         )
     }
@@ -77,14 +76,14 @@ export default function UserProfilePage() {
                         {user&&user.nickname===profile.nickname&&(
                             <button className="absolute top-4 left-4 bg-blue-500 text-white shadow-md z-10
                         px-4 py-2 rounded hover:scale-105 transition-transform duration-200 font-MyFancyFont text-sm" onClick={() => setShowPasswordForm(true)}>
-                            {t.profile.changePassword}
+                            {t('changePassword')}
                             </button>
                         )}
                         {(!user || profile.nickname !== user?.nickname) && (
                             profile.onlineStatus === 'online' ? (
-                                <span className="text-green-500  text-sm sm:text-2xl font-MyFancyFont absolute top-2 left-3">● {t.profile.online}</span>
+                                <span className="text-green-500  text-sm sm:text-2xl font-MyFancyFont absolute top-2 left-3">● {t('online')}</span>
                             ) : (
-                                <span className="text-red-500 text-sm sm:text-2xl font-MyFancyFont absolute top-2 left-3">● {t.profile.offline}</span>
+                                <span className="text-red-500 text-sm sm:text-2xl font-MyFancyFont absolute top-2 left-3">● {t('offline')}</span>
                             ))}
                         <div className="flex flex-col lg:flex-row relative items-center  w-full gap-5 ">
 
@@ -97,13 +96,13 @@ export default function UserProfilePage() {
                                         <div className="text-[6px] md:text-[8px] flex flex-col items-center justify-center
                                 ">
                                             <AddFriendButton userNickname={profile.nickname} className="text-2xl" />
-                                            {loggedUserFriendList.includes(profile.nickname) ? t.profile.deleteFriend : t.profile.addFriend}
+                                            {loggedUserFriendList.includes(profile.nickname) ? t('deleteFriend') : t('addFriend')}
                                         </div>
                                         }
                                 </div>
                                 {user && user?.nickname !== profile.nickname && user.role === 'admin' &&
                                 <div className="absolute right-0 top-0   flex justify-center items-center gap-2" >
-                                    <span className="text-sm text-white">{t.profile.deleteAccount}</span>
+                                    <span className="text-sm text-white">{t('deleteAccount')}</span>
                                 <DeleteAccountButton nickname={profile.nickname} cb={() => { setIsDeleted(true)}}
                                  className="text-2xl"/>
                                  </div>
@@ -119,17 +118,17 @@ export default function UserProfilePage() {
                             <div className="w-[50%] flex justify-center">
                                 <button className="bg-gray-900/60 p-2 text-sm md:text-lg rounded-md"
                                     onClick={() => setActiveTab('history')}
-                                >{t.profile.gameHistory}</button>
+                                >{t('gameHistory')}</button>
                             </div>
                             <div className="w-[50%] flex justify-center">
                                 <button className="bg-gray-900/60 p-2 text-sm md:text-lg rounded-md"
                                     onClick={() => setActiveTab('friends')}
-                                >{t.profile.friendList}</button>
+                                >{t('friendList')}</button>
                             </div>
                             <div className="w-[50%] flex justify-center">
                                 <button className="bg-gray-900/60 p-2 text-sm md:text-lg rounded-md"
                                     onClick={() => setActiveTab('elo')}
-                                >{t.profile.eloChart}</button>
+                                >{t('eloChart')}</button>
                             </div>
                         </div>
                          <div className={`${activeTab === 'elo' ? 'flex' : 'hidden'} xl:flex w-full justify-center mb-10`}>

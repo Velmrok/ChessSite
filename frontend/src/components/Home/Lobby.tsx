@@ -1,17 +1,17 @@
 import useHomeStore from "@/stores/useHomeStore";
-import {  useEffect } from "react";
+import { useEffect } from "react";
 import Loading from "../global/Loading";
-import useLanguageStore from "@/stores/useLanguageStore";
-import {socket} from '../../services/socket/socketService';
+import { socket } from '../../services/socket/socketService';
 import { MdAccessTime } from "react-icons/md";
 import { SiPushbullet, SiStackblitz } from "react-icons/si";
 import { IoIosInfinite } from "react-icons/io";
+import { useTranslation } from "react-i18next";
 
 export default function Lobby() {
     const queueList = useHomeStore((state) => state.queueList);
     const fetchQueueList = useHomeStore((state) => state.fetchQueueList);
     const deletedQueues = useHomeStore((state) => state.deletedQueues);
-    const t = useLanguageStore((state) => state.t);
+    const {t} = useTranslation("home");
     const gameType = useHomeStore((state) => state.lobbyGameType);
     const setLobbyGameType = useHomeStore((state) => state.setLobbyGameType);
 
@@ -49,7 +49,7 @@ export default function Lobby() {
 
     return (
         <div className="bg-black/[20%] h-full max-h-[800px] flex flex-col gap-4 w-full text-white p-4 rounded-lg shadow-lg ">
-            <div className="w-full text-center text-2xl">{t.home.quickMenu.lobby}</div>
+            <div className="w-full text-center text-2xl">{t('lobby')}</div>
             <div className="flex gap-2 md:gap-3 justify-center">
                 <button className={`hover:scale-110 ${gameType === 'rapid' ? 'scale-80 border-b-3 border-green-500' : ''}`}
                     onClick={(e) => handleChangeGameType(e, 'rapid')}>
@@ -70,16 +70,16 @@ export default function Lobby() {
             <table className="w-full border-separate" style={{ borderCollapse: 'separate', borderSpacing: '0 12px' }}>
                 <thead className="w-full">
                     <tr>
-                        <th className="text-center w-[33%]">{t.home.lobby.player}</th>
-                        <th className="text-center w-[33%]">{t.home.lobby.rating}</th>
-                        <th className="text-center w-[33%]">{t.home.lobby.time}</th>
+                        <th className="text-center w-[33%]">{t('player')}</th>
+                        <th className="text-center w-[33%]">{t('rating')}</th>
+                        <th className="text-center w-[33%]">{t('time')}</th>
                     </tr>
                 </thead>
                 {queueList.queues.length === 0 ?
                     <tbody>
                         <tr>
 
-                            <td colSpan={3} className="text-center p-4 pt-10">{t.home.lobby.noPlayersInQueue}</td>
+                            <td colSpan={3} className="text-center p-4 pt-10">{t('noPlayersInQueue')}</td>
 
 
                         </tr>

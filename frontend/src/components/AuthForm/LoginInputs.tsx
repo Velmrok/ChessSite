@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from "react";
-import { useContext } from "react";
-import useLanguageStore from "@/stores/useLanguageStore";
+import React, { useState } from "react";
 import type { LoginFormType } from "../../types/auth";
+import { useTranslation } from "react-i18next";
 
 
 
@@ -15,17 +14,17 @@ export default function LoginInputs({ handleSubmit }: Props) {
         login: "",
         password: ""
     });
- const t = useLanguageStore((state) => state.t);
+    const {t} = useTranslation("auth");
 
 
     return (
         <>
             <form onSubmit={(e) => handleSubmit(e, form)} className="flex flex-col gap-4">
                 <div className="flex flex-col">
-                    <span>{t.auth.login}</span>
+                    <span>{t('login')}</span>
                     <input
                         type="text"
-                        placeholder={t.auth.login}
+                        placeholder={t('login')}
                         value={form.login}
                         onChange={(e) => setForm({ ...form, login: e.target.value })}
                         className="border border-gray-300 p-2 rounded focus:outline-none focus:border-blue-500"
@@ -33,10 +32,10 @@ export default function LoginInputs({ handleSubmit }: Props) {
 
 
                 <div className="flex flex-col">
-                    <span>{t.auth.password}</span>
+                    <span>{t('password')}</span>
                     <input
                         type="password"
-                        placeholder={t.auth.password}
+                        placeholder={t('password')}
                         value={form.password}
                         onChange={(e) => setForm({ ...form, password: e.target.value })}
                         className="border border-gray-300 p-2 rounded focus:outline-none focus:border-blue-500"
@@ -46,7 +45,7 @@ export default function LoginInputs({ handleSubmit }: Props) {
                     type="submit"
                     className="bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition-colors font-bold"
                 >
-                    {t.auth.login}
+                    {t('login')}
                 </button>
             </form>
 

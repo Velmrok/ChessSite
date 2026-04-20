@@ -1,4 +1,3 @@
-import { makeMove } from "@/services/socket/socketGameService";
 import useGameStore from "@/stores/useGameStore";
 import { Chess, type Square } from "chess.js";
 import { useEffect, useRef, useState } from "react";

@@ -1,32 +1,32 @@
 import useUserStore from "@/stores/useUserStore";
 import { Link } from "react-router-dom";
 
-type Props={
-    nickname:string,
-    
-    avatarUrl:string,
-    rating?:number,
-    time:string,
-    withLink:boolean
+type Props = {
+    nickname: string,
+
+    avatarUrl: string,
+    rating?: number,
+    time: string,
+    withLink: boolean
 }
 const API_URL = import.meta.env.VITE_API_URL;
-export default function PlayerBar({nickname, avatarUrl, rating,time, withLink}:Props){
-    
+export default function PlayerBar({ nickname, avatarUrl, rating, time, withLink }: Props) {
+
     const isInQueue = useUserStore((state) => state.user?.isInQueue);
-    
+
     const formatedTime = `${time.split("+")[0]}:00`;
 
     const userInfo = (
         <div className={`flex gap-3 ${isInQueue && !rating ? "animate-pulse" : ""}`}>
-            <img src={API_URL + avatarUrl} alt="Player Avatar" 
-            className="w-10 h-10 rounded-full outline-2"/>
+            <img src={API_URL + avatarUrl} alt="Player Avatar"
+                className="w-10 h-10 rounded-full outline-2" />
             <div className="h-full">
-            
-            <span>{nickname}</span>
-            
-            {rating && <span className="ml-2 text-gray-400">({rating})</span>}
+
+                <span>{nickname}</span>
+
+                {rating && <span className="ml-2 text-gray-400">({rating})</span>}
             </div>
-            </div>
+        </div>
     )
     return (
         <div className="flex w-full h-10 md:h-15 bg-black/30 rounded-md p-2

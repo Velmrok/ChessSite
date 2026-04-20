@@ -1,8 +1,7 @@
 import useUserStore from "@/stores/useUserStore";
 import RegisterForm from "../components/AuthForm/RegisterForm";
-import LoginForm from "../components/AuthForm/LoginForm";
 import {  useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect} from "react";
 
 export default function RegisterPage() {
     const user = useUserStore((state) => state.user);

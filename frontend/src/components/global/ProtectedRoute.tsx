@@ -3,14 +3,14 @@ import useUserStore from '@/stores/useUserStore';
 
 export const OnlyLoggedInRoute = () => {
     const user = useUserStore((state) => state.user);
-    
-    
+
+
     if (!user) {
-        
+
         return <Navigate to="/login" replace />;
     }
 
-    
+
     return <Outlet />;
 };
 

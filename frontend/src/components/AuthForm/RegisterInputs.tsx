@@ -1,7 +1,7 @@
-import React, { useEffect, useState} from "react";
-import { useContext } from "react";
-import useLanguageStore from "@/stores/useLanguageStore";
+import React, {useState} from "react";
+
 import type { RegisterFormType } from "../../types/auth";
+import { useTranslation } from "react-i18next";
 
 type Props = {
     handleSubmit: (e: React.FormEvent,
@@ -15,47 +15,47 @@ export default function RegisterInputs({handleSubmit }: Props) {
         nickname: "",
         password: ""
     });
-    const t = useLanguageStore((state) => state.t);
+    const {t} = useTranslation("auth");
   
    
     return (
         <>
             <form onSubmit={(e) => handleSubmit(e, form)} className="flex flex-col gap-4">
                 <div className="flex flex-col">
-                    <span>{t.auth.login}</span>
+                    <span>{t('login')}</span>
                     <input
                         type="text"
-                        placeholder={t.auth.login}
+                        placeholder={t('login')}
                         value={form.login}
                         onChange={(e) => setForm({ ...form, login: e.target.value })}
                         className="border border-gray-300 p-2 rounded focus:outline-none focus:border-blue-500"
                     /></div>
 
                 <div className="flex flex-col">
-                    <span>{t.auth.email}</span>
+                    <span>{t('email')}</span>
                     <input
                         type="text"
-                        placeholder={t.auth.email}
+                        placeholder={t('email')}
                         value={form.email}
                         onChange={(e) => setForm({ ...form, email: e.target.value })}
                         className="border border-gray-300 p-2 rounded focus:outline-none focus:border-blue-500"
                     /></div>
 
                 <div className="flex flex-col">
-                    <span>{t.auth.password}</span>
+                    <span>{t('password')}</span>
                     <input
                         type="password"
-                        placeholder={t.auth.password}
+                        placeholder={t('password')}
                         value={form.password}
                         onChange={(e) => setForm({ ...form, password: e.target.value })}
                         className="border border-gray-300 p-2 rounded focus:outline-none focus:border-blue-500"
                     /></div>
 
                 <div className="flex flex-col">
-                    <span>{t.auth.nickname}</span>
+                    <span>{t('nickname')}</span>
                     <input
                         type="text"
-                        placeholder={t.auth.nickname}
+                        placeholder={t('nickname')}
                         value={form.nickname}
                         onChange={(e) => setForm({ ...form, nickname: e.target.value })}
                         className="border border-gray-300 p-2 rounded focus:outline-none focus:border-blue-500"
@@ -66,7 +66,7 @@ export default function RegisterInputs({handleSubmit }: Props) {
                     type="submit"
                     className="bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition-colors font-bold"
                 >
-                    {t.auth.register}
+                    {t('register')}
                 </button>
             </form>
 

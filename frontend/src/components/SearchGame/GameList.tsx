@@ -1,4 +1,3 @@
-import useLanguageStore from "@/stores/useLanguageStore";
 import Loading from "../global/Loading";
 import { MdAccessTime } from "react-icons/md";
 import { SiPushbullet, SiStackblitz } from "react-icons/si";
@@ -8,8 +7,7 @@ import { Link } from "react-router-dom";
 import PaginationButtons from "../global/Pagination_buttons";
 import useGameSearchStore from "@/stores/useGameSearchStore";
 import SortArrows from "./SortArrows";
-
-const API_URL = import.meta.env.VITE_API_URL;
+import { useTranslation } from "react-i18next";
 
 type Props = {
     isLoading: boolean;
@@ -18,11 +16,11 @@ type Props = {
 }
 
 export default function GameList({ isLoading, games, totalPages }: Props) {
-    const t = useLanguageStore((state) => state.t);
+    const { t } = useTranslation("search");
     const page = useGameSearchStore((state) => state.params.page);
     const setFilters = useGameSearchStore((state) => state.setFilters);
     const params = useGameSearchStore((state) => state.params);
-    
+
     const iconMap: { [key: string]: JSX.Element } = {
         rapid: <MdAccessTime className="text-green-500 text-base md:text-xl inline" />,
         blitz: <SiStackblitz className="text-yellow-300 text-base md:text-xl inline" />,
@@ -37,13 +35,13 @@ export default function GameList({ isLoading, games, totalPages }: Props) {
 
     const handleSort = (field: string) => {
         const isSameField = params.sortBy === field;
-        const newOrder = isSameField ? !params.sortOrder : true; 
-        setFilters({ sortBy: field as "date"|"time"|"nicknames", sortOrder: newOrder });
+        const newOrder = isSameField ? !params.sortOrder : true;
+        setFilters({ sortBy: field as "date" | "time" | "nicknames", sortOrder: newOrder });
     };
 
-  
+
     const renderSortArrow = (field: string) => {
-        if (params.sortBy !== field) return <SortArrows sortOrder={null} />; 
+        if (params.sortBy !== field) return <SortArrows sortOrder={null} />;
         return <SortArrows sortOrder={params.sortOrder ? 'asc' : 'desc'} />;
     };
 
@@ -59,31 +57,31 @@ export default function GameList({ isLoading, games, totalPages }: Props) {
                     <div className="w-full overflow-x-auto pb-2">
                         <div className="min-w-[800px] grid gap-4">
 
-    
+
                             <div className="bg-cyan-800 p-2 h-10 rounded grid grid-cols-10 place-items-center text-xs md:text-lg font-MyFancyFont text-white">
-                                
+
 
                                 <div className="col-span-2 flex items-center justify-center gap-2 cursor-pointer hover:text-cyan-300 transition-colors" onClick={() => handleSort("nicknames")}>
-                                    {t.search.players}
+                                    {t('players')}
                                     {renderSortArrow("nicknames")}
                                 </div>
 
-                                  <div className="col-span-3 text-center">{t.search.moves}</div>
+                                <div className="col-span-3 text-center">{t('moves')}</div>
 
 
                                 <div className="col-span-1 flex items-center justify-center gap-2 cursor-pointer hover:text-cyan-300 transition-colors" onClick={() => handleSort("time")}>
-                                    {t.search.time}
+                                    {t('time')}
                                     {renderSortArrow("time")}
                                 </div>
                                 <div className="col-span-2 flex items-center justify-center gap-2 cursor-pointer hover:text-cyan-300 transition-colors" onClick={() => handleSort("date")}>
-                                    {t.search.date}
+                                    {t('date')}
                                     {renderSortArrow("date")}
                                 </div>
 
 
-                                <div className="col-span-1 text-center">{t.search.type}</div>
+                                <div className="col-span-1 text-center">{t('type')}</div>
 
-                                <div className="col-span-1 text-center">{t.search.status}</div>
+                                <div className="col-span-1 text-center">{t('status')}</div>
                             </div>
 
                             {games.length > 0 ? games.map((game) => (
@@ -93,12 +91,12 @@ export default function GameList({ isLoading, games, totalPages }: Props) {
 
                                         <div className="flex items-center justify-center gap-2 md:gap-4 col-span-2 w-full">
                                             <div className="text-xs bg-black/50 rounded-md p-1 w-14 h-14 md:w-16 md:h-16 font-MyFancyFont text-white flex flex-col items-center justify-center shrink-0">
-                                                <img src={`${API_URL}${game.whitePlayer.avatar}`} alt="White" className="w-8 h-8 md:w-10 md:h-10 rounded-full border-2 border-white object-cover" />
+                                                <img src={`${game.whitePlayer.avatar}`} alt="White" className="w-8 h-8 md:w-10 md:h-10 rounded-full border-2 border-white object-cover" />
                                                 <span className="truncate max-w-[50px] md:max-w-[60px]">{game.whitePlayer.nickname}</span>
                                             </div>
                                             <span className="font-bold text-sm">vs</span>
                                             <div className="text-xs bg-black/50 rounded-md p-1 w-14 h-14 md:w-16 md:h-16 font-MyFancyFont text-white flex flex-col items-center justify-center shrink-0">
-                                                <img src={`${API_URL}${game.blackPlayer.avatar}`} alt="Black" className="w-8 h-8 md:w-10 md:h-10 rounded-full border-2 border-white object-cover" />
+                                                <img src={`${game.blackPlayer.avatar}`} alt="Black" className="w-8 h-8 md:w-10 md:h-10 rounded-full border-2 border-white object-cover" />
                                                 <span className="truncate max-w-[50px] md:max-w-[60px]">{game.blackPlayer.nickname}</span>
                                             </div>
                                         </div>
@@ -113,7 +111,7 @@ export default function GameList({ isLoading, games, totalPages }: Props) {
                                                     ))}
                                                 </div>
                                             ) : (
-                                                <div>{t.search.noMoves}</div>
+                                                <div>{t('noMoves')}</div>
                                             )}
                                         </div>
 
@@ -122,20 +120,20 @@ export default function GameList({ isLoading, games, totalPages }: Props) {
                                         </div>
 
                                         <div className="col-span-2 text-xs md:text-sm whitespace-nowrap">{game.date}</div>
-                                        
+
 
                                         <div className="col-span-1 text-sm text-cyan-300 flex items-center gap-1">
                                             {iconMap[game.gameType]}
                                         </div>
 
                                         <div className="text-xs md:text-sm">
-                                            {game.status === 'finished' ? t.search.finished : t.search.live}
+                                            {game.status === 'finished' ? t('finished') : t('live')}
                                         </div>
                                     </div>
                                 </Link>
                             )) : (
                                 <div className="text-center text-cyan-300 mt-10">
-                                    {t.search.noGamesFound}
+                                    {t('noGamesFound')}
                                 </div>
                             )}
                         </div>

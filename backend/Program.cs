@@ -4,6 +4,7 @@ using backend.Data;
 using backend.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
@@ -55,12 +56,12 @@ builder.Services.AddAuthentication("Bearer")
             OnChallenge = async context =>
             {
                 context.HandleResponse();
-                context.Response.StatusCode = 401;
+                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
                 context.Response.ContentType = "application/json";
                 await context.Response.WriteAsJsonAsync(new ProblemDetails
                 {
                     Title = "unauthorized",
-                    Status = 401
+                    Status = StatusCodes.Status401Unauthorized
                 });
             }
         };
@@ -85,6 +86,27 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
             });
         };
 });
+builder.Services.AddRateLimiter(options =>
+{
+    options.AddFixedWindowLimiter("auth", limiterOptions =>
+    {
+        limiterOptions.PermitLimit = 5;
+        limiterOptions.Window = TimeSpan.FromMinutes(1);
+        limiterOptions.QueueLimit = 0;
+    });
+    
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    options.OnRejected = async (context,token) =>
+    {
+        context.HttpContext.Response.ContentType = "application/json";
+        await context.HttpContext.Response.WriteAsJsonAsync(new ProblemDetails
+        {
+            Title = "tooManyRequests",
+            Status = StatusCodes.Status429TooManyRequests,
+            Detail = "You have exceeded the allowed number of requests. Please try again later."
+        }, cancellationToken: token);
+    };
+});
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -92,6 +114,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseRateLimiter();
 
 app.UseGlobalErrorHandling();
 
@@ -103,7 +126,6 @@ app.UseCors(policy =>
         .AllowAnyMethod()
         .AllowAnyHeader()
 );
-
 
 app.UseAuthentication();
 app.UseAuthorization();

@@ -11,6 +11,7 @@ using backend.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace backend.Controllers
 {
@@ -40,6 +41,7 @@ namespace backend.Controllers
             _cookieService.SetRefreshTokenCookie(Response, refreshToken!);
             return Created($"/users/{result.Value.User.Nickname}/profile", result.Value.User);
         }
+        [EnableRateLimiting("auth")]
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {

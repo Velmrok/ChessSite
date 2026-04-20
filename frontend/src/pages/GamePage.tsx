@@ -30,6 +30,7 @@ export default function GamePage() {
     const pushAnalysisMove = useGameStore((state) => state.pushAnalysisMove);
     const { setCurrentAnalysisMoveIndex } = useAnalysisGame();
     const { setCurrentMoveIndex } = useLiveGame();
+    const  ratingType = useGameStore((state) => state.ratingType);
     useEffect(() => {
 
         return () => {
@@ -82,7 +83,7 @@ export default function GamePage() {
 
     return (
         <div className="flex  justify-center  h-auto bg-cyan-800 text-white p-4 overflow-hidden ">
-            {gameHasJustStarted && <GameStartOverlay whitePlayer={game.white} blackPlayer={game.black} onAnimationEnd={() => useGameStore.getState().setGameHasJustStarted(false)} />}
+            {gameHasJustStarted && <GameStartOverlay whitePlayer={game.white} blackPlayer={game.black} ratingType={ratingType} onAnimationEnd={() => useGameStore.getState().setGameHasJustStarted(false)} />}
 
 
             <div className="bg-cyan-900 rounded-md h-auto shadow-md  justify-center mb-10 pb-15
@@ -94,25 +95,25 @@ export default function GamePage() {
                     {orientation === "black" ?
                         <>
                             <PlayerBar nickname={game.white.nickname} avatarUrl={game.white.avatar} withLink={true}
-                                rating={game.white.rating} time={currentWhiteTime} />
+                                rating={game.white.rating[ratingType]} time={currentWhiteTime} />
 
                             <ChessBoard game={game} boardOrientation="black" gameJustEnded={gameJustEnded} endData={formatEndData}
                                 pushAnalysisMove={pushAnalysisMove} />
 
                             <PlayerBar nickname={game.black.nickname} avatarUrl={game.black.avatar} withLink={true}
-                                rating={game.black.rating} time={currentBlackTime} />
+                                rating={game.black.rating[ratingType]} time={currentBlackTime} />
 
                         </>
                         :
                         <>
                             <PlayerBar nickname={game.black.nickname} avatarUrl={game.black.avatar} withLink={true}
-                                rating={game.black.rating} time={currentBlackTime} />
+                                rating={game.black.rating[ratingType]} time={currentBlackTime} />
 
                             <ChessBoard game={game} boardOrientation="white" gameJustEnded={gameJustEnded} endData={formatEndData}
                                 pushAnalysisMove={pushAnalysisMove} />
 
                             <PlayerBar nickname={game.white.nickname} avatarUrl={game.white.avatar} withLink={true}
-                                rating={game.white.rating} time={currentWhiteTime} />
+                                rating={game.white.rating[ratingType]} time={currentWhiteTime} />
                         </>
                     }
 

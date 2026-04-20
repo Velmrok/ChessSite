@@ -19,7 +19,7 @@ export default function LoginForm() {
     const setToast = useToastStore((state) => state.setToast);
 
     const [error,setError] = useState("");
-    const { request, loading } = useApi();
+    const { request } = useApi();
 
     const handleSubmit = async (e: React.FormEvent, form: LoginFormType) => {
         e.preventDefault();

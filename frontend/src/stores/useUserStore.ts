@@ -1,4 +1,5 @@
 
+import type { User } from '@/types/User';
 import {create} from 'zustand';
 type UserStore = {
     user: User | null;

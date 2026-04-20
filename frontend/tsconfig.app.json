@@ -21,11 +21,23 @@
 
     /* Linting */
     "strict": true,
-    "noUnusedLocals": true,
+   
     "noUnusedParameters": true,
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    "noUncheckedSideEffectImports": true,
+    "resolveJsonModule": true,
+
+    "esModuleInterop": true,
+    "noUnusedLocals": false,
+    "rootDir": "src",
+    "outDir": "dist"
   },
-  "include": ["src"]
+ 
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/**/*.json"
+  ],
+  
 }

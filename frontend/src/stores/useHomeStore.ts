@@ -1,6 +1,5 @@
 import {create} from "zustand";
-import {socket} from "../services/socket/socketService";
-import { fetchUserFriends, fetchUserOnlineFriends } from "@/services/userService";
+import { fetchUserOnlineFriends } from "@/services/userService";
 import { getQueueList } from "@/services/homeService";
 type HomeStore = {
     usersOnline: number;

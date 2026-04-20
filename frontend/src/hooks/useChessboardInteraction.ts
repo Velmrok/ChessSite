@@ -163,7 +163,7 @@ export function useChessboardInteraction({ game, pushAnalysisMove }: Props) {
         setClickedSquare(square.square);
     }
 
-    const onSquareRightClick = (square: any) => {
+    const onSquareRightClick = () => {
         setClickedSquareStyles({});
         setClickedSquare(null);
     }

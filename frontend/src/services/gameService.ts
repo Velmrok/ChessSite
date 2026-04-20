@@ -1,7 +1,5 @@
 import apiFetch from "./api";
 
-const API_URL = import.meta.env.VITE_API_URL;
-
 
 export const fetchGame = async (gameId: string): Promise<GameState> => {
    const response = await apiFetch({ url: `/games/${gameId}`, method: 'GET', includeCredentials: true, contentType: 'application/json' });

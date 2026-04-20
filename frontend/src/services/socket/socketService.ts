@@ -1,5 +1,3 @@
-
-import useUserStore from '@/stores/useUserStore';
 import { io, Socket } from 'socket.io-client';
 
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL;

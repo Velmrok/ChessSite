@@ -1,15 +1,18 @@
+import useGameStore from "@/stores/useGameStore";
+import type { PublicUser } from "@/types/User";
 import { useEffect, useState } from "react";
 const API_URL = import.meta.env.VITE_API_URL;
 
 type Props = {
-    whitePlayer: { nickname: string; avatar: string; rating?: number };
-    blackPlayer: { nickname: string; avatar: string; rating?: number };
+    whitePlayer: PublicUser;
+    blackPlayer: PublicUser;
+    ratingType: 'bullet' | 'blitz' | 'rapid';
     onAnimationEnd: () => void;
 };
 
-export default function GameStartOverlay({ whitePlayer, blackPlayer, onAnimationEnd }: Props) {
+export default function GameStartOverlay({ whitePlayer, blackPlayer, ratingType, onAnimationEnd }: Props) {
     const [isVisible, setIsVisible] = useState(true);
-
+    
     useEffect(() => {
         const timer = setTimeout(() => {
             setIsVisible(false);
@@ -33,7 +36,7 @@ export default function GameStartOverlay({ whitePlayer, blackPlayer, onAnimation
                     className="w-32 h-32 rounded-full outline-12 border-white shadow-lg mb-4"
                 />
                 <h2 className="text-3xl font-bold text-white">{whitePlayer.nickname}</h2>
-                <p className="text-gray-400 text-xl">{whitePlayer.rating}</p>
+                <p className="text-gray-400 text-xl">{whitePlayer.rating[ratingType]}</p>
             </div>
 
 
@@ -56,7 +59,7 @@ export default function GameStartOverlay({ whitePlayer, blackPlayer, onAnimation
                     className="w-32 h-32 rounded-full outline-12 text-black shadow-lg mb-4"
                 />
                 <h2 className="text-3xl font-bold text-white">{blackPlayer.nickname}</h2>
-                <p className="text-gray-400 text-xl">{blackPlayer.rating}</p>
+                <p className="text-gray-400 text-xl">{blackPlayer.rating[ratingType]}</p>
             </div>
         </div>
     );

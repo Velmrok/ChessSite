@@ -18,6 +18,7 @@ old_backend
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
+dist
 # Mono auto generated files
 mono_crash.*
 

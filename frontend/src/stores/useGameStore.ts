@@ -1,5 +1,5 @@
 import { fetchGame as fg } from "@/services/gameService";
-;import {Chess} from "chess.js";
+import type { Rating } from "@/types/User";
 
 import {create} from "zustand";
 
@@ -12,6 +12,7 @@ type GameStoreType = {
     currentWhiteTime: number;
     currentBlackTime: number;
     gameHasJustStarted: boolean;
+    ratingType : 'bullet' | 'blitz' | 'rapid';
     setGame: (game: GameState) => void;
     fetchGame: (gameId: string) => Promise<void>;
     setCurrentMoveIndex: (cb:(index: number)=> number) => void;
@@ -41,6 +42,7 @@ const useGameStore = create<GameStoreType>((set) => ({
     currentAnalysisMoveIndex: -1,
     isInAnalysisTree: false,
     gameHasJustStarted: false,
+    ratingType: "blitz",
     resetGame: () => set({
         game: null,
         currentMoveIndex: -1,

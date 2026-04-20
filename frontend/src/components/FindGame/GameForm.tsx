@@ -48,7 +48,7 @@ export default function GameForm({ currentTime, setCurrentTime }: Props) {
             <div className="grid grid-cols-3 place-items-center gap-4 w-full ">
                 {["bullet", "1+0", "1+1", "1+2", "2+0", "2+1", "2+2",
                     "blitz", "3+0", "3+1", "3+2", "5+0", "5+3", "5+5",
-                    "rapid", "10+0", "10+2", "15+0", "15+5", "30+0", "30+15"].map((text, index) => (
+                    "rapid", "10+0", "10+2", "15+0", "15+5", "30+0", "30+15"].map((text) => (
 
                         !isGameType(text) ? (
                             <button

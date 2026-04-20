@@ -1,6 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
 import ReactCountryFlag from "react-country-flag";
-import type { Language } from "../../translations";
 import useUserStore from "@/stores/useUserStore";
 import useToastStore from "@/stores/useToastStore";
 import { logoutUser } from "@/services/authService";
@@ -86,7 +85,7 @@ export default function Navbar() {
 
 
 
-    const handleChangeLanguage = (lang: Language) => {
+    const handleChangeLanguage = (lang: string) => {
 
         i18n.changeLanguage(lang);
     }

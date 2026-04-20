@@ -25,9 +25,7 @@ export default function RegisterForm() {
 
         const user = await request(() => registerUser(form), {
             onError: (message) => {
-                const translation =
-                    errorT(message) ??
-                    errorT('generic');
+                const translation =errorT(message)
                 setError(translation);
             }
         });

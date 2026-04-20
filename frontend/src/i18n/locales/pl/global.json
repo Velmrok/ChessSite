@@ -1,0 +1,13 @@
+{
+  "cancel": "Anuluj",
+  "confirm": "Potwierdź",
+  "confirmation": "Czy na pewno chcesz kontynuować?",
+  "cannotBeUndone": "Ta operacja nie może zostać cofnięta.",
+  "loadingMessage": "Ładowanie...",
+  "notFound": {
+    "title": "Strona nie znaleziona",
+    "game": "Gra nie znaleziona",
+    "user": "Użytkownik nie znaleziony"
+  },
+  "backToHome": "Powrót do strony głównej"
+}

@@ -1,0 +1,46 @@
+{
+  "error": {
+    "generic": "Wystąpił błąd. Spróbuj ponownie.",
+    "changedAvatar": "Nie udało się zmienić awatara.",
+    "changedBio": "Nie udało się zmienić opisu.",
+    "login": "Nie udało się zalogować.",
+    "register": "Nie udało się zarejestrować.",
+    "avatarNoFile": "Proszę wybrać plik z awatarem.",
+    "logout": "Nie udało się wylogować.",
+    "bioTooLong": "Opis jest za długi.",
+    "alreadyInGame": "Jesteś już w grze.",
+    "alreadyInQueue": "Jesteś już w kolejce.",
+    "didntLeaveQueue": "Nie udało się opuścić kolejki.",
+    "unableToJoinGame": "Nie udało się dołączyć do gry.",
+    "pgnCopied": "Nie udało się skopiować PGN do schowka.",
+    "deleteAccount": "Nie udało się usunąć konta.",
+    "changedPassword": "Nie udało się zmienić hasła.",
+    "wrongPassword": "Błędne aktualne hasło.",
+    "friendAddError": "Nie udało się zmienić statusu znajomego.",
+    "friendDeleted": "Nie udało się usunąć znajomego.",
+    "friendAdded": "Nie udało się dodać znajomego."
+  },
+  "success": {
+    "generic": "Operacja zakończona pomyślnie.",
+    "changedAvatar": "Awatar został zmieniony!",
+    "changedBio": "Opis został zmieniony!",
+    "login": "Pomyślnie zalogowano!",
+    "register": "Pomyślnie zarejestrowano!",
+    "logout": "Pomyślnie wylogowano!",
+    "leftQueue": "Pomyślnie opuściłeś kolejkę!",
+    "pgnCopied": "PGN skopiowany do schowka!",
+    "deleteAccount": "Konto zostało usunięte!",
+    "accountCreated": "Konto zostało utworzone!",
+    "changedPassword": "Hasło zostało zmienione!",
+    "friendDeleted": "Znajomy został usunięty!",
+    "friendAdded": "Znajomy został dodany!"
+  },
+  "info": {
+    "addedToQueue": "Zostałeś dodany do kolejki.",
+    "leftQueue": "Opuściłeś kolejkę.",
+    "drawOffered": "Zaproponowano remis.",
+    "isOnline": "Twój znajomy {{nickname}} jest teraz online.",
+    "isOffline": "Twój znajomy {{nickname}} jest teraz offline.",
+    "logoutBySystem": "Zostałeś wylogowany"
+  }
+}

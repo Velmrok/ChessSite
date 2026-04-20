@@ -104,9 +104,9 @@ export default function Navbar() {
 
 
                 <div className="flex gap-4">
-                    {/* <button onClick={() => handleChangeLanguage("pl")}>
+                    <button onClick={() => handleChangeLanguage("pl")}>
                     <ReactCountryFlag countryCode="PL" className="hover:scale-110 transition-transform duration-300 !w-[1.5em]" svg  />
-                </button> */}
+                </button>
                     <button onClick={() => handleChangeLanguage("en")}>
                         <ReactCountryFlag countryCode="GB" className="hover:scale-110 transition-transform duration-300 !w-[1.5em]" svg />
                     </button>

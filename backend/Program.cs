@@ -12,11 +12,7 @@ using StackExchange.Redis;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddGlobalErrorHandling();
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(
-        builder.Configuration.GetConnectionString("Default")
-    )
-);
+builder.Services.AddDatabase(builder.Configuration);
 
 
 builder.Services.AddControllers();
@@ -25,107 +21,32 @@ builder.Services.AddApplicationServices();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddAuthentication("Bearer")
-    .AddJwtBearer("Bearer", options =>
-    {
-        var jwt = builder.Configuration.GetSection("Jwt");
-        options.MapInboundClaims = false;
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
+builder.Services.AddJwtAuthentication(builder.Configuration);   
 
-            ValidIssuer = jwt["Issuer"],
-            ValidAudience = jwt["Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(jwt["Key"]!)
-            )
-        };
 
-        options.Events = new JwtBearerEvents
-        {
-            OnMessageReceived = context =>
-            {
-                if (context.Request.Cookies.TryGetValue("accessToken", out var token))
-                {
-                    context.Token = token;
-                }
-                return Task.CompletedTask;
-            },
-            OnChallenge = async context =>
-            {
-                context.HandleResponse();
-                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                context.Response.ContentType = "application/json";
-                await context.Response.WriteAsJsonAsync(new ProblemDetails
-                {
-                    Title = "unauthorized",
-                    Status = StatusCodes.Status401Unauthorized
-                });
-            }
-        };
+var isTestEnvironment = builder.Configuration.GetValue<bool>("IsTestEnvironment");
 
-    });
-
-builder.Services.Configure<ApiBehaviorOptions>(options =>
+if (!isTestEnvironment)
 {
-    options.InvalidModelStateResponseFactory = context =>
-        {
-            var firstErrorCode = context.ModelState
-                .Where(x => x.Value!.Errors.Count > 0)
-                .SelectMany(x => x.Value!.Errors)
-                .Select(e => e.ErrorMessage)
-                .FirstOrDefault() ?? "invalidRequest";
-
-            return new BadRequestObjectResult(new ProblemDetails
-            {
-                Title = firstErrorCode,
-                Status = StatusCodes.Status400BadRequest,
-                Detail = "Validation failed"
-            });
-        };
-});
-builder.Services.AddRateLimiter(options =>
+    builder.Services.AddCustomCache(builder.Configuration);
+}
+else
 {
-    options.AddFixedWindowLimiter("auth", limiterOptions =>
-    {
-        limiterOptions.PermitLimit = 5;
-        limiterOptions.Window = TimeSpan.FromMinutes(1);
-        limiterOptions.QueueLimit = 0;
-    });
-    
-    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
-    options.OnRejected = async (context,token) =>
-    {
-        context.HttpContext.Response.ContentType = "application/json";
-        await context.HttpContext.Response.WriteAsJsonAsync(new ProblemDetails
-        {
-            Title = "tooManyRequests",
-            Status = StatusCodes.Status429TooManyRequests,
-            Detail = "You have exceeded the allowed number of requests. Please try again later."
-        }, cancellationToken: token);
-    };
-});
+    builder.Services.AddDistributedMemoryCache();
+}
 
-builder.Services.AddStackExchangeRedisCache(options =>
-{
-    options.Configuration = builder.Configuration.GetConnectionString("Redis");
-    options.InstanceName = "ChessSite:";
-});
-builder.Services.AddSingleton<IConnectionMultiplexer>(
-    ConnectionMultiplexer.Connect(
-        builder.Configuration.GetConnectionString("Redis")!
-    )
-);
+builder.Services.AddCustomModelValidation();
+
+builder.Services.AddCustomRateLimiting();
+
+builder.Services.AddCustomCors();
+
+
+
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    db.Database.Migrate();
-}
+app.MigrateDatabase();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -138,11 +59,7 @@ app.UseGlobalErrorHandling();
 app.UseHttpsRedirection();
 
 
-app.UseCors(policy =>
-    policy.AllowAnyOrigin()
-        .AllowAnyMethod()
-        .AllowAnyHeader()
-);
+app.UseCustomCors();
 
 app.UseAuthentication();
 app.UseAuthorization();

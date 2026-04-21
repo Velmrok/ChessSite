@@ -5,6 +5,7 @@ using backend.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 
 
+
 namespace backend.Extensions;
 public static class ServiceCollectionExtensions
 {
@@ -15,8 +16,11 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
         services.AddScoped<IRefreshTokenService, RefreshTokenService>();
         services.AddScoped<ICookieService, CookieService>();
-        services.AddSingleton<IJwtGenerator,JwtGenerator>();
         services.AddScoped<ICacheInvalidationService, CacheInvalidationService>();
+
+        services.AddSingleton<IJwtGenerator, JwtGenerator>();
+        
+
         return services;
     }
     public static IServiceCollection AddGlobalErrorHandling(this IServiceCollection services)

@@ -1,8 +1,11 @@
 using backend.Data;
+using backend.DTO.Users;
 using backend.Enums;
 using backend.Models;
 using backend.Services;
 using FluentAssertions;
+using Microsoft.Extensions.Caching.Distributed;
+using NSubstitute;
 
 namespace backend.Tests.Unit.Services;
 
@@ -12,7 +15,10 @@ public class UsersServiceTests : TestBase
 
     public UsersServiceTests()
     {
-        _usersService = new UsersService(DbContext);
+        var cacheMock  = Substitute.For<IDistributedCache>();
+        cacheMock.GetAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
+        .Returns((byte[]?)null);
+        _usersService = new UsersService(DbContext, cacheMock);
     }
 
     private User MakeUser(string name, int rapid = 1000, int blitz = 1000, int bullet = 1000,

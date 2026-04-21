@@ -48,7 +48,7 @@ public class UsersService : IUsersService
 
         
         var cached = await _cache.GetStringAsync(cacheKey);
-        if (cached != null)
+        if (!string.IsNullOrEmpty(cached))
         {
             return JsonSerializer.Deserialize<UsersResponse>(cached)!;
         }

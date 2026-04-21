@@ -22,10 +22,11 @@ public class AuthServiceTests : TestBase
     public AuthServiceTests()
     {
         var jwtMock = Substitute.For<IJwtGenerator>();
+        var cacheInvalidationServiceMock = Substitute.For<ICacheInvalidationService>();
         var refreshTokenServiceMock = Substitute.For<IRefreshTokenService>();
         jwtMock.GenerateToken(Arg.Any<User>()).Returns("mocked-jwt-token");
         refreshTokenServiceMock.CreateRefreshTokenAsync(Arg.Any<User>()).Returns("mocked-refresh-token");
-        _authService = new AuthService(DbContext, jwtMock, new PasswordHasher<User>(), refreshTokenServiceMock);
+        _authService = new AuthService(DbContext, jwtMock, new PasswordHasher<User>(),cacheInvalidationServiceMock, refreshTokenServiceMock);
         _passwordHasher = new PasswordHasher<User>();
 
     }

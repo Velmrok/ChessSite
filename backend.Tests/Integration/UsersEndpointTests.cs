@@ -36,6 +36,7 @@ public class UsersEndpointTests : TestBase
     [Fact]
     public async Task GetUsersEndpoint_WithNoUsers_ShouldReturnOk()
     {
+        await LoginAsUserAsync();
         var response = await _client.GetAsync("/users");
 
         response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);

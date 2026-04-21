@@ -1,11 +1,13 @@
 using backend.DTO.Users;
 using backend.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
 
 
 namespace backend.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("/users")]
     public class UsersController : ControllerBase

@@ -3,6 +3,7 @@ using System.Linq.Expressions;
 using System.Text.Json;
 using backend.Data;
 using backend.DTO.Users;
+using backend.Enums;
 using backend.Models;
 using backend.Services.Interfaces;
 using backend.Services.Mappers;

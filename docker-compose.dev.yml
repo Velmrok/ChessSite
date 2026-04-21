@@ -35,6 +35,7 @@ services:
       "
     depends_on:
       - db
+      - redis
 
   frontend:
     image: node:20-alpine
@@ -55,7 +56,17 @@ services:
     depends_on:
       - backend
 
+  redis:
+    image: redis:7-alpine
+    container_name: chess_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+
 volumes:
+  redis_data:
   postgres_data:
   dotnet_packages:
   frontend_node_modules:

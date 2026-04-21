@@ -1,28 +1,25 @@
 
 using System.Linq.Expressions;
+using System.Text.Json;
 using backend.Data;
 using backend.DTO.Users;
 using backend.Models;
 using backend.Services.Interfaces;
 using backend.Services.Mappers;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
 
 namespace backend.Services;
 
 public class UsersService : IUsersService
 {
     private readonly AppDbContext _context;
-    public UsersService(AppDbContext context)
+    private readonly IDistributedCache _cache;
+    public UsersService(AppDbContext context, IDistributedCache cache)
     {
         _context = context;
+        _cache = cache;
     }
-
-    private static readonly Dictionary<UsersSortBy, Expression<Func<User, object>>> SortMap = new()
-    {
-
-
-
-    };
 
     private static IQueryable<User> ApplySort(IQueryable<User> users, UsersSortBy sortBy, RatingType ratingType, bool descending)
     {
@@ -44,6 +41,17 @@ public class UsersService : IUsersService
     }
     public async Task<UsersResponse> GetAllUsersAsync(GetUsersQuery query)
     {
+         var cacheKey = $"users:{query.Page}:{query.Limit}:{query.Search}:" +
+                       $"{query.SortBy}:{query.SortDescending}:{query.RatingType}:" +
+                       $"{query.MinRating}:{query.MaxRating}:{query.Online}";
+
+        
+        var cached = await _cache.GetStringAsync(cacheKey);
+        if (cached != null)
+        {
+            return JsonSerializer.Deserialize<UsersResponse>(cached)!;
+        }
+
         var users = _context.Users.AsQueryable();
         
        
@@ -63,6 +71,15 @@ public class UsersService : IUsersService
             .ToListAsync();
         var totalCount = await users.CountAsync();
         var totalPages = (int)Math.Ceiling(totalCount / (double)query.Limit);
-        return new UsersResponse(result, totalPages);
+
+        var response = new UsersResponse(result, totalPages);
+
+        var options = new DistributedCacheEntryOptions
+        {
+            AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(60)
+        };
+        await _cache.SetStringAsync(cacheKey, JsonSerializer.Serialize(response), options);
+
+        return response;
     }
 }

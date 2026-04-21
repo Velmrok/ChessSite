@@ -26,6 +26,7 @@ services:
       - ConnectionStrings__Default=Host=db;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
     depends_on:
       - db
+      - redis
     restart: unless-stopped
    
   frontend:
@@ -37,6 +38,15 @@ services:
     depends_on:
       - backend
     restart: unless-stopped
+  
+  redis:
+    image: redis:7-alpine
+    container_name: chess_redis_production
+    volumes:
+      - redis_data_production:/data
+    command: redis-server --appendonly yes
+    restart: unless-stopped
 
 volumes:
+  redis_data_production:
   postgres_data_production:

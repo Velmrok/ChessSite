@@ -22,13 +22,17 @@ public class AuthService : IAuthService
     private readonly IJwtGenerator _jwtGenerator;
     private readonly IPasswordHasher<User> _passwordHasher;
     private readonly IRefreshTokenService _refreshTokenService;
+    private readonly ICacheInvalidationService _cacheInvalidation;
 
-    public AuthService(AppDbContext dbContext, IJwtGenerator jwtGenerator, IPasswordHasher<User> passwordHasher, IRefreshTokenService refreshTokenService)
+    public AuthService(AppDbContext dbContext, IJwtGenerator jwtGenerator,
+     IPasswordHasher<User> passwordHasher, ICacheInvalidationService cacheInvalidation,
+     IRefreshTokenService refreshTokenService)
     {
         _dbContext = dbContext;
         _jwtGenerator = jwtGenerator;
         _passwordHasher = passwordHasher;
         _refreshTokenService = refreshTokenService;
+        _cacheInvalidation = cacheInvalidation;
     }
     public async Task<ErrorOr<AuthResult>> RegisterAsync(RegisterRequest request)
     {
@@ -72,7 +76,7 @@ public class AuthService : IAuthService
         var accessToken = _jwtGenerator.GenerateToken(newUser);
         var refreshToken = await _refreshTokenService.CreateRefreshTokenAsync(newUser);
         await _dbContext.SaveChangesAsync();
-
+        await _cacheInvalidation.InvalidateUsersCache();
         return new AuthResult(accessToken, refreshToken, newUser.ToGetMeResponse());
 
     }

@@ -83,5 +83,38 @@ public class AuthEndpointTests : TestBase
         var response4 = await _client.PostAsync("/auth/refresh", null);
         response4.StatusCode.Should().Be(System.Net.HttpStatusCode.Unauthorized);
     }
+    [Fact]
+    public async Task LoginEndpoint_ShouldReturnUnauthorized_WhenCredentialsAreInvalid()
+    {
+        
+        var request = new LoginRequest
+        {
+            Login = "nonexistentUser",
+            Password = "wrongPassword"
+        };
+
+        var response = await _client.PostAsJsonAsync("/auth/login", request);
+
+        response.StatusCode.Should().Be(System.Net.HttpStatusCode.Unauthorized);
+    }
+    [Fact]
+    public async Task LoginEndpoint_ShouldReturn409TooManyRequests_WhenRateLimitExceeded()
+    {
+        var loginRequest = new LoginRequest
+        {
+            Login = "testUser",
+            Password = "123456"
+        };
+        var response = await _client.PostAsJsonAsync("/auth/login", loginRequest);
+            response.StatusCode.Should().Be(System.Net.HttpStatusCode.Unauthorized);
+        for (int i = 0; i < 10; i++)
+        {
+            await _client.PostAsJsonAsync("/auth/login", loginRequest);
+            
+        }
+
+        var rateLimitedResponse = await _client.PostAsJsonAsync("/auth/login", loginRequest);
+        rateLimitedResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.TooManyRequests);
+    }
 }
 

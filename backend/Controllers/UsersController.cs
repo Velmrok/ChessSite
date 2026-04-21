@@ -20,13 +20,13 @@ namespace backend.Controllers
         [HttpGet]
         public async Task<IActionResult> GetUsers([FromQuery] GetUsersQuery query)
         {
-            var cacheKey = $"users:{query.Page}:{query.Limit}:{query.Search}:{query.SortBy}:{query.SortDescending}:{query.RatingType}:{query.MinRating}:{query.MaxRating}:{query.Online}";
+            
+           
+            var usersResult = await _usersService.GetAllUsersAsync(query);
 
-            var cached = await _cache.GetStringAsync(cacheKey);
-            Response.Headers["X-Cache"] = cached != null ? "HIT" : "MISS";
-            var usersResponse = await _usersService.GetAllUsersAsync(query);
+             Response.Headers["X-Cache"] = usersResult.IsCached ? "HIT" : "MISS";
 
-            return Ok(usersResponse);
+            return Ok(usersResult.Response);
         }
 
     }

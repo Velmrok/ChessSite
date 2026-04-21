@@ -7,6 +7,7 @@ using backend.Enums;
 using backend.Models;
 using backend.Services.Interfaces;
 using backend.Services.Mappers;
+using backend.Services.Results;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 
@@ -40,7 +41,7 @@ public class UsersService : IUsersService
             _ => users.OrderByField(u => u.CreatedAt, descending),
         };
     }
-    public async Task<UsersResponse> GetAllUsersAsync(GetUsersQuery query)
+    public async Task<UsersResult> GetAllUsersAsync(GetUsersQuery query)
     {
          var cacheKey = $"users:{query.Page}:{query.Limit}:{query.Search}:" +
                        $"{query.SortBy}:{query.SortDescending}:{query.RatingType}:" +
@@ -50,7 +51,8 @@ public class UsersService : IUsersService
         var cached = await _cache.GetStringAsync(cacheKey);
         if (!string.IsNullOrEmpty(cached))
         {
-            return JsonSerializer.Deserialize<UsersResponse>(cached)!;
+            var cachedResponse = JsonSerializer.Deserialize<UsersResponse>(cached)!;
+            return new UsersResult(cachedResponse, true);
         }
 
         var users = _context.Users.AsQueryable();
@@ -81,6 +83,6 @@ public class UsersService : IUsersService
         };
         await _cache.SetStringAsync(cacheKey, JsonSerializer.Serialize(response), options);
 
-        return response;
+        return new UsersResult(response, false);
     }
 }

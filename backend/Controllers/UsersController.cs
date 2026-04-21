@@ -13,11 +13,10 @@ namespace backend.Controllers
     public class UsersController : ControllerBase
     {
         private readonly IUsersService _usersService;
-        private readonly IDistributedCache _cache;
         public UsersController(IUsersService usersService, IDistributedCache cache  )
         {
             _usersService = usersService;
-            _cache = cache;
+           
         }
         [HttpGet]
         public async Task<IActionResult> GetUsers([FromQuery] GetUsersQuery query)

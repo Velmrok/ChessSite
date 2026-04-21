@@ -6,6 +6,7 @@ using backend.Services.Results;
 using ErrorOr;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using NSubstitute;
@@ -57,7 +58,7 @@ public class AuthControllerTests
             Email = "test@test.com",
             Login = "test",
             Nickname = "test",
-            Password = "Haslo" 
+            Password = "123456" 
         };
 
         var expectedError = Error.Conflict(errorCode, errorMessage);
@@ -98,5 +99,119 @@ public class AuthControllerTests
         Assert.Equal(201, statusCodeResult.StatusCode);
 
     }
+    [Fact]
+    public async Task Register_ShouldReturn401Unauthorized_WhenRegistrationFails()
+    {
+        var request = new RegisterRequest
+        {
+            Email = "test@test.com",
+            Login = "test",
+            Nickname = "test",
+            Password = "123456"
+        };
 
+        var expectedError = Error.Unauthorized("registrationFailed", "Registration failed.");
+        _authServiceMock.RegisterAsync(Arg.Any<RegisterRequest>()).Returns(expectedError);
+
+        var result = await _controller.Register(request);
+
+        var objectResult = result.Should().BeOfType<ObjectResult>().Subject;
+        var problemDetails = objectResult.Value.Should().BeOfType<ProblemDetails>().Subject;
+        problemDetails.Status.Should().Be(401);
+        
+    }
+
+    [Fact]
+    public async Task Login_ShouldReturn200OK_WhenLoginIsSuccessful()
+    {
+        var request = new LoginRequest
+        {
+            Login = "test",
+            Password = "123456"
+        };
+        _authServiceMock.LoginAsync(Arg.Any<LoginRequest>()).Returns(FakeAuthResult());
+        var result = await _controller.Login(request);
+        _cookieServiceMock.Received(1).SetJwtCookie(Arg.Any<HttpResponse>(), Arg.Any<string>());
+        var okResult = Assert.IsType<OkObjectResult>(result);
+        Assert.Equal(200, okResult.StatusCode);
+    }
+    [Fact]
+    public async Task Login_ShouldReturn401Unauthorized_WhenLoginFails()
+    {
+        var request = new LoginRequest
+        {
+            Login = "test",
+            Password = "WrongPassword!"
+        };
+        var expectedError = Error.Unauthorized("invalidCredentials", "Invalid login or password.");
+        _authServiceMock.LoginAsync(Arg.Any<LoginRequest>()).Returns(expectedError);
+        var result = await _controller.Login(request);
+        var objectResult = result.Should().BeOfType<ObjectResult>().Subject;
+        var problemDetails = objectResult.Value.Should().BeOfType<ProblemDetails>().Subject;
+        problemDetails.Status.Should().Be(401);
+        problemDetails.Title.Should().Be("invalidCredentials");
+        problemDetails.Detail.Should().Be("Invalid login or password.");
+    }
+
+    [Fact]
+    public async Task Logout_ShouldReturn204NoContent()
+    {
+        var result = await _controller.Logout();
+        _cookieServiceMock.Received(1).DeleteJwtCookie(Arg.Any<HttpResponse>());
+        _cookieServiceMock.Received(1).DeleteRefreshTokenCookie(Arg.Any<HttpResponse>());
+        var statusCodeResult = Assert.IsAssignableFrom<IStatusCodeActionResult>(result);
+        Assert.Equal(204, statusCodeResult.StatusCode);
+    }
+    [Fact]
+    public async Task Refresh_ShouldReturn200OK_WhenRefreshIsSuccessful()
+    {
+        
+        _authServiceMock.RefreshAsync(Arg.Any<string>()).Returns(FakeAuthResult());
+        var result = await _controller.Refresh();
+        var okResult = Assert.IsType<OkObjectResult>(result);
+        Assert.Equal(200, okResult.StatusCode);
+        _cookieServiceMock.Received(1).SetJwtCookie(Arg.Any<HttpResponse>(), Arg.Any<string>());
+    }
+    [Fact]
+    public async Task Refresh_ShouldReturn401Unauthorized_WhenRefreshFails()
+    {
+        var expectedError = Error.Unauthorized("invalidRefreshToken", "Refresh token is invalid or has expired.");
+        _authServiceMock.RefreshAsync(Arg.Any<string>()).Returns(expectedError);
+        var result = await _controller.Refresh();
+        var objectResult = result.Should().BeOfType<ObjectResult>().Subject;
+        var problemDetails = objectResult.Value.Should().BeOfType<ProblemDetails>().Subject;
+        problemDetails.Status.Should().Be(401);
+        problemDetails.Title.Should().Be("invalidRefreshToken");
+        problemDetails.Detail.Should().Be("Refresh token is invalid or has expired.");
+    }
+    [Fact]
+    public async Task GetMe_ShouldReturn200OK_WhenAccessTokenIsValid()
+    {
+        var expectedResponse = new GetMeResponse(
+            Nickname: "test",
+            ProfileBio: "",
+            ProfilePictureUrl: "",
+            CreatedAt: DateTime.UtcNow,
+            LastActive: DateTime.UtcNow,
+            Rating: new RatingResponse(Rapid: 1000, Blitz: 1000, Bullet: 1000)
+        );
+        _authServiceMock.GetMeAsync(Arg.Any<string>()).Returns(expectedResponse);
+        var result = await _controller.GetMe();
+        var okResult = Assert.IsType<OkObjectResult>(result);
+        Assert.Equal(200, okResult.StatusCode);
+        var response = Assert.IsType<GetMeResponse>(okResult.Value);
+        Assert.Equal(expectedResponse.Nickname, response.Nickname);
+    }
+    [Fact]
+    public async Task GetMe_ShouldReturn401Unauthorized_WhenAccessTokenIsInvalid()
+    {
+        var expectedError = Error.Unauthorized("invalidAccessToken", "Access token is invalid.");
+        _authServiceMock.GetMeAsync(Arg.Any<string>()).Returns(expectedError);
+        var result = await _controller.GetMe();
+        var objectResult = result.Should().BeOfType<ObjectResult>().Subject;
+        var problemDetails = objectResult.Value.Should().BeOfType<ProblemDetails>().Subject;
+        problemDetails.Status.Should().Be(401);
+        problemDetails.Title.Should().Be("invalidAccessToken");
+        problemDetails.Detail.Should().Be("Access token is invalid.");
+    }
 }

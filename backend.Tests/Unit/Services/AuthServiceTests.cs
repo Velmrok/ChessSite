@@ -3,6 +3,7 @@ using backend.Data;
 using backend.DTO.Auth;
 using backend.Models;
 using backend.Services;
+using backend.Services.Helpers.Auth;
 using backend.Services.Interfaces;
 using ErrorOr;
 using FluentAssertions;
@@ -23,10 +24,10 @@ public class AuthServiceTests : TestBase
     {
         var jwtMock = Substitute.For<IJwtGenerator>();
         var cacheInvalidationServiceMock = Substitute.For<ICacheInvalidationService>();
-        var refreshTokenServiceMock = Substitute.For<IRefreshTokenService>();
+        var refreshTokenService = new RefreshTokenService(DbContext);
         jwtMock.GenerateToken(Arg.Any<User>()).Returns("mocked-jwt-token");
-        refreshTokenServiceMock.CreateRefreshTokenAsync(Arg.Any<User>()).Returns("mocked-refresh-token");
-        _authService = new AuthService(DbContext, jwtMock, new PasswordHasher<User>(),cacheInvalidationServiceMock, refreshTokenServiceMock);
+       
+        _authService = new AuthService(DbContext, jwtMock, new PasswordHasher<User>(),cacheInvalidationServiceMock, refreshTokenService);
         _passwordHasher = new PasswordHasher<User>();
 
     }
@@ -48,7 +49,7 @@ public class AuthServiceTests : TestBase
         result.Value.AccessToken.Should().StartWith("mocked-jwt-token");
 
         result.Value.RefreshToken.Should().NotBeNullOrEmpty();
-        result.Value.RefreshToken.Should().StartWith("mocked-refresh-token");
+       
 
 
         var userInDb = await DbContext.Users.FirstOrDefaultAsync(u => u.Login == request.Login);
@@ -91,7 +92,7 @@ public class AuthServiceTests : TestBase
         usersCount.Should().Be(1);
     }
     [Fact]
-    public async Task RegisterAsync_ShouldTreatIdentifiersAsCaseInsensitive()
+    public async Task RegisterAsync_ShouldTreatIdentifiersAsCaseSensitive()
     {
         DbContext.Users.Add(new User
         {
@@ -115,7 +116,7 @@ public class AuthServiceTests : TestBase
         result.Value.AccessToken.Should().StartWith("mocked-jwt-token");
 
         result.Value.RefreshToken.Should().NotBeNullOrEmpty();
-        result.Value.RefreshToken.Should().StartWith("mocked-refresh-token");
+        
     }
 
 
@@ -146,7 +147,7 @@ public class AuthServiceTests : TestBase
         result.Value.AccessToken.Should().StartWith("mocked-jwt-token");
 
         result.Value.RefreshToken.Should().NotBeNullOrEmpty();
-        result.Value.RefreshToken.Should().StartWith("mocked-refresh-token");
+        
     }
     [Fact]
     public async Task LoginAsync_ShouldReturnOK_WhenLoginWithEmailIsSuccessful()
@@ -174,7 +175,7 @@ public class AuthServiceTests : TestBase
         result.Value.AccessToken.Should().StartWith("mocked-jwt-token");
 
         result.Value.RefreshToken.Should().NotBeNullOrEmpty();
-        result.Value.RefreshToken.Should().StartWith("mocked-refresh-token");
+        
     }
 
     [Fact]
@@ -218,6 +219,107 @@ public class AuthServiceTests : TestBase
         error.Code.Should().Be("invalidLoginOrPassword");
         result.Value.Should().BeNull();
     }
+    [Fact]
+    public async Task LogoutAsync_ShouldReturnOK_WhenLogoutIsSuccessful()
+    {
+        var user = new User
+        {
+            Nickname = "testuser",
+            Login = "testuser",
+            Email = "test@example.com",
+            PasswordHash = _passwordHasher.HashPassword(null!, "Password123!")
+        };
+        DbContext.Users.Add(user);
+        await DbContext.SaveChangesAsync();
+
+        var response = await _authService.LoginAsync(new LoginRequest
+        {
+            Login = "testuser",
+            Password = "Password123!"
+        });
+        response.IsError.Should().BeFalse();
+        var refreshToken = response.Value.RefreshToken;
+
+        var result = await _authService.LogoutAsync(refreshToken);
+        result.IsError.Should().BeFalse();
+    }
+ 
+    [Fact]
+    public async Task RefreshTokenAsync_ShouldReturnOK_WhenRefreshIsSuccessful()
+    {
+        var user = new User
+        {
+            Nickname = "testuser",
+            Login = "testuser",
+            Email = "test@example.com",
+            PasswordHash = _passwordHasher.HashPassword(null!, "Password123!")
+        };
+        DbContext.Users.Add(user);
+        await DbContext.SaveChangesAsync();
+
+        var response = await _authService.LoginAsync(new LoginRequest
+        {
+            Login = "testuser",
+            Password = "Password123!"
+        });
+        response.IsError.Should().BeFalse();
+        var refreshToken = response.Value.RefreshToken;
+
+        var result = await _authService.RefreshAsync(refreshToken);
+        result.IsError.Should().BeFalse();
+        result.Value.AccessToken.Should().NotBeNullOrEmpty();
+        result.Value.AccessToken.Should().StartWith("mocked-jwt-token");
+        result.Value.RefreshToken.Should().NotBeNullOrEmpty();
+       
     
-   
+    }
+    [Fact]
+    public async Task RefreshTokenAsync_ShouldReturnUnauthorized_WhenRefreshTokenIsInvalid()
+    {
+        var result = await _authService.RefreshAsync("invalid-refresh-token");
+        result.IsError.Should().BeTrue();
+        var error = result.FirstError;
+        error.Code.Should().Be("invalidRefreshToken");
+    }
+    [Fact]
+    public async Task RefreshTokenAsync_ShouldReturnUnauthorized_WhenRefreshTokenIsMissing()
+    {
+        var result = await _authService.RefreshAsync("");
+        result.IsError.Should().BeTrue();
+        var error = result.FirstError;
+        error.Code.Should().Be("invalidRefreshToken");
+    }
+    [Fact]
+    public async Task GetMeAsync_ShouldReturnOK_WhenUserExists()
+    {
+        var user = new User
+        {
+            Nickname = "testuser",
+            Login = "testuser",
+            Email = "test@test.test",
+            PasswordHash = _passwordHasher.HashPassword(null!, "Password123!")
+        };
+        DbContext.Users.Add(user);
+        await DbContext.SaveChangesAsync();
+
+        var loginResult = await _authService.LoginAsync(new LoginRequest
+        {
+            Login = "testuser",
+            Password = "Password123!"
+        });
+
+        var result = await _authService.GetMeAsync(user.Id.ToString());
+        result.IsError.Should().BeFalse();
+    }
+    [Fact]
+    public async Task GetMeAsync_ShouldReturnNotFound_WhenUserDoesNotExist()
+    {
+        var result = await _authService.GetMeAsync(Guid.NewGuid().ToString());
+        result.IsError.Should().BeTrue();
+        var error = result.FirstError;
+        error.Code.Should().Be("userNotFound");
+    }
+    
+
+    
 }

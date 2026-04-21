@@ -139,7 +139,11 @@ public class AuthService : IAuthService
         {
             return Error.Unauthorized("invalidAccessToken", "Access token is invalid.");
         }
-        var userEntity = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id.ToString() == sub);
+        if (!Guid.TryParse(sub, out var userId))
+        {
+            return Error.Unauthorized("invalidAccessToken", "Access token is invalid.");
+        }
+        var userEntity = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
         if (userEntity == null)
             return Error.NotFound("userNotFound", "User account no longer exists.");
         return userEntity.ToGetMeResponse();

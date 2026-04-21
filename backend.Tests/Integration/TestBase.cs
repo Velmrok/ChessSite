@@ -63,6 +63,8 @@ public class TestBase : IClassFixture<WebApplicationFactory<Program>>
 
                services.AddDistributedMemoryCache();
 
+              
+
                services.AddSingleton(sp => 
                 {
                     var mockMultiplexer = Substitute.For<IConnectionMultiplexer>();

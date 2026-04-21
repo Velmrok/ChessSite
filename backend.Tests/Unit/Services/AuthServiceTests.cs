@@ -118,6 +118,22 @@ public class AuthServiceTests : TestBase
         result.Value.RefreshToken.Should().NotBeNullOrEmpty();
         
     }
+    [Fact]
+    public async Task RegisterAsync_ShouldReturnValidationError_WhenFieldsAreMissing()
+    {
+        var request = new RegisterRequest
+        {
+            Nickname = "",
+            Login = "",
+            Email = "",
+            Password = ""
+        };
+
+        var result = await _authService.RegisterAsync(request);
+        result.IsError.Should().BeTrue();
+        var error = result.FirstError;
+        error.Code.Should().Be("invalidInput");
+    }
 
 
     [Fact]
@@ -149,6 +165,46 @@ public class AuthServiceTests : TestBase
         result.Value.RefreshToken.Should().NotBeNullOrEmpty();
         
     }
+    [Fact]
+    public async Task LoginAsync_ShouldReturnOK_ShouldTrimInput()
+    {
+        DbContext.Users.Add(new User
+        {
+            Nickname = "testuser",
+            Login = "testuser",
+            Email = "test@example.com",
+            PasswordHash = _passwordHasher.HashPassword(null!, "Password123!")
+        });
+        await DbContext.SaveChangesAsync();
+        var existingRequest = new LoginRequest
+        {
+            Login = "testuser   ",
+            Password = "Password123!            "
+        };
+        var result = await _authService.LoginAsync(existingRequest);
+        result.IsError.Should().BeFalse();
+
+        result.Value.AccessToken.Should().NotBeNullOrEmpty();
+        result.Value.AccessToken.Should().StartWith("mocked-jwt-token");
+
+        result.Value.RefreshToken.Should().NotBeNullOrEmpty();
+        
+    }
+    [Fact]
+    public async Task LoginAsync_ShouldReturnValidationError_WhenFieldsAreMissing()
+    {
+        var request = new LoginRequest
+        {
+            Login = "",
+            Password = ""
+         };
+
+        var result = await _authService.LoginAsync(request);
+        result.IsError.Should().BeTrue();
+        var error = result.FirstError;
+        error.Code.Should().Be("invalidLoginOrPassword");
+    }
+
     [Fact]
     public async Task LoginAsync_ShouldReturnOK_WhenLoginWithEmailIsSuccessful()
     {
@@ -218,6 +274,23 @@ public class AuthServiceTests : TestBase
         var error = result.FirstError;
         error.Code.Should().Be("invalidLoginOrPassword");
         result.Value.Should().BeNull();
+    }
+    [Theory]
+    [InlineData(null, "Password123!")]
+    [InlineData("testuser", null)]
+    [InlineData("", "Password123!")]
+    [InlineData("testuser", "")]
+    [InlineData(null, null)]
+    [InlineData("", "")]
+    public async Task LoginAsync_ShouldReturnUnauthorized_WhenFieldIsNullOrEmpty(string? login, string? password)
+    {
+        var request = new LoginRequest
+        {
+            Login = login,
+            Password = password
+        };
+        var result = await _authService.LoginAsync(request);
+        result.IsError.Should().BeTrue();
     }
     [Fact]
     public async Task LogoutAsync_ShouldReturnOK_WhenLogoutIsSuccessful()
@@ -289,6 +362,64 @@ public class AuthServiceTests : TestBase
         var error = result.FirstError;
         error.Code.Should().Be("invalidRefreshToken");
     }
+    [Fact]
+    public async Task RefreshTokenAsync_ShouldReturnUnauthorized_WhenRefreshTokenIsExpired()
+    {
+        var user = new User
+        {
+            Nickname = "testuser",
+            Login = "testuser",
+            Email = "test@test.test",
+            PasswordHash = _passwordHasher.HashPassword(null!, "Password123!")
+        };
+        DbContext.Users.Add(user);
+        await DbContext.SaveChangesAsync();
+        
+        var refreshTokenEntity = new RefreshToken
+        {
+            Token = "expired-refresh-token",
+            UserId = user.Id,
+            ExpiresAt = DateTime.UtcNow.AddHours(-1) ,
+            User = user
+        };
+        DbContext.RefreshTokens.Add(refreshTokenEntity);
+        await DbContext.SaveChangesAsync();
+
+        var result = await _authService.RefreshAsync(refreshTokenEntity.Token);
+        result.IsError.Should().BeTrue();
+        var error = result.FirstError;
+        error.Code.Should().Be("invalidRefreshToken");
+    }
+    [Fact]
+    public async Task RefreshTokenAsync_ShouldReturnUnauthorized_WhenRefreshTokenIsRevoked()
+    {
+        var user = new User
+        {
+            Nickname = "testuser",
+            Login = "testuser",
+            Email = "test@test.test",
+            PasswordHash = _passwordHasher.HashPassword(null!, "Password123!")
+        };
+        DbContext.Users.Add(user);
+        await DbContext.SaveChangesAsync();
+
+        var refreshTokenEntity = new RefreshToken
+        {
+            Token = "revoked-refresh-token",
+            UserId = user.Id,
+            ExpiresAt = DateTime.UtcNow.AddHours(1),
+            IsRevoked = true,
+            User = user
+        };
+        DbContext.RefreshTokens.Add(refreshTokenEntity);
+        await DbContext.SaveChangesAsync();
+
+        var result = await _authService.RefreshAsync(refreshTokenEntity.Token);
+        result.IsError.Should().BeTrue();
+        var error = result.FirstError;
+        error.Code.Should().Be("invalidRefreshToken");
+    }
+
     [Fact]
     public async Task GetMeAsync_ShouldReturnOK_WhenUserExists()
     {

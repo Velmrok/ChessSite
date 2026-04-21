@@ -30,8 +30,15 @@ public class AuthService : IAuthService
         _cacheInvalidation = cacheInvalidation;
     }
     public async Task<ErrorOr<AuthResult>> RegisterAsync(RegisterRequest request)
-    {
-
+    {   
+        if (string.IsNullOrWhiteSpace(request.Email) || string.IsNullOrWhiteSpace(request.Login) ||
+            string.IsNullOrWhiteSpace(request.Nickname) || string.IsNullOrWhiteSpace(request.Password))
+        {
+            return Error.Validation("invalidInput", "All fields are required.");
+        }
+        request.Email = request.Email.Trim();
+        request.Login = request.Login.Trim();
+        request.Nickname = request.Nickname.Trim();
 
         var passwordHash = _passwordHasher.HashPassword(null!, request.Password);
             var newUser = new User
@@ -44,8 +51,6 @@ public class AuthService : IAuthService
                 ProfilePictureUrl = "",
             };
         await _dbContext.Users.AddAsync(newUser);
-
-        
 
 
         try
@@ -77,6 +82,12 @@ public class AuthService : IAuthService
     }
     public async Task<ErrorOr<AuthResult>> LoginAsync(LoginRequest request)
     {
+        if (string.IsNullOrWhiteSpace(request.Login) || string.IsNullOrWhiteSpace(request.Password))
+        {
+            return Error.Unauthorized("invalidLoginOrPassword", "Invalid login or password.");
+        }
+        request.Login = request.Login.Trim();
+        request.Password = request.Password.Trim();
         var user = await _dbContext.Users.FirstOrDefaultAsync(u =>
             u.Login == request.Login || u.Email == request.Login);
 

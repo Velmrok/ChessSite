@@ -98,7 +98,7 @@ public class AuthEndpointTests : TestBase
         response.StatusCode.Should().Be(System.Net.HttpStatusCode.Unauthorized);
     }
     [Fact]
-    public async Task LoginEndpoint_ShouldReturn409TooManyRequests_WhenRateLimitExceeded()
+    public async Task LoginEndpoint_ShouldReturn429TooManyRequests_WhenRateLimitExceeded()
     {
         var loginRequest = new LoginRequest
         {

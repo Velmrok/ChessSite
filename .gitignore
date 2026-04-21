@@ -15,6 +15,7 @@ old_backend
 *.userosscache
 *.sln.docstates
 
+coveragereport
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 *.ttf

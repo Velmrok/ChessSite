@@ -110,6 +110,26 @@ public class UsersEndpointTests : TestBase
         secondResponse.Headers.Contains("X-Cache").Should().BeTrue();
         secondResponse.Headers.GetValues("X-Cache").First().Should().Be("HIT");
     }
-    
-   
+    [Fact]
+    public async Task GetUsersEndpoint_ShouldReturnNotCachedResponse_AfterUserRegistration()
+    {
+        await LoginAsUserAsync();
+
+        var response = await _client.GetAsync("/users?search=test");
+        response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+        response.Headers.Contains("X-Cache").Should().BeTrue();
+        response.Headers.GetValues("X-Cache").First().Should().Be("MISS");
+
+        var secondResponse = await _client.GetAsync("/users?search=test");
+        secondResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+        secondResponse.Headers.Contains("X-Cache").Should().BeTrue();
+        secondResponse.Headers.GetValues("X-Cache").First().Should().Be("HIT");
+
+        await LoginAsUserAsync(email: "newuser@example.com", login: "newuser", nickname: "NewUser", password: "123456");
+
+        var thirdResponse = await _client.GetAsync("/users?search=test");
+        thirdResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+        thirdResponse.Headers.Contains("X-Cache").Should().BeTrue();
+        thirdResponse.Headers.GetValues("X-Cache").First().Should().Be("MISS");
+    }
 }

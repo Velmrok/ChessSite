@@ -2,28 +2,23 @@
 
 using backend.Services.Interfaces;
 using Microsoft.Extensions.Caching.Distributed;
-using StackExchange.Redis;
 
 namespace backend.Services.Helpers.Auth;
 
 public class CacheInvalidationService : ICacheInvalidationService
 {
-   
-    private readonly IConnectionMultiplexer _redis;
+    private readonly IDistributedCache _cache;
 
-    public CacheInvalidationService(IConnectionMultiplexer redis)
+    public CacheInvalidationService(IDistributedCache cache)
     {
-        _redis = redis;
+        _cache = cache;
     }
 
     public async Task InvalidateUsersCache()
     {
-        var server = _redis.GetServer(_redis.GetEndPoints().First());
-        var keys = server.Keys(pattern: "ChessSite:users:*");
-        var db = _redis.GetDatabase();
-        foreach (var key in keys)
-        {
-            await db.KeyDeleteAsync(key);
-        }
+        var versionString = await _cache.GetStringAsync("users:version");
+        if (!int.TryParse(versionString, out int version)) version = 0;
+        version++;
+        await _cache.SetStringAsync("users:version", version.ToString());
     }
 }

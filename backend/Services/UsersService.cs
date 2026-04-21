@@ -43,9 +43,10 @@ public class UsersService : IUsersService
     }
     public async Task<UsersResult> GetAllUsersAsync(GetUsersQuery query)
     {
-         var cacheKey = $"users:{query.Page}:{query.Limit}:{query.Search}:" +
-                       $"{query.SortBy}:{query.SortDescending}:{query.RatingType}:" +
-                       $"{query.MinRating}:{query.MaxRating}:{query.Online}";
+        var version = await _cache.GetStringAsync("users:version") ?? "0";
+        var cacheKey = $"users_v{version}:users:{query.Page}:{query.Limit}:{query.Search}:" +
+                  $"{query.SortBy}:{query.SortDescending}:{query.RatingType}:" +
+                  $"{query.MinRating}:{query.MaxRating}:{query.Online}";
 
         
         var cached = await _cache.GetStringAsync(cacheKey);

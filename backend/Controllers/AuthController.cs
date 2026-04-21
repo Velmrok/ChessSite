@@ -5,7 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using backend.DTO.Auth;
-using backend.Errors;
+using backend.Extensions;
 using backend.Services.Helpers.Auth;
 using backend.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;

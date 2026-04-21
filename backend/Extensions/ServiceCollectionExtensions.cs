@@ -1,10 +1,11 @@
 using backend.Models;
+using backend.Services;
 using backend.Services.Helpers.Auth;
 using backend.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 
 
-namespace backend.Services;
+namespace backend.Extensions;
 public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)

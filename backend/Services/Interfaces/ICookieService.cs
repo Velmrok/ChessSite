@@ -1,4 +1,4 @@
-
+namespace backend.Services.Interfaces;
 public interface ICookieService
 {
     public void SetJwtCookie(HttpResponse response, string token);

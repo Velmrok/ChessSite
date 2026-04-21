@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+namespace backend.Data;
 
 public static class QueryableExtensions
 {

@@ -1,3 +1,5 @@
+using backend.Services.Interfaces;
+
 namespace backend.Services.Helpers.Auth
 {
     public  class CookieService : ICookieService

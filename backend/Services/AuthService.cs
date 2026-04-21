@@ -5,12 +5,7 @@ using backend.Models;
 using backend.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using ErrorOr;
-using System.IdentityModel.Tokens.Jwt;
-using System.Net;
-using backend.Services.Helpers.Auth;
-using backend.DTO.Users;
 using backend.Services.Mappers;
 using backend.Services.Results;
 

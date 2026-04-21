@@ -1,7 +1,10 @@
 // backend/Services/Helpers/CacheInvalidationService.cs
 
+using backend.Services.Interfaces;
 using Microsoft.Extensions.Caching.Distributed;
 using StackExchange.Redis;
+
+namespace backend.Services.Helpers.Auth;
 
 public class CacheInvalidationService : ICacheInvalidationService
 {

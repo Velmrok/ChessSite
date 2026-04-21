@@ -3,7 +3,8 @@
 
 @font-face {
   font-family: 'MyFancyFont';
-  src: url('./assets/fonts/zh-cn.ttf') format('truetype');
+  src: url('./assets/fonts/BreeSerif-Regular.woff2') format('woff2'),
+      
 }
 body {
   overflow-x: hidden; 

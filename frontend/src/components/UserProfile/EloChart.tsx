@@ -1,3 +1,4 @@
+import { useApi } from "@/hooks/useApi";
 import { getEloHistory } from "@/services/userService";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -12,11 +13,14 @@ export default function EloChart() {
     const nickname = useParams<{ nickname: string }>().nickname;
     const [gameType, setGameType] = useState<'ratingRapid' | 'ratingBlitz' | 'ratingBullet'>('ratingRapid');
     const { t } = useTranslation("profile");
+
+    const { request } = useApi();
     useEffect(() => {
         const fetch = async () => {
-            const data = await getEloHistory(nickname!, gameType);
+            const data = await request(() => getEloHistory(nickname!, gameType));
+            if (data)
             setEloHistory(data.map((x, i) => ({ i, date: x.date.slice(0, 10), rating: x.rating })));
-            console.log(data);
+           
         };
         fetch();
     }, [nickname, gameType]);

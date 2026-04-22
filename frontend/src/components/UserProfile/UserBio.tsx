@@ -3,6 +3,7 @@ import { updateUserBio } from "../../services/userService";
 import useToastStore from "@/stores/useToastStore";
 import useUserStore from "@/stores/useUserStore";
 import { useTranslation } from "react-i18next";
+import { useApi } from "@/hooks/useApi";
 
 
 
@@ -20,20 +21,24 @@ export default function UserBio({ bio, nickname }: Props) {
     const [bioValue, setBioValue] = useState(bio);
     const setToast = useToastStore((state) => state.setToast);
     const textAreaRef = useRef<HTMLTextAreaElement>(null);
+
+    const { request } = useApi();
+
     const handleEditClick = async () => {
         const newValue = textAreaRef.current?.value;
-        try {
-            const updatedBio = await updateUserBio(nickname!, newValue || "");
+
+        const updatedBio = await request(() => updateUserBio(nickname!, newValue || ""), {
+            onError: (message) => {
+                setToast({ msg: toastT(message) + ` ${textAreaRef.current?.value.length}/200`, type: "error" });
+                return;
+
+            }
+        });
+        if (updatedBio) {
             setBioValue(updatedBio.bio);
             setEditing(false);
+
             setToast({ msg: toastT('success.changedBio'), type: "success" });
-        } catch (error: any) {
-            if (error.message == "BioTooLong") {
-                setToast({ msg: toastT('error.bioTooLong') + ` ${textAreaRef.current?.value.length}/200`, type: "error" });
-                return;
-            }
-            console.error("Failed to update bio:", error);
-            setToast({ msg: toastT('error.changedBio'), type: "error" });
         }
     };
     return (

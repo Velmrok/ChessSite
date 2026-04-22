@@ -1,5 +1,5 @@
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import AddFriendButton from "../global/AddFriendButton";
 import useUserStore from "@/stores/useUserStore";
@@ -8,6 +8,8 @@ import { useUserProfileStore } from "@/stores/useUserProfileStore";
 import PaginationButtons from "../global/Pagination_buttons";
 import Rating from "../global/Rating";
 import { useTranslation } from "react-i18next";
+import { fetchUserFriends } from "@/services/userService";
+import { useApi } from "@/hooks/useApi";
 
 
 export default function FriendList() {
@@ -15,15 +17,24 @@ export default function FriendList() {
     const { t } = useTranslation("profile");
     const user = useUserStore((state) => state.user);
     const friends = useUserProfileStore((state) => state.friends);
-    const loadingFriends = useUserProfileStore((state) => state.loadingFriends);
-    const fetchFriends = useUserProfileStore(state => state.fetchFriends);
+    const [loading, setLoading] = useState(false);
+    const setFriends = useUserProfileStore(state => state.setFriends);
     const friendsPage = useUserProfileStore(state => state.friendsPage);
     const totalFriendsPages = useUserProfileStore(state => state.totalFriendsPages);
     const setFriendsPage = useUserProfileStore(state => state.setFriendsPage);
 
+    const { request } = useApi();
     useEffect(() => {
-
-        fetchFriends(nickname!);
+        setLoading(true);
+        const fetch = async () => { 
+            const response = await request(() => fetchUserFriends(nickname!, friendsPage));
+            if (response) {
+                setFriends(response.friendList);
+                
+            }
+            setLoading(false);
+        };
+        fetch();
     }, [nickname, friendsPage]);
     if (friends.length === 0) {
         return (
@@ -50,7 +61,7 @@ export default function FriendList() {
             </div>
             <div className="grid grid-cols-1 px-4 py-2 lg:p-5 items-center 
         w-full xl:w-100 mt-4 bg-gray-800/[30%] rounded-lg gap-4">
-                {loadingFriends ? <Loading /> :
+                {loading ? <Loading /> :
                     friends && friends.map((friend) => (
                         <div key={friend.nickname} className="flex items-center gap-4
                  bg-gray-900/50 p-2 rounded-md w-full justify-between px-3 sm:px-6 relative">

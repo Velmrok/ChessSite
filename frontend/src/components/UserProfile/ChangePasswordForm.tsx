@@ -1,3 +1,4 @@
+import { useApi } from "@/hooks/useApi";
 import { changePassword } from "@/services/userService";
 import useToastStore from "@/stores/useToastStore";
 import useUserStore from "@/stores/useUserStore";
@@ -13,27 +14,31 @@ export default function ChangePasswordForm({ onClose }: Props) {
     const setToast = useToastStore((state) => state.setToast);
     const { t } = useTranslation("profile");
     const { t: toastT } = useTranslation("toast");
+
+    const { request } = useApi();
     if (!user) return null;
+
+
     const formik = useFormik({
         initialValues: {
             currentPassword: '',
             newPassword: '',
         },
         onSubmit: async (values) => {
-            try {
-                await changePassword(user.nickname, values.currentPassword, values.newPassword);
+
+            const response = await request(() => changePassword(user.nickname, values.currentPassword, values.newPassword),
+                {
+                    onError: (message) => {
+                        setToast({ msg: toastT(message), type: "error" });
+                        setToast({ msg: toastT(message), type: "error" });
+                    }
+                });
+            if (response) {
                 setToast({ msg: toastT('success.changedPassword'), type: "success" });
                 formik.resetForm();
                 onClose();
-
-            } catch (error) {
-                console.error("Failed to change password:", error);
-                if ((error as Error).message === "InvalidPassword") {
-                    setToast({ msg: toastT('error.wrongPassword'), type: "error" });
-                    return;
-                }
-                setToast({ msg: toastT('error.changedPassword'), type: "error" });
             }
+
         }
 
     });

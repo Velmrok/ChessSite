@@ -14,11 +14,15 @@ import DeleteAccountButton from "../components/global/DeleteAccountButton";
 import EloChart from "@/components/UserProfile/EloChart";
 import ChangePasswordForm from "@/components/UserProfile/ChangePasswordForm";
 import { useTranslation } from "react-i18next";
+import { fetchUserProfile } from "@/services/userService";
+import { useApi } from "@/hooks/useApi";
+
+
 export default function UserProfilePage() {
     const nickname = useParams<{ nickname: string }>().nickname;
     const profile = useUserProfileStore(s => s.profile);
     const setProfile = useUserProfileStore(s => s.setProfile);
-    const fetchProfile = useUserProfileStore(s => s.fetchProfile);
+    //const fetchProfile = useUserProfileStore(s => s.fetchProfile);
     const [showPasswordForm, setShowPasswordForm] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [activeTab, setActiveTab] = useState<'history' | 'friends'|'elo'>('history');
@@ -26,17 +30,17 @@ export default function UserProfilePage() {
     const { t } = useTranslation('profile');
     const loggedUserFriendList = useUserStore((state) => state.friendList);
     const [isDeleted, setIsDeleted] = useState(false);
+    const {request} = useApi();
+
+    
     useEffect( () => {
         const fetch = async () => {
         setIsLoading(true);
-        try {
-
-            await fetchProfile(nickname!);
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setIsLoading(false);
-        }
+        var profile = await request(()=>fetchUserProfile(nickname!))
+        if(profile)
+            setProfile(profile);
+        setIsLoading(false);
+       
     };
         fetch();
     }, [nickname]);

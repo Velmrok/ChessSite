@@ -1,4 +1,4 @@
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 
 import { FaChessPawn } from "react-icons/fa";
 import { Link, useParams } from "react-router-dom";
@@ -6,6 +6,8 @@ import Loading from "../global/Loading";
 import { useUserProfileStore } from "@/stores/useUserProfileStore";
 import PaginationButtons from "../global/Pagination_buttons";
 import { useTranslation } from "react-i18next";
+import { fetchUserGameHistory } from "@/services/userService";
+import { useApi } from "@/hooks/useApi";
 
 
 
@@ -14,19 +16,29 @@ export default function UserGameHistory() {
   const nickname = useParams<{ nickname: string }>().nickname;
   const { t } = useTranslation("profile");
   const games = useUserProfileStore(state => state.games);
-  const loading = useUserProfileStore(state => state.loadingGames);
-  const fetchGames = useUserProfileStore(state => state.fetchGames);
+  const [loading, setLoading] = useState(false);
+  //const fetchGames = useUserProfileStore(state => state.fetchGames);
   const gamesPage = useUserProfileStore(state => state.gamesPage);
   const totalGamesPages = useUserProfileStore(state => state.totalGamesPages);
+  const setGames = useUserProfileStore(state => state.setGames);
   const setGamesPage = useUserProfileStore(state => state.setGamesPage);
-
+  const { request } = useApi();
 
   useEffect(() => {
     setGamesPage(1);
   }, [nickname]);
 
   useEffect(() => {
-    fetchGames(nickname!);
+    setLoading(true);
+    const fetch = async () => {
+      var response = await request(() => fetchUserGameHistory(nickname!, gamesPage));
+      if (response) {
+        setGames(response.gameHistory);
+      }
+      setLoading(false);
+
+    }
+    fetch();
 
   }, [gamesPage, nickname]);
 

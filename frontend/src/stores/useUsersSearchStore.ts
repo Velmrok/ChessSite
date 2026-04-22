@@ -43,17 +43,30 @@ const useUsersSearchStore = create<SearchStore>((set) => ({
             page: 1,
         }
     }),
-    getParamsLink: ():string => {
-     
-        return "?Search=" + encodeURIComponent(useUsersSearchStore.getState().params.search) +
-            "&Limit=" + useUsersSearchStore.getState().params.limit +
-            "&MinRating=" + useUsersSearchStore.getState().params.minRating +
-            "&MaxRating=" + useUsersSearchStore.getState().params.maxRating +
-            "&JustOnline=" + useUsersSearchStore.getState().params.online +
-            "&SortBy=" + useUsersSearchStore.getState().params.sortBy +
-            "&SortDescending=" + useUsersSearchStore.getState().params.sortDescending +
-            "&Page=" + useUsersSearchStore.getState().params.page +
-            "&RatingType=" + useUsersSearchStore.getState().params.ratingType;
+    getParamsLink: (): string => {
+        const params = useUsersSearchStore.getState().params;
+
+        const query = new URLSearchParams();
+
+        const append = (key: string, value: unknown, defaultValue?: unknown) => {
+            if (value === undefined || value === null) return;
+            if (value === "") return;
+            if (defaultValue !== undefined && value === defaultValue) return;
+            query.append(key, String(value));
+        };
+
+        append("Search", params.search);
+        append("Limit", params.limit, 10);
+        append("MinRating", params.minRating, 0);
+        append("MaxRating", params.maxRating, 3000);
+        append("JustOnline", params.online, false);
+        append("SortBy", params.sortBy, "CreatedAt");
+        append("SortDescending", params.sortDescending, true);
+        append("Page", params.page, 1);
+        append("RatingType", params.ratingType, "Rapid");
+
+        const queryString = query.toString();
+        return queryString ? `?${queryString}` : "";
     },
     setOrder: (sortBy) => set((state) => {
         if(state.params.sortBy === sortBy){

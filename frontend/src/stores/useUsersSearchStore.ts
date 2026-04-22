@@ -49,7 +49,7 @@ const useUsersSearchStore = create<SearchStore>((set) => ({
             "&Limit=" + useUsersSearchStore.getState().params.limit +
             "&MinRating=" + useUsersSearchStore.getState().params.minRating +
             "&MaxRating=" + useUsersSearchStore.getState().params.maxRating +
-            "&Online=" + useUsersSearchStore.getState().params.online +
+            "&JustOnline=" + useUsersSearchStore.getState().params.online +
             "&SortBy=" + useUsersSearchStore.getState().params.sortBy +
             "&SortDescending=" + useUsersSearchStore.getState().params.sortDescending +
             "&Page=" + useUsersSearchStore.getState().params.page +

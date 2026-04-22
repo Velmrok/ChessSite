@@ -3,9 +3,11 @@
 using System.Net.Http.Json;
 using backend.DTO.Auth;
 using backend.DTO.Users;
+using backend.Models;
 using backend.Tests.Integration;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.Caching.Distributed;
 
 public class UsersEndpointTests : TestBase
 {
@@ -13,25 +15,6 @@ public class UsersEndpointTests : TestBase
     {
     }
     
-    private async Task LoginAsUserAsync(
-        string email = "test@test.com",
-        string login = "testuser",
-        string nickname = "TestNick",
-        string password = "123456")
-    {
-
-        var registerRequest = new RegisterRequest
-        {
-            Email = email,
-            Login = login,
-            Nickname = nickname,
-            Password = password
-        };
-        var response = await _client.PostAsJsonAsync("/auth/register", registerRequest);
-
-        response.StatusCode.Should().Be(System.Net.HttpStatusCode.Created);
-        
-    }
 
     [Fact]
     public async Task GetUsersEndpoint_WithNoUsers_ShouldReturnOk()
@@ -125,11 +108,33 @@ public class UsersEndpointTests : TestBase
         secondResponse.Headers.Contains("X-Cache").Should().BeTrue();
         secondResponse.Headers.GetValues("X-Cache").First().Should().Be("HIT");
 
-        await LoginAsUserAsync(email: "newuser@example.com", login: "newuser", nickname: "NewUser", password: "123456");
+        await RegisterUserAsync(email: "newuser@example.com", login: "newuser", nickname: "NewUser", password: "123456");
 
         var thirdResponse = await _client.GetAsync("/users?search=test");
         thirdResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
         thirdResponse.Headers.Contains("X-Cache").Should().BeTrue();
         thirdResponse.Headers.GetValues("X-Cache").First().Should().Be("MISS");
+    }
+    [Fact]
+    public async Task GetUsersEndpoint_ShouldReturnOnlyOnlineUsers_WhenFilterOnlineIsTrue()
+    {
+        await LoginAsUserAsync();
+        var onlineUser = await MakeUserAsync("onlineuser@example.com", "onlineuser", "OnlineUser", "123456");
+
+        await _cache.SetStringAsync($"user:online:{onlineUser.Id}", "1", new DistributedCacheEntryOptions
+        {
+            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+         });
+
+        var response = await _client.GetAsync("/users?JustOnline=true");
+        response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+        var jsonData = await response.Content.ReadFromJsonAsync<UsersResponse>();
+
+        jsonData.Should().NotBeNull();
+        var users = jsonData.Users;
+
+        users.Should().NotBeNull();
+        users.Should().HaveCount(1);
+        users.First().Nickname.Should().Be(onlineUser.Nickname);
     }
 }

@@ -3,6 +3,7 @@ using backend.DTO.Users;
 using backend.Enums;
 using backend.Models;
 using backend.Services;
+using backend.Services.Interfaces;
 using FluentAssertions;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,6 +14,7 @@ namespace backend.Tests.Unit.Services;
 public class UsersServiceTests : TestBase
 {
     private readonly UsersService _usersService;
+    private readonly IPresenceService _presenceService;
 
     public UsersServiceTests()
     {
@@ -21,7 +23,8 @@ public class UsersServiceTests : TestBase
         var provider = services.BuildServiceProvider();
 
         var cache = provider.GetRequiredService<IDistributedCache>();
-        _usersService = new UsersService(DbContext, cache);
+        _presenceService = Substitute.For<IPresenceService>();
+        _usersService = new UsersService(DbContext, cache, _presenceService);
     }
 
     private User MakeUser(string name, int rapid = 1000, int blitz = 1000, int bullet = 1000,
@@ -51,7 +54,7 @@ public class UsersServiceTests : TestBase
         await SeedAsync(MakeUser("alice"), MakeUser("bob"), MakeUser("carol"));
 
         var result = await _usersService.GetAllUsersAsync(new GetUsersQuery());
-        var users = result.Response.Users;
+        var users = result.Value.Response.Users;
 
         users.Should().HaveCount(3);
     }
@@ -61,8 +64,8 @@ public class UsersServiceTests : TestBase
     {
         var result = await _usersService.GetAllUsersAsync(new GetUsersQuery());
 
-        result.Response.Users.Should().BeEmpty();
-        result.Response.TotalPages.Should().Be(0);
+        result.Value.Response.Users.Should().BeEmpty();
+        result.Value.Response.TotalPages.Should().Be(0);
     }
 
 
@@ -73,8 +76,8 @@ public class UsersServiceTests : TestBase
 
         var result = await _usersService.GetAllUsersAsync(new GetUsersQuery(Search: "ma"));
 
-        result.Response.Users.Should().HaveCount(2);
-        result.Response.Users.Should().AllSatisfy(u => u.Nickname.Should().Contain("ma"));
+        result.Value.Response.Users.Should().HaveCount(2);
+        result.Value.Response.Users.Should().AllSatisfy(u => u.Nickname.Should().Contain("ma"));
     }
 
     [Fact]
@@ -84,7 +87,7 @@ public class UsersServiceTests : TestBase
 
         var result = await _usersService.GetAllUsersAsync(new GetUsersQuery(Search: "magnus"));
 
-        result.Response.Users.Should().HaveCount(1);
+        result.Value.Response.Users.Should().HaveCount(1);
     }
 
     [Fact]
@@ -94,7 +97,7 @@ public class UsersServiceTests : TestBase
 
         var result = await _usersService.GetAllUsersAsync(new GetUsersQuery(Search: "xyz"));
 
-        result.Response.Users.Should().BeEmpty();
+        result.Value.Response.Users.Should().BeEmpty();
     }
 
 
@@ -105,8 +108,8 @@ public class UsersServiceTests : TestBase
 
         var result = await _usersService.GetAllUsersAsync(new GetUsersQuery(Limit: 2));
 
-        result.Response.Users.Should().HaveCount(2);
-        result.Response.TotalPages.Should().Be(3); 
+        result.Value.Response.Users.Should().HaveCount(2);
+        result.Value.Response.TotalPages.Should().Be(3); 
     }
 
     [Fact]
@@ -123,9 +126,9 @@ public class UsersServiceTests : TestBase
 
         var page2 = await _usersService.GetAllUsersAsync(new GetUsersQuery(Page: 2, Limit: 2));
 
-        page2.Response.Users.Should().HaveCount(2);
-        page2.Response.Users[0].Nickname.Should().Be("c");
-        page2.Response.Users[1].Nickname.Should().Be("b");
+        page2.Value.Response.Users.Should().HaveCount(2);
+        page2.Value.Response.Users[0].Nickname.Should().Be("c");
+        page2.Value.Response.Users[1].Nickname.Should().Be("b");
     }
 
     [Theory]
@@ -143,7 +146,7 @@ public class UsersServiceTests : TestBase
 
         var result = await _usersService.GetAllUsersAsync(new GetUsersQuery(Limit: limit));
 
-        result.Response.TotalPages.Should().Be(expectedPages);
+        result.Value.Response.TotalPages.Should().Be(expectedPages);
     }
 
     [Fact]
@@ -154,7 +157,7 @@ public class UsersServiceTests : TestBase
         var result = await _usersService.GetAllUsersAsync(
             new GetUsersQuery(SortBy: UsersSortBy.Nickname, SortDescending: false));
 
-        result.Response.Users.Select(u => u.Nickname).Should().BeInAscendingOrder();
+        result.Value.Response.Users.Select(u => u.Nickname).Should().BeInAscendingOrder();
     }
 
     [Fact]
@@ -165,7 +168,7 @@ public class UsersServiceTests : TestBase
         var result = await _usersService.GetAllUsersAsync(
             new GetUsersQuery(SortBy: UsersSortBy.Nickname, SortDescending: true));
 
-        result.Response.Users.Select(u => u.Nickname).Should().BeInDescendingOrder();
+        result.Value.Response.Users.Select(u => u.Nickname).Should().BeInDescendingOrder();
     }
 
     [Fact]
@@ -180,8 +183,8 @@ public class UsersServiceTests : TestBase
 
         var result = await _usersService.GetAllUsersAsync(new GetUsersQuery());
 
-        result.Response.Users[0].Nickname.Should().Be("newest");
-        result.Response.Users[2].Nickname.Should().Be("oldest");
+        result.Value.Response.Users[0].Nickname.Should().Be("newest");
+        result.Value.Response.Users[2].Nickname.Should().Be("oldest");
     }
     [Fact]
     public async Task GetAllUsersAsync_SortBy_CreatedAt_Ascending_IsDefault()
@@ -195,8 +198,8 @@ public class UsersServiceTests : TestBase
 
         var result = await _usersService.GetAllUsersAsync(new GetUsersQuery(SortDescending: false));
 
-        result.Response.Users[0].Nickname.Should().Be("oldest");
-        result.Response.Users[2].Nickname.Should().Be("newest");
+        result.Value.Response.Users[0].Nickname.Should().Be("oldest");
+        result.Value.Response.Users[2].Nickname.Should().Be("newest");
     }
 
     [Fact]
@@ -211,8 +214,8 @@ public class UsersServiceTests : TestBase
         var result = await _usersService.GetAllUsersAsync(
             new GetUsersQuery(SortBy: UsersSortBy.LastActive, SortDescending: true));
 
-        result.Response.Users[0].Nickname.Should().Be("active");
-        result.Response.Users[1].Nickname.Should().Be("inactive");
+        result.Value.Response.Users[0].Nickname.Should().Be("active");
+        result.Value.Response.Users[1].Nickname.Should().Be("inactive");
     }
 
     
@@ -228,8 +231,8 @@ public class UsersServiceTests : TestBase
         var result = await _usersService.GetAllUsersAsync(
             new GetUsersQuery(SortBy: UsersSortBy.LastActive, SortDescending: false));
 
-        result.Response.Users[0].Nickname.Should().Be("inactive");
-        result.Response.Users[1].Nickname.Should().Be("active");
+        result.Value.Response.Users[0].Nickname.Should().Be("inactive");
+        result.Value.Response.Users[1].Nickname.Should().Be("active");
     }
 
   
@@ -249,9 +252,9 @@ public class UsersServiceTests : TestBase
         var result = await _usersService.GetAllUsersAsync(
             new GetUsersQuery(SortBy: UsersSortBy.Rating, SortDescending: true, RatingType: ratingType));
 
-        result.Response.Users[0].Nickname.Should().Be("strong");
-        result.Response.Users[1].Nickname.Should().Be("medium");
-        result.Response.Users[2].Nickname.Should().Be("weak");
+        result.Value.Response.Users[0].Nickname.Should().Be("strong");
+        result.Value.Response.Users[1].Nickname.Should().Be("medium");
+        result.Value.Response.Users[2].Nickname.Should().Be("weak");
     }
     [Theory]
     [InlineData(RatingType.Rapid)]
@@ -268,9 +271,9 @@ public class UsersServiceTests : TestBase
         var result = await _usersService.GetAllUsersAsync(
             new GetUsersQuery(SortBy: UsersSortBy.Rating, SortDescending: false, RatingType: ratingType));
 
-        result.Response.Users[0].Nickname.Should().Be("weak");
-        result.Response.Users[1].Nickname.Should().Be("medium");
-        result.Response.Users[2].Nickname.Should().Be("strong");
+        result.Value.Response.Users[0].Nickname.Should().Be("weak");
+        result.Value.Response.Users[1].Nickname.Should().Be("medium");
+        result.Value.Response.Users[2].Nickname.Should().Be("strong");
     }
 
     [Fact]
@@ -287,8 +290,8 @@ public class UsersServiceTests : TestBase
         var byBlitz = await _usersService.GetAllUsersAsync(
             new GetUsersQuery(SortBy: UsersSortBy.Rating, SortDescending: true, RatingType: RatingType.Blitz));
 
-        byRapid.Response.Users[0].Nickname.Should().Be("highRapid");
-        byBlitz.Response.Users[0].Nickname.Should().Be("highBlitz");
+        byRapid.Value.Response.Users[0].Nickname.Should().Be("highRapid");
+        byBlitz.Value.Response.Users[0].Nickname.Should().Be("highBlitz");
     }
 
   
@@ -306,7 +309,7 @@ public class UsersServiceTests : TestBase
         var result = await _usersService.GetAllUsersAsync(
             new GetUsersQuery(Search: "ma", Limit: 1));
 
-        result.Response.TotalPages.Should().Be(2); 
+        result.Value.Response.TotalPages.Should().Be(2); 
     }
 
     [Fact]
@@ -315,7 +318,7 @@ public class UsersServiceTests : TestBase
         await SeedAsync(MakeUser("alice"), MakeUser("bob"), MakeUser("carol"));
 
          var result = await _usersService.GetAllUsersAsync(new GetUsersQuery());
-        result.IsCached.Should().BeFalse();
+        result.Value.IsCached.Should().BeFalse();
     }
     [Fact]
     public async Task GetAllUsersAsync_ShouldReturnCachedResult_WhenCacheIsHit()
@@ -324,6 +327,73 @@ public class UsersServiceTests : TestBase
 
          var result1 = await _usersService.GetAllUsersAsync(new GetUsersQuery());
             var result2 = await _usersService.GetAllUsersAsync(new GetUsersQuery());
-            result2.IsCached.Should().BeTrue();
+            result2.Value.IsCached.Should().BeTrue();
+    }
+    [Fact]
+    public async Task GetAllUsersAsync_ShouldReturnAllOnlineUsers_WhenJustOnlineIsTrue()
+    {
+        var user1 = MakeUser("alice");
+        var user2 = MakeUser("bob");
+        var user3 = MakeUser("carol");
+        await SeedAsync(user1, user2, user3);
+
+        _presenceService.GetOnlineIdsAsync(Arg.Any<IEnumerable<Guid>>())
+            .Returns([user1.Id, user3.Id]);
+        
+        var response = await _usersService.GetAllUsersAsync(new GetUsersQuery(JustOnline: true));
+        response.Value.Response.Users.Should().HaveCount(2);
+        response.Value.Response.Users.Select(u => u.Nickname).Should().Contain(["alice", "carol"]);
+    }
+    [Fact]
+    public async Task GetAllUsersAsync_ShouldReturnNoUsers_WhenJustOnlineIsTrue_ButNoOneIsOnline()
+    {
+        var user1 = MakeUser("alice");
+        var user2 = MakeUser("bob");
+        await SeedAsync(user1, user2);
+
+        _presenceService.GetOnlineIdsAsync(Arg.Any<IEnumerable<Guid>>())
+            .Returns([]);
+        var response = await _usersService.GetAllUsersAsync(new GetUsersQuery(JustOnline: true));
+        response.Value.Response.Users.Should().BeEmpty();
+    }
+    [Fact]
+    public async Task GetAllUsersAsync_ShouldReturnAllUsers_WhenJustOnlineIsFalse()
+    {
+        var user1 = MakeUser("alice");
+        var user2 = MakeUser("bob");
+        await SeedAsync(user1, user2);
+        _presenceService.GetOnlineIdsAsync(Arg.Any<IEnumerable<Guid>>())
+            .Returns([user1.Id]);
+        var response = await _usersService.GetAllUsersAsync(new GetUsersQuery(JustOnline: false));
+        response.Value.Response.Users.Should().HaveCount(2);
+
+    }
+    [Fact]
+    public async Task GetAllUsersAsync_ShouldApplyOnlineFilter_BeforePagination()
+    {
+        var users = Enumerable.Range(1, 20)
+            .Select(i => MakeUser($"user{i}"))
+            .ToArray();
+        await SeedAsync(users);
+
+        var onlineIds = users.Take(5).Select(u => u.Id).ToHashSet();
+        _presenceService.GetOnlineIdsAsync(Arg.Any<IEnumerable<Guid>>())
+            .Returns(onlineIds);
+
+        var response = await _usersService.GetAllUsersAsync(new GetUsersQuery(Page: 1, Limit: 10, JustOnline: true));
+        response.Value.Response.Users.Should().HaveCount(5);
+        response.Value.Response.Users.Select(u => u.Nickname).Should().Contain(["user1", "user2", "user3", "user4", "user5"]);
+    }
+    [Fact]
+    public async Task GetAllUsersAsync_ShouldReturnUsersWithinRatingRange_WhenMinMaxRatingIsSet()
+    {
+        var user1 = MakeUser("alice", rapid: 800);
+        var user2 = MakeUser("bob", rapid: 1500);
+        var user3 = MakeUser("carol", bullet: 1200, rapid: 2200);
+        await SeedAsync(user1, user2, user3);
+        var response = await _usersService.GetAllUsersAsync(new GetUsersQuery(
+            MinRating: 1000, MaxRating: 2000, RatingType: RatingType.Rapid));
+        response.Value.Response.Users.Should().HaveCount(1);
+        response.Value.Response.Users[0].Nickname.Should().Be("bob");
     }
 }

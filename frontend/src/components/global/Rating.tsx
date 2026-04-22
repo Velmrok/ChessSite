@@ -1,6 +1,6 @@
 import { MdAccessTime } from "react-icons/md";
 import { SiPushbullet, SiStackblitz } from "react-icons/si";
-import type { Rating } from "@/types/User";
+import type { Rating } from "@/types/user";
 
 type Props = {
     rating: Rating;

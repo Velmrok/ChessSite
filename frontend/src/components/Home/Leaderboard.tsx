@@ -1,5 +1,5 @@
 
-import type { User } from "@/types/User";
+import type { User } from "@/types/user";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { MdAccessTime } from "react-icons/md";

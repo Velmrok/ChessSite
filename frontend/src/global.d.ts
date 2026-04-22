@@ -4,19 +4,7 @@ export { };
 declare global {
 
 
-    
-    type UserInfo = {
-        rating: {
-            rapid: number;
-            blitz: number;
-            bullet: number;
-        };
-        joinDate: string;
-        gamesPlayed: number;
-        wins: number;
-        losses: number;
-        draws: number;
-    }
+
     type Friend = {
         nickname: string;
         avatar: string;
@@ -27,14 +15,7 @@ declare global {
             bullet: number;
         }
     }
-    type UserProfile = {
-        nickname: string;
-        avatar: string;
-        bio: string;
-        onlineStatus: 'online' | 'offline';
-
-        userInfo: UserInfo;
-    };
+    
     type Message = {
         id: string;
         nickname: string;

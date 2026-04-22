@@ -1,5 +1,5 @@
 import { fetchGame as fg } from "@/services/gameService";
-import type { Rating } from "@/types/User";
+import type { Rating } from "@/types/user";
 
 import {create} from "zustand";
 

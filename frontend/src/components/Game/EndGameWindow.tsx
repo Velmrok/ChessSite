@@ -1,4 +1,4 @@
-import type { User } from "@/types/User";
+import type { User } from "@/types/user";
 import { FaWindowClose } from "react-icons/fa";
 
 type Props = {

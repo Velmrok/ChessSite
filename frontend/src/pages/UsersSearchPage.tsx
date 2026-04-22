@@ -7,7 +7,7 @@ import FilterMenu from "../components/UsersSearch/FilterMenu";
 import Loading from "../components/global/Loading";
 import PaginationButtons from "../components/global/Pagination_buttons";
 import useUsersSearchStore from "../stores/useUsersSearchStore";
-import type { PublicUser } from "@/types/User";
+import type { PublicUser } from "@/types/user";
 import { useApi } from "@/hooks/useApi";
 
 

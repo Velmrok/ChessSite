@@ -1,4 +1,5 @@
 import { fetchUserFriends, fetchUserGameHistory, fetchUserProfile } from "@/services/userService";
+import type { UserProfile } from "@/types/user";
 import { create } from "zustand";
 
 type UserProfileStore = {

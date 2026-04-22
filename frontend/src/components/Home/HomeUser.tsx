@@ -11,7 +11,7 @@ import Lobby from "./Lobby";
 import { useHomeSocket } from "@/hooks/useHomeSocket";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import type { User } from "@/types/User";
+import type { User } from "@/types/user";
 
 export default function HomeUser() {
     const {t} = useTranslation("home");

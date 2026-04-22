@@ -7,7 +7,7 @@ import Rating from "../global/Rating";
 import DeleteAccountButton from "../global/DeleteAccountButton";
 import { useEffect, useState } from "react";
 import EditAccountButton from "../global/EditAccountButton";
-import type { User } from "@/types/User";
+import type { User } from "@/types/user";
 import { useTranslation } from "react-i18next";
 
 const API_URL = import.meta.env.VITE_API_URL;

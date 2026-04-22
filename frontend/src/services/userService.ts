@@ -1,3 +1,4 @@
+import type { UserProfile } from "@/types/user";
 import apiFetch from "./api";
 
 
@@ -14,15 +15,15 @@ export const fetchUserOnlineFriends = async (nickname: string, page: number, lim
     const response = await apiFetch({ url: `/users/${nickname}/friends/online?page=${page}&limit=${limit}`, method: 'GET', includeCredentials: false, contentType: 'application/json' });
     return response as Promise<{ friendList: Array<Friend>, totalPages: number }>;
 }
-export const updateUserBio = async (nickname: string, bio: string) => {
+export const updateUserBio = async (nickname: string, bio: string) : Promise<{ bio: string }> => {
     const response = await apiFetch({ url: `/users/${nickname}/profile`, method: 'PATCH', includeCredentials: true, contentType: 'application/json', body: JSON.stringify({ bio }) });
-    return response;
+    return response as Promise<{ bio: string }>;
 }
-export const uploadUserAvatar = async (avatarFile: File) => {
+export const uploadUserAvatar = async (avatarFile: File) : Promise<{ avatar: string }> => {
     const formData = new FormData();
     formData.append("avatar", avatarFile);
     const response = await apiFetch({ url: `/users/avatar`, method: 'PATCH', includeCredentials: true, contentType: undefined, body: formData });
-    return response;
+    return response as Promise<{ avatar: string }>;
 }
 export const fetchUserGameHistory = async (nickname: string, page: number): Promise<{ gameHistory: Array<ProfileGame>, totalPages: number }> => {
     const response = await apiFetch({ url: `/users/${nickname}/games?page=${page}`, method: 'GET', includeCredentials: false, contentType: 'application/json' });

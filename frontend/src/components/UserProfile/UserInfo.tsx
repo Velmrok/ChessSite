@@ -1,23 +1,12 @@
 
 import { useTranslation } from "react-i18next";
 import Rating from "../global/Rating";
-
+import type { UserInfo } from "@/types/user";
 
 type Props = {
     userInfo: UserInfo;
 };
-type UserInfo = {
-    rating: {
-        rapid: number;
-        blitz: number;
-        bullet: number;
-    };
-    joinDate: string;
-    gamesPlayed: number;
-    wins: number;
-    losses: number;
-    draws: number;
-}
+
 export default function UserInfo({ userInfo }: Props) {
     const { t } = useTranslation("profile");
 

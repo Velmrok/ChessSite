@@ -1,4 +1,4 @@
-import type { PublicUser } from "./User";
+import type { PublicUser } from "./user";
 
 export type SearchParams = {
     search: string;

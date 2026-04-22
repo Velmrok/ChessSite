@@ -1,4 +1,5 @@
 using backend.DTO.Users;
+using backend.Extensions;
 using backend.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -21,9 +22,16 @@ namespace backend.Controllers
         [HttpGet]
         public async Task<IActionResult> GetUsers([FromQuery] GetUsersQuery query)
         {
-            
-           
-            var usersResult = await _usersService.GetAllUsersAsync(query);
+
+            var result = await _usersService.GetAllUsersAsync(query);
+
+            if(result.IsError)
+            {
+                var error = result.FirstError;
+                
+                return Problem(statusCode: error.ToStatusCode(), title: error.Code, detail: error.Description);
+            }
+            var usersResult = result.Value;
 
              Response.Headers["X-Cache"] = usersResult.IsCached ? "HIT" : "MISS";
 

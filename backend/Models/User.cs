@@ -13,9 +13,9 @@ public class User
     public  string ProfilePictureUrl { get; set; } = "";
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime LastActive { get; set; } = DateTime.UtcNow;
-    public int RapidRating { get; set; }
-    public int BlitzRating { get; set; }
-    public int BulletRating { get; set; }
+    public int RapidRating { get; set; } = 1200;
+    public int BlitzRating { get; set; } = 1200;
+    public int BulletRating { get; set; } = 1200;
     public RoleType Role { get; set; } = RoleType.User;
 
 

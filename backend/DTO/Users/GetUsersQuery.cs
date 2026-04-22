@@ -21,7 +21,7 @@ public record GetUsersQuery(
     [Range(0, 3000)]
     int MaxRating = 3000,
 
-    bool Online = false,
+    bool JustOnline = false,
 
     RatingType RatingType = RatingType.Rapid
 

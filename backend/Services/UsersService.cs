@@ -8,6 +8,7 @@ using backend.Models;
 using backend.Services.Interfaces;
 using backend.Services.Mappers;
 using backend.Services.Results;
+using ErrorOr;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 
@@ -17,10 +18,12 @@ public class UsersService : IUsersService
 {
     private readonly AppDbContext _context;
     private readonly IDistributedCache _cache;
-    public UsersService(AppDbContext context, IDistributedCache cache)
+    private readonly IPresenceService _presenceService;
+    public UsersService(AppDbContext context, IDistributedCache cache, IPresenceService presenceService)
     {
         _context = context;
         _cache = cache;
+        _presenceService = presenceService;
     }
 
     private static IQueryable<User> ApplySort(IQueryable<User> users, UsersSortBy sortBy, RatingType ratingType, bool descending)
@@ -41,12 +44,13 @@ public class UsersService : IUsersService
             _ => users.OrderByField(u => u.CreatedAt, descending),
         };
     }
-    public async Task<UsersResult> GetAllUsersAsync(GetUsersQuery query)
+    public async Task<ErrorOr<UsersResult>> GetAllUsersAsync(GetUsersQuery query)
     {
+       
         var version = await _cache.GetStringAsync("users:version") ?? "0";
         var cacheKey = $"users_v{version}:users:{query.Page}:{query.Limit}:{query.Search}:" +
                   $"{query.SortBy}:{query.SortDescending}:{query.RatingType}:" +
-                  $"{query.MinRating}:{query.MaxRating}:{query.Online}";
+                  $"{query.MinRating}:{query.MaxRating}:{query.JustOnline}";
 
         
         var cached = await _cache.GetStringAsync(cacheKey);
@@ -58,17 +62,29 @@ public class UsersService : IUsersService
 
         var users = _context.Users.AsQueryable();
         
-       
+
         if (!string.IsNullOrEmpty(query.Search))
         {
             users = users.Where(u => u.Nickname.ToLower().Contains(query.Search.ToLower()));
         }
+        users = query.RatingType switch 
+        {
+            RatingType.Blitz => users.Where(u => u.BlitzRating >= query.MinRating && u.BlitzRating <= query.MaxRating),
+            RatingType.Bullet => users.Where(u => u.BulletRating >= query.MinRating && u.BulletRating <= query.MaxRating),
+            _ => users.Where(u => u.RapidRating >= query.MinRating && u.RapidRating <= query.MaxRating),
+        };
+        
+        
        
+        if (query.JustOnline)
+        {
+            var onlineIds = await _presenceService.GetOnlineIdsAsync(users.Select(u => u.Id));
+            users = users.Where(u => onlineIds.Contains(u.Id));
+        }
 
         users = ApplySort(users, query.SortBy, query.RatingType, query.SortDescending);
 
         var result = await users
-            
             .Skip((query.Page - 1) * query.Limit)
             .Take(query.Limit)
             .Select(u => u.ToUserResponse())
@@ -86,4 +102,6 @@ public class UsersService : IUsersService
 
         return new UsersResult(response, false);
     }
+
+    
 }

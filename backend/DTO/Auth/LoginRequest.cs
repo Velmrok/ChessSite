@@ -1,7 +1,6 @@
 
 using System.ComponentModel.DataAnnotations;
 namespace backend.DTO.Auth;
-using backend.CustomAttributes;
 
 
 

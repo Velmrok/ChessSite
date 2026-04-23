@@ -6,12 +6,14 @@ using backend.DTO.Auth;
 using backend.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using StackExchange.Redis;
+using Xunit.Abstractions;
 
 namespace backend.Tests.Integration;
 public class TestBase : IClassFixture<WebApplicationFactory<Program>>
@@ -20,10 +22,12 @@ public class TestBase : IClassFixture<WebApplicationFactory<Program>>
 
     protected readonly AppDbContext _dbContext;
     protected readonly IDistributedCache _cache;
-    
+    private readonly ITestOutputHelper _output;
     private readonly IPasswordHasher<User> _passwordHasher;
-    public TestBase(WebApplicationFactory<Program> factory)
+    public TestBase(WebApplicationFactory<Program> factory,ITestOutputHelper output)
     {
+        _output = output;
+       
 
         var dbName = Guid.NewGuid().ToString();
         _passwordHasher = new PasswordHasher<User>();
@@ -64,15 +68,16 @@ public class TestBase : IClassFixture<WebApplicationFactory<Program>>
                {
                    services.Remove(descriptor);
                }
-               services.AddDbContext<AppDbContext>(options =>
-              {
-                  options.UseInMemoryDatabase(dbName);
-              });
+               var connection = new SqliteConnection("DataSource=:memory:");
+               connection.Open();
+
+                services.AddDbContext<AppDbContext>(options =>
+                    options.UseSqlite(connection));
 
                services.AddDistributedMemoryCache();
 
 
-
+                services.AddSingleton(connection);
                services.AddSingleton(sp =>
                 {
                     var mockMultiplexer = Substitute.For<IConnectionMultiplexer>();
@@ -151,6 +156,8 @@ public class TestBase : IClassFixture<WebApplicationFactory<Program>>
         };
 
         var response = await _client.PostAsJsonAsync("/auth/login", loginRequest);
+        var body = await response.Content.ReadAsStringAsync();
+        _output.WriteLine($"Login response: {response.StatusCode}, Body: {body}");
         response.EnsureSuccessStatusCode();
         
     }

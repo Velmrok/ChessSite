@@ -50,12 +50,25 @@ public static class AuthenticationExtensions
                             Title = "unauthorized",
                             Status = StatusCodes.Status401Unauthorized
                         });
+                    },
+                    OnForbidden = async context =>
+                    {
+                        context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                        context.Response.ContentType = "application/json";
+
+                        await context.Response.WriteAsJsonAsync(new ProblemDetails
+                        {
+                            Title = "forbidden",
+                            Status = StatusCodes.Status403Forbidden
+                        });
                     }
+
                 };
+
 
             });
 
-            return services;
+        return services;
     }
 
     public static IServiceCollection AddCustomModelValidation(

@@ -15,7 +15,7 @@ namespace backend.Tests.Integration;
 public class AuthEndpointTests : TestBase
 {
     
-    public AuthEndpointTests(WebApplicationFactory<Program> factory, ITestOutputHelper output) : base(factory, output)
+    public AuthEndpointTests(WebApplicationFactory<Program> factory) : base(factory)
     {
     }
 

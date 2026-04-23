@@ -4,6 +4,7 @@ using System.Net.Http.Json;
 using backend.Data;
 using backend.DTO.Auth;
 using backend.Models;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Data.Sqlite;
@@ -12,8 +13,10 @@ using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
+using NSubstitute.ClearExtensions;
 using StackExchange.Redis;
 using Xunit.Abstractions;
+using Microsoft.Extensions.Logging;
 
 namespace backend.Tests.Integration;
 public class TestBase : IClassFixture<WebApplicationFactory<Program>>
@@ -22,17 +25,21 @@ public class TestBase : IClassFixture<WebApplicationFactory<Program>>
 
     protected readonly AppDbContext _dbContext;
     protected readonly IDistributedCache _cache;
-    private readonly ITestOutputHelper _output;
+
     private readonly IPasswordHasher<User> _passwordHasher;
-    public TestBase(WebApplicationFactory<Program> factory,ITestOutputHelper output)
+    public TestBase(WebApplicationFactory<Program> factory)
     {
-        _output = output;
-       
+
+
 
         var dbName = Guid.NewGuid().ToString();
         _passwordHasher = new PasswordHasher<User>();
         var customizedFactory = factory.WithWebHostBuilder(builder =>
         {
+            builder.ConfigureLogging(logging =>
+                {
+                    logging.ClearProviders();
+                });
             builder.ConfigureAppConfiguration((context, configBuilder) =>
             {
                 configBuilder.Sources.Clear();

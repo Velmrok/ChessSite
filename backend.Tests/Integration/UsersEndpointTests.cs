@@ -12,7 +12,7 @@ using Xunit.Abstractions;
 
 public class UsersEndpointTests : TestBase
 {
-    public UsersEndpointTests(WebApplicationFactory<Program> factory, ITestOutputHelper output) : base(factory, output)
+    public UsersEndpointTests(WebApplicationFactory<Program> factory) : base(factory)
     {
     }
     
@@ -138,4 +138,112 @@ public class UsersEndpointTests : TestBase
         users.Should().HaveCount(1);
         users.First().Nickname.Should().Be(onlineUser.Nickname);
     }
+    [Fact]
+    public async Task GetUserProfile_ShouldReturnUserProfile_WhenUserExists()
+    {
+        await LoginAsUserAsync();
+       
+        var response = await _client.GetAsync($"/users/{"TestNick"}/profile");
+        response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+        var profile = await response.Content.ReadFromJsonAsync<UserProfileResponse>();
+        profile.Should().NotBeNull();
+        profile.Nickname.Should().Be("TestNick");
+       
+    }
+    [Fact]
+    public async Task GetUserProfile_ShouldReturnNotFound_WhenUserDoesNotExist()
+    {
+        await LoginAsUserAsync();
+        var response = await _client.GetAsync("/users/nonexistentuser");
+        response.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
+    }
+    [Fact]
+    public async Task GetFriends_ShouldReturnOk()
+    {
+        await LoginAsUserAsync();
+        var user = await MakeUserAsync("testuser2@example.com", "testuser2", "TestUser2", "1234562");
+        var response = await _client.GetAsync($"/users/{user.Nickname}/friends");
+        response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+    }
+    [Fact]
+    public async Task GetFriends_ShouldReturnNotFound_WhenUserDoesNotExist()
+    {
+        await LoginAsUserAsync();
+        var response = await _client.GetAsync("/users/nonexistentuser/friends");
+        response.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
+    }
+    [Fact]
+    public async Task AddFriend_ShouldReturn204NoContent_WhenUsersExist()
+    {
+        await LoginAsUserAsync();
+        var user1 = await MakeUserAsync("user1@example.com", "user1", "User1", "123456");
+        
+        
+        var response = await _client.PostAsync($"/users/friend", JsonContent.Create(new { user1.Nickname }));
+        response.StatusCode.Should().Be(System.Net.HttpStatusCode.NoContent);
+    }
+    [Fact]
+    public async Task AddFriend_ShouldReturnNotFound_WhenFriendDoesNotExist()
+    {
+        await LoginAsUserAsync();
+        var response = await _client.PostAsync($"/users/friend", JsonContent.Create(new { Nickname = "nonexistentuser" }));
+        response.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
+    }
+    [Fact]
+    public async Task AddFriend_ShouldReturnValidationError_WhenAddingSelf()
+    {
+        await LoginAsUserAsync();
+        var response = await _client.PostAsync($"/users/friend", JsonContent.Create(new { Nickname = "TestNick" }));
+        response.StatusCode.Should().Be(System.Net.HttpStatusCode.BadRequest);
+    }
+    [Fact]
+    public async Task AddFriend_ShouldReturnConflict_WhenAlreadyFriends()
+    {
+        await LoginAsUserAsync();
+        var user1 = await MakeUserAsync("user1@example.com", "user1", "User1", "123456");
+
+        
+        var response1 = await _client.PostAsync($"/users/friend", JsonContent.Create(new { Nickname = user1.Nickname }));
+        response1.StatusCode.Should().Be(System.Net.HttpStatusCode.NoContent);
+        var response2 = await _client.PostAsync($"/users/friend", JsonContent.Create(new { Nickname = user1.Nickname }));
+        response2.StatusCode.Should().Be(System.Net.HttpStatusCode.Conflict);
+    }
+    [Fact]
+    public async Task UpdateUserBio_ShouldReturnOk_WhenBioIsUpdated()
+    {
+        await LoginAsUserAsync();
+        var newBio = "This is my new bio.";
+        var response = await _client.PatchAsJsonAsync("/users/TestNick/profile/bio", new UpdateUserBioRequest(newBio));
+        response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+        var updatedProfile = await response.Content.ReadFromJsonAsync<UpdateUserBioResponse>();
+        updatedProfile.Should().NotBeNull();
+        updatedProfile.Bio.Should().Be(newBio);
+    }
+    [Fact]
+    public async Task UpdateUserBio_ShouldReturnNotFound_WhenUserDoesNotExist()
+    {
+        await LoginAsUserAsync();
+        var response = await _client.PatchAsJsonAsync("/users/TestNick/profile/bio", new UpdateUserBioRequest("New bio"));
+        response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+
+        var response2 = await _client.PatchAsJsonAsync("/users/TestNick/profile/bio", new UpdateUserBioRequest("New bio"));
+        response2.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+    }
+    [Fact]
+    public async Task UpdateUserBio_ShouldReturnBadRequest_WhenBioIsTooLong()
+    {
+        await LoginAsUserAsync();
+        var longBio = new string('a', 2010);
+        var response = await _client.PatchAsJsonAsync("/users/TestNick/profile/bio", new UpdateUserBioRequest(longBio));
+        response.StatusCode.Should().Be(System.Net.HttpStatusCode.BadRequest);
+    }
+    [Fact]
+    public async Task UpdateUserBio_ShouldReturnForbidden_WhenUpdatingOtherUserBio()
+    {
+        await LoginAsUserAsync();
+        var otherUser = await MakeUserAsync("otheruser@example.com", "otheruser", "OtherUser", "123456");
+        var response = await _client.PatchAsJsonAsync($"/users/{otherUser.Nickname}/profile/bio", new UpdateUserBioRequest("New bio"));
+        response.StatusCode.Should().Be(System.Net.HttpStatusCode.Forbidden);
+    }
+
 }

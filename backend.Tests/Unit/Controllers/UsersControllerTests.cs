@@ -89,5 +89,45 @@ public class UsersControllerTests
 
            
     }
+    [Fact]
+    public async Task GetFriends_ShouldReturnOk()
+    {
+        var nickname = "testuser";
+        var query = new PaginationQuery { PageNumber = 1, Limit = 10 };
+
+        _usersServiceMock.GetFriendsAsync(nickname, query).Returns(new FriendsResponse
+        (
+            [],1
+        ));
+
+        var result = await _controller.GetFriends(nickname, query);
+
+        var okResult = Assert.IsType<OkObjectResult>(result);
+        Assert.Equal(200, okResult.StatusCode);
+    }
+    [Fact]
+    public async Task AddFriend_ShouldReturnOk()
+    {
+        var nickname = "testuser";
+        var request = new AddFriendRequest { Nickname = "frienduser" };
+
+        _usersServiceMock.AddFriendAsync(request, nickname).Returns(new Success());
+
+        var result = await _controller.AddFriend(request);
+
+        var okResult = Assert.IsType<NoContentResult>(result);
+        Assert.Equal(204, okResult.StatusCode);
+    }
+    [Fact]
+    public async Task UpdateUserBio_ShouldReturnOk()
+    {
+        var nickname = "testuser";
+        var request = new UpdateUserBioRequest ( Bio : "This is my new bio." );
+        _usersServiceMock.UpdateUserBioAsync(nickname, request)
+        .Returns(new UpdateUserBioResponse ( Bio : request.Bio ));
+        var result = await _controller.UpdateUserBio(nickname, request);
+        var okResult = Assert.IsType<OkObjectResult>(result);
+        Assert.Equal(200, okResult.StatusCode);
+    }
 }
 

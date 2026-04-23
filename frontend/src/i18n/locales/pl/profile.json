@@ -19,7 +19,7 @@
   "offline": "Offline",
   "delete": "Konto zostało usunięte.",
   "deleteAccount": "Usuń konto",
-  "rating": "Ocena",
+  "rating": "Ranking",
   "eloChart": "Wykres Elo",
   "newPassword": "Nowe hasło",
   "currentPassword": "Aktualne hasło",
@@ -30,5 +30,8 @@
   "date": "Data",
   "noGames": "Brak rozegranych partii...",
   "analysis": "Analiza",
-  "review": "Przegląd"
+  "review": "Przegląd",
+  "totalWins": "Całkowite wygrane",
+    "totalLosses": "Całkowite przegrane",
+    "totalDraws": "Całkowite remisy"
 }

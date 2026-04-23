@@ -30,5 +30,8 @@
     "date": "Date",
     "noGames": "No games played...",
     "analysis": "Analysis",
-    "review": "Review"
+    "review": "Review",
+    "totalWins": "Total Wins",
+    "totalLosses": "Total Losses",
+    "totalDraws": "Total Draws"
 }

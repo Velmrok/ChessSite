@@ -8,13 +8,14 @@ using Xunit;
 using Microsoft.Extensions.DependencyInjection;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.Extensions.Configuration;
+using Xunit.Abstractions;
 namespace backend.Tests.Integration;
 
 
 public class AuthEndpointTests : TestBase
 {
     
-    public AuthEndpointTests(WebApplicationFactory<Program> factory) : base(factory)
+    public AuthEndpointTests(WebApplicationFactory<Program> factory, ITestOutputHelper output) : base(factory, output)
     {
     }
 

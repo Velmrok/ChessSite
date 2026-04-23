@@ -18,7 +18,8 @@
     "wrongPassword": "Błędne aktualne hasło.",
     "friendAddError": "Nie udało się zmienić statusu znajomego.",
     "friendDeleted": "Nie udało się usunąć znajomego.",
-    "friendAdded": "Nie udało się dodać znajomego."
+    "friendAdded": "Nie udało się dodać znajomego.",
+  "forbidden": "Nie masz uprawnień do wykonania tej akcji."
   },
   "success": {
     "generic": "Operacja zakończona pomyślnie.",

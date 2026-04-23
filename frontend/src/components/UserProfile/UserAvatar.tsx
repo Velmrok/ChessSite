@@ -8,9 +8,10 @@ import { useTranslation } from 'react-i18next';
 
 type Props = {
     avatar: string;
+    className?: string;
     onAvatarUpdate: (newAvatarUrl: string) => void;
 }
-export default function UserAvatar({avatar, onAvatarUpdate}:Props) {
+export default function UserAvatar({avatar, className, onAvatarUpdate}:Props) {
     const user = useUserStore((state) => state.user);
     const setUser = useUserStore((state) => state.setUser);
     const {nickname} = useParams<{nickname: string}>();
@@ -43,8 +44,9 @@ export default function UserAvatar({avatar, onAvatarUpdate}:Props) {
         }
     }
 
+    const defaultClass = "flex flex-col items-center  w-65   gap-4 md:ml-4";
     return(
-        <div className="flex flex-col items-center  w-65   gap-4 md:ml-4">
+        <div className={className || defaultClass}>
         
            <img src={`${avatar}`} alt="Profile" 
            className="w-30 h-30 md:w-40 md:h-40  rounded-full border-2 border-black outline-12 outline-cyan-500"/>

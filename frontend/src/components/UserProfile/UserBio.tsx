@@ -44,7 +44,7 @@ export default function UserBio({ bio, nickname }: Props) {
     return (
 
         <div className="flex flex-col gap-4 items-center lg:items-start h-auto w-full md:w-[80%]
-        lg:max-w-[95%] lg:w-[35vw] lg:w-full lg:col-span-6">
+        lg:max-w-[95%] lg:w-[35vw] lg:w-full xl:col-span-6">
 
 
             <div className={`min-w-full min-h-50 flex flex-col bg-gray-900/[30%] p-4 rounded-lg

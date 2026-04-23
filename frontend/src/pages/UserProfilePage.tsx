@@ -58,18 +58,18 @@ export default function UserProfilePage() {
             </div>
         )
     }
-    if(isDeleted){
-        return(
-        <div className="flex justify-center items-center text-white font-MyFancyFont text-4xl
+    if (isDeleted) {
+        return (
+            <div className="flex justify-center items-center text-white font-MyFancyFont text-4xl
          min-h-screen bg-cyan-800 pt-10 pb-10 ">
-            {t('delete')}
-        </div>
+                {t('delete')}
+            </div>
         )
     }
 
     return (
         <>
-        
+
             {!profile &&
                 <NotFound whatIsMissing="user" />
             }
@@ -77,10 +77,10 @@ export default function UserProfilePage() {
                 <div className="flex justify-center items-start min-h-screen bg-cyan-800 pt-10 pb-10">
                     <div className="flex flex-col items-center gap-6 mb-10 min-h-screen w-[90%]  md:w-[80%] 
              max-w-[1000px]  bg-cyan-900 rounded-lg shadow-lg p-6 relative">
-                        {user&&user.nickname===profile.nickname&&(
+                        {user && user.nickname === profile.nickname && (
                             <button className="absolute top-4 left-4 bg-blue-500 text-white shadow-md z-10
                         px-4 py-2 rounded hover:scale-105 transition-transform duration-200 font-MyFancyFont text-sm" onClick={() => setShowPasswordForm(true)}>
-                            {t('changePassword')}
+                                {t('changePassword')}
                             </button>
                         )}
                         {(!user || profile.nickname !== user?.nickname) && (
@@ -89,32 +89,36 @@ export default function UserProfilePage() {
                             ) : (
                                 <span className="text-red-500 text-sm sm:text-2xl font-MyFancyFont absolute top-2 left-3">● {t('offline')}</span>
                             ))}
-                        <div className="flex flex-col lg:flex-row relative items-center  w-full gap-5 ">
-
-                            <UserAvatar avatar={profile.avatar} onAvatarUpdate={handleUserAvatarUpdate} />
+                        <div className="flex flex-col lg:flex-row relative items-center  w-full gap-5 h-full">
+                            <div className="flex flex-col items-center justify-center w-full lg:w-50 self-start">
+                            <UserAvatar avatar={profile.avatar} className="flex flex-col items-center justify-center p-6 w-60 gap-8 "
+                             onAvatarUpdate={handleUserAvatarUpdate} />
+                                </div>
                             <div className="flex flex-col  w-full max-w-full gap-4 items-center lg:items-start">
                                 <div className="flex gap-5 text-white text-2xl mdtext-2xl lg:text-4xl  font-MyFancyFont lg:ml-4 pt-6 md:pt-0 ">
                                     {profile.nickname}
 
                                     {user && user?.nickname !== profile.nickname &&
-                                        <div className="text-[6px] md:text-[8px] flex flex-col items-center justify-center
-                                ">
+                                        <div className="text-[6px] md:text-[8px] flex flex-col items-center justify-center">
                                             <AddFriendButton userNickname={profile.nickname} className="text-2xl" />
                                             {loggedUserFriendList.includes(profile.nickname) ? t('deleteFriend') : t('addFriend')}
                                         </div>
-                                        }
+                                    }
                                 </div>
                                 {user && user?.nickname !== profile.nickname && user.role === 'admin' &&
-                                <div className="absolute right-0 top-0   flex justify-center items-center gap-2" >
-                                    <span className="text-sm text-white">{t('deleteAccount')}</span>
-                                <DeleteAccountButton nickname={profile.nickname} cb={() => { setIsDeleted(true)}}
-                                 className="text-2xl"/>
-                                 </div>
+                                    <div className="absolute right-0 top-0   flex justify-center items-center gap-2" >
+                                        <span className="text-sm text-white">{t('deleteAccount')}</span>
+                                        <DeleteAccountButton nickname={profile.nickname} cb={() => { setIsDeleted(true) }}
+                                            className="text-2xl" />
+                                    </div>
                                 }
-                                <div className="grid w-full gap-6 lg:gap-6 lg:grid-cols-10 justify-items-center w-full ">
+                                <div className="grid w-full gap-6 lg:gap-6 grid-cols-1 justify-items-center lg:justify-items-start  xl:grid-cols-10  w-full ">
                                     <UserBio key={profile.nickname}
                                         bio={profile.bio} nickname={profile.nickname} />
-                                    <UserInfo userInfo={profile.userInfo} />
+                                        
+                                        <UserInfo userInfo={profile.userInfo} 
+                                        className="bg-gray-900/[30%]  rounded-md shadow-md  w-[95%]  xl:col-span-4 py-2 pr-3 xl:hidden" />
+                                        
                                 </div>
                             </div>
                         </div>
@@ -135,9 +139,9 @@ export default function UserProfilePage() {
                                 >{t('eloChart')}</button>
                             </div>
                         </div>
-                         <div className={`${activeTab === 'elo' ? 'flex' : 'hidden'} xl:flex w-full justify-center mb-10`}>
+                        <div className={`${activeTab === 'elo' ? 'flex' : 'hidden'} xl:flex w-full justify-center mb-10`}>
                             <EloChart />
-                            </div>
+                        </div>
                         <div className={`w-full justify-center  mb-10
                 ${activeTab === 'history' ? 'flex' : 'hidden'} xl:flex`}>
 
@@ -146,12 +150,15 @@ export default function UserProfilePage() {
                         <div className={`w-full  ${activeTab === 'friends' ? 'block' : 'hidden'} xl:hidden`}>
 
                             <FriendList />
+
                         </div>
                     </div>
-                    <div className="hidden xl:flex ml-5 min-w-[250px] mb-10  min-h-screen ">
-                        <div className="w-full ">
-
+                    <div className="hidden xl:flex ml-5 min-w-[380px] mb-10  min-h-screen ">
+                        <div className="w-full flex flex-col  gap-5 ">
+                            
                             <FriendList />
+                            <UserInfo userInfo={profile.userInfo} 
+                            className="bg-gray-900/[30%]  rounded-md shadow-md  lg:w-full  lg:col-span-4 py-2 pr-3 "/>
                         </div>
                     </div>
                 </div>

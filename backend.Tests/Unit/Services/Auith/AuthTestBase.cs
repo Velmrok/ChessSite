@@ -15,10 +15,10 @@ namespace backend.Tests.Unit.Services.Auith
         {
             var jwtMock = Substitute.For<IJwtGenerator>();
             var cacheInvalidationServiceMock = Substitute.For<ICacheInvalidationService>();
-            var refreshTokenService = new RefreshTokenService(DbContext);
+            var refreshTokenService = new RefreshTokenService(_dbContext);
             jwtMock.GenerateToken(Arg.Any<User>()).Returns("mocked-jwt-token");
 
-            _authService = new AuthService(DbContext, jwtMock, new PasswordHasher<User>(), cacheInvalidationServiceMock, refreshTokenService);
+            _authService = new AuthService(_dbContext, jwtMock, new PasswordHasher<User>(), cacheInvalidationServiceMock, refreshTokenService);
             _passwordHasher = new PasswordHasher<User>();
 
         }

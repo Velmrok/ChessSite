@@ -29,7 +29,7 @@ namespace backend.Tests.Unit.Services.Auith;
 
 
 
-        var userInDb = await DbContext.Users.FirstOrDefaultAsync(u => u.Login == request.Login);
+        var userInDb = await _dbContext.Users.FirstOrDefaultAsync(u => u.Login == request.Login);
         userInDb.Should().NotBeNull();
     }
     [Theory]
@@ -65,20 +65,20 @@ namespace backend.Tests.Unit.Services.Auith;
         var error = result.FirstError;
         error.Code.Should().Be(expectedErrorCode);
 
-        var usersCount = await DbContext.Users.CountAsync();
+        var usersCount = await _dbContext.Users.CountAsync();
         usersCount.Should().Be(1);
     }
     [Fact]
     public async Task RegisterAsync_ShouldTreatIdentifiersAsCaseSensitive()
     {
-        DbContext.Users.Add(new User
+        _dbContext.Users.Add(new User
         {
             Nickname = "TestUser",
             Login = "TestUser",
             Email = "TestUser@test.test",
             PasswordHash = _passwordHasher.HashPassword(null!, "Password123!")
         });
-        await DbContext.SaveChangesAsync();
+        await _dbContext.SaveChangesAsync();
         var existingRequest = new RegisterRequest
         {
             Nickname = "testuser",

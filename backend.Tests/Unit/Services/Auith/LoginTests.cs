@@ -13,14 +13,14 @@ public class LoginTests : AuthTestBase
     public async Task LoginAsync_ShouldReturnOK_WhenLoginIsSuccessful()
     {
 
-        DbContext.Users.Add(new User
+        _dbContext.Users.Add(new User
         {
             Nickname = "testuser",
             Login = "testuser",
             Email = "test@example.com",
             PasswordHash = _passwordHasher.HashPassword(null!, "Password123!")
         });
-        await DbContext.SaveChangesAsync();
+        await _dbContext.SaveChangesAsync();
 
 
         var request = new LoginRequest
@@ -41,14 +41,14 @@ public class LoginTests : AuthTestBase
     [Fact]
     public async Task LoginAsync_ShouldReturnOK_ShouldTrimInput()
     {
-        DbContext.Users.Add(new User
+        _dbContext.Users.Add(new User
         {
             Nickname = "testuser",
             Login = "testuser",
             Email = "test@example.com",
             PasswordHash = _passwordHasher.HashPassword(null!, "Password123!")
         });
-        await DbContext.SaveChangesAsync();
+        await _dbContext.SaveChangesAsync();
         var existingRequest = new LoginRequest
         {
             Login = "testuser   ",
@@ -82,14 +82,14 @@ public class LoginTests : AuthTestBase
     public async Task LoginAsync_ShouldReturnOK_WhenLoginWithEmailIsSuccessful()
     {
 
-        DbContext.Users.Add(new User
+        _dbContext.Users.Add(new User
         {
             Nickname = "testuser",
             Login = "testuser",
             Email = "test@example.com",
             PasswordHash = _passwordHasher.HashPassword(null!, "Password123!")
         });
-        await DbContext.SaveChangesAsync();
+        await _dbContext.SaveChangesAsync();
 
 
         var request = new LoginRequest
@@ -121,20 +121,20 @@ public class LoginTests : AuthTestBase
         var error = result.FirstError;
         error.Code.Should().Be("invalidLoginOrPassword");
 
-        var user = await DbContext.Users.FirstOrDefaultAsync(u => u.Login == request.Login || u.Email == request.Login);
+        var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Login == request.Login || u.Email == request.Login);
         user.Should().BeNull();
     }
     [Fact]
     public async Task LoginAsync_ShouldReturnUnauthorized_WhenPasswordIsIncorrect()
     {
-        DbContext.Users.Add(new User
+        _dbContext.Users.Add(new User
         {
             Nickname = "testuser",
             Login = "testuser",
             Email = "test@example.com",
             PasswordHash = _passwordHasher.HashPassword(null!, "CorrectPassword")
         });
-        await DbContext.SaveChangesAsync();
+        await _dbContext.SaveChangesAsync();
 
         var request = new LoginRequest
         {

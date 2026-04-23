@@ -25,7 +25,7 @@ public abstract class UsersServiceTestBase : TestBase
 
         var cache = provider.GetRequiredService<IDistributedCache>();
         _presenceService = Substitute.For<IPresenceService>();
-        _usersService = new UsersService(DbContext, cache, _presenceService);
+        _usersService = new UsersService(_dbContext, cache, _presenceService);
     }
     protected User MakeUser(string name, int rapid = 1000, int blitz = 1000, int bullet = 1000,
         DateTime? createdAt = null, DateTime? lastActive = null) => new()
@@ -41,8 +41,8 @@ public abstract class UsersServiceTestBase : TestBase
 
     protected async Task SeedAsync(params User[] users)
     {
-        DbContext.Users.AddRange(users);
-        await DbContext.SaveChangesAsync();
+        _dbContext.Users.AddRange(users);
+        await _dbContext.SaveChangesAsync();
     }
 }
 

@@ -16,8 +16,8 @@ public class GetMeTests : AuthTestBase
             Email = "test@test.test",
             PasswordHash = _passwordHasher.HashPassword(null!, "Password123!")
         };
-        DbContext.Users.Add(user);
-        await DbContext.SaveChangesAsync();
+        _dbContext.Users.Add(user);
+        await _dbContext.SaveChangesAsync();
 
         var loginResult = await _authService.LoginAsync(new LoginRequest
         {

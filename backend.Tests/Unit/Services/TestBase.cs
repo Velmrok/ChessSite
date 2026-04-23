@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 namespace backend.Tests.Unit.Services;
 public abstract class TestBase
 {
-    protected readonly AppDbContext DbContext;
+    protected readonly AppDbContext _dbContext;
 
     protected TestBase()
     {
@@ -13,7 +13,7 @@ public abstract class TestBase
         var options = new DbContextOptionsBuilder<AppDbContext>()
             .UseSqlite(connection)
             .Options;
-        DbContext = new AppDbContext(options);
-        DbContext.Database.EnsureCreated();
+        _dbContext = new AppDbContext(options);
+        _dbContext.Database.EnsureCreated();
     }
 }

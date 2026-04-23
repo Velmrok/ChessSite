@@ -19,8 +19,8 @@ public class LogoutTests : AuthTestBase
             Email = "test@example.com",
             PasswordHash = _passwordHasher.HashPassword(null!, "Password123!")
         };
-        DbContext.Users.Add(user);
-        await DbContext.SaveChangesAsync();
+        _dbContext.Users.Add(user);
+        await _dbContext.SaveChangesAsync();
 
         var response = await _authService.LoginAsync(new LoginRequest
         {

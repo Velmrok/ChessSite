@@ -20,8 +20,8 @@ public class RefreshTests : AuthTestBase
             Email = "test@example.com",
             PasswordHash = _passwordHasher.HashPassword(null!, "Password123!")
         };
-        DbContext.Users.Add(user);
-        await DbContext.SaveChangesAsync();
+        _dbContext.Users.Add(user);
+        await _dbContext.SaveChangesAsync();
 
         var response = await _authService.LoginAsync(new LoginRequest
         {
@@ -65,8 +65,8 @@ public class RefreshTests : AuthTestBase
             Email = "test@test.test",
             PasswordHash = _passwordHasher.HashPassword(null!, "Password123!")
         };
-        DbContext.Users.Add(user);
-        await DbContext.SaveChangesAsync();
+        _dbContext.Users.Add(user);
+        await _dbContext.SaveChangesAsync();
         
         var refreshTokenEntity = new RefreshToken
         {
@@ -75,8 +75,8 @@ public class RefreshTests : AuthTestBase
             ExpiresAt = DateTime.UtcNow.AddHours(-1) ,
             User = user
         };
-        DbContext.RefreshTokens.Add(refreshTokenEntity);
-        await DbContext.SaveChangesAsync();
+        _dbContext.RefreshTokens.Add(refreshTokenEntity);
+        await _dbContext.SaveChangesAsync();
 
         var result = await _authService.RefreshAsync(refreshTokenEntity.Token);
         result.IsError.Should().BeTrue();
@@ -93,8 +93,8 @@ public class RefreshTests : AuthTestBase
             Email = "test@test.test",
             PasswordHash = _passwordHasher.HashPassword(null!, "Password123!")
         };
-        DbContext.Users.Add(user);
-        await DbContext.SaveChangesAsync();
+        _dbContext.Users.Add(user);
+        await _dbContext.SaveChangesAsync();
 
         var refreshTokenEntity = new RefreshToken
         {
@@ -104,8 +104,8 @@ public class RefreshTests : AuthTestBase
             IsRevoked = true,
             User = user
         };
-        DbContext.RefreshTokens.Add(refreshTokenEntity);
-        await DbContext.SaveChangesAsync();
+        _dbContext.RefreshTokens.Add(refreshTokenEntity);
+        await _dbContext.SaveChangesAsync();
 
         var result = await _authService.RefreshAsync(refreshTokenEntity.Token);
         result.IsError.Should().BeTrue();

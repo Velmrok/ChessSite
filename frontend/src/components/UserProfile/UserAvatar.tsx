@@ -48,7 +48,7 @@ export default function UserAvatar({avatar, className, onAvatarUpdate}:Props) {
     return(
         <div className={className || defaultClass}>
         
-           <img src={`${avatar}`} alt="Profile" 
+           <img src={`${avatar == "" ? "/default-avatar.png" : avatar}`} alt="Profile" 
            className="w-30 h-30 md:w-40 md:h-40  rounded-full border-2 border-black outline-12 outline-cyan-500"/>
            { user && user.nickname === nickname &&
            <div className="flex flex-row items-center gap-4 ">

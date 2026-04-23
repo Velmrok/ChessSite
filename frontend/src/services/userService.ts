@@ -1,4 +1,4 @@
-import type { UserProfile } from "@/types/user";
+import type { PublicUser, UserProfile } from "@/types/user";
 import apiFetch from "./api";
 
 
@@ -7,13 +7,14 @@ export const fetchUserProfile = async (nickname: string): Promise<UserProfile> =
     const response = await apiFetch({ url: `/users/${nickname}/profile`, method: 'GET', includeCredentials: false, contentType: 'application/json' });
     return response as Promise<UserProfile>;
 };
-export const fetchUserFriends = async (nickname: string, page: number, limit: number = 5): Promise<{ friendList: Array<Friend>, totalPages: number }> => {
+export const fetchUserFriends = async (nickname: string, page: number, limit: number = 5): Promise<{ friends: Array<PublicUser>, totalPages: number }> => {
     const response = await apiFetch({ url: `/users/${nickname}/friends?page=${page}&limit=${limit}`, method: 'GET', includeCredentials: false, contentType: 'application/json' });
-    return response as Promise<{ friendList: Array<Friend>, totalPages: number }>;
+    
+    return response as Promise<{ friends: Array<PublicUser>, totalPages: number }>;
 }
-export const fetchUserOnlineFriends = async (nickname: string, page: number, limit: number = 5): Promise<{ friendList: Array<Omit<Friend, "rating">>, totalPages: number }> => {
+export const fetchUserOnlineFriends = async (nickname: string, page: number, limit: number = 5): Promise<{ friendList: Array<Omit<PublicUser, "rating">>, totalPages: number }> => {
     const response = await apiFetch({ url: `/users/${nickname}/friends/online?page=${page}&limit=${limit}`, method: 'GET', includeCredentials: false, contentType: 'application/json' });
-    return response as Promise<{ friendList: Array<Friend>, totalPages: number }>;
+    return response as Promise<{ friendList: Array<PublicUser>, totalPages: number }>;
 }
 export const updateUserBio = async (nickname: string, bio: string) : Promise<{ bio: string }> => {
     const response = await apiFetch({ url: `/users/${nickname}/profile`, method: 'PATCH', includeCredentials: true, contentType: 'application/json', body: JSON.stringify({ bio }) });
@@ -30,12 +31,12 @@ export const fetchUserGameHistory = async (nickname: string, page: number): Prom
     return response as Promise<{ gameHistory: Array<ProfileGame>, totalPages: number }>;
 }
 
-export const addFriend = async (friendNickname: string) => {
-    const response = await apiFetch({ url: `/users/friend`, method: 'POST', includeCredentials: true, contentType: 'application/json', body: JSON.stringify({ friendNickname }) });
+export const addFriend = async (nickname: string) => {
+    const response = await apiFetch({ url: `/users/friend`, method: 'POST', includeCredentials: true, contentType: 'application/json', body: JSON.stringify({Nickname:nickname }) });
     return response;
 }
 export const deleteFriend = async (friendNickname: string) => {
-     const response = await apiFetch({ url: `/users/friend`, method: 'DELETE', includeCredentials: true, contentType: 'application/json', body: JSON.stringify({ friendNickname }) });
+     const response = await apiFetch({ url: `/users/friend`, method: 'DELETE', includeCredentials: true, contentType: 'application/json', body: JSON.stringify({ Nickname: friendNickname }) });
     return response;
 }
 export const deleteAccount = async (nickname: string) => {

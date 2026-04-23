@@ -3,7 +3,6 @@ import type { User } from '@/types/user';
 import {create} from 'zustand';
 type UserStore = {
     user: User | null;
-    friendList: string[];
     queueTime?: number;
     queueTimeInterval?: ReturnType<typeof setInterval>;
     isConnected: boolean;
@@ -19,7 +18,6 @@ type UserStore = {
 };
 const useUserStore = create<UserStore>((set, get) => ({
     user: null,
-    friendList: [],
     queueTime: undefined,
     queueTimeInterval: undefined,
     isConnected: false,
@@ -39,7 +37,7 @@ const useUserStore = create<UserStore>((set, get) => ({
         return {
             user: {
                 ...state.user,
-                friendList: state.user.friendList.filter(friend => friend !== nickname)
+                friendNicknames: state.user.friendNicknames.filter(friend => friend !== nickname)
             }
         };
     }),
@@ -48,7 +46,7 @@ const useUserStore = create<UserStore>((set, get) => ({
         return {
             user: {
                 ...state.user,
-                friendList: [...state.user.friendList, nickname]
+                friendNicknames: [...state.user.friendNicknames, nickname]
             }
         };
     }),

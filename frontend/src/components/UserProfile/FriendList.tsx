@@ -29,14 +29,14 @@ export default function FriendList() {
         const fetch = async () => { 
             const response = await request(() => fetchUserFriends(nickname!, friendsPage));
             if (response) {
-                setFriends(response.friendList);
+                setFriends(response.friends);
                 
             }
             setLoading(false);
         };
         fetch();
     }, [nickname, friendsPage]);
-    if (friends.length === 0) {
+    if (!friends || friends.length === 0) {
         return (
             <>
                 <div className="font-MyFancyFont text-lg text-white flex justify-center">{t('friends')}</div>
@@ -72,7 +72,7 @@ export default function FriendList() {
                             <span className="text-white font-MyFancyFont text-[10px] sm:text-base">{friend.nickname}</span>
                             <span className="text-white font-MyFancyFont text-[10px] sm:text-base">
                                 <Rating rating={friend.rating} className="text-white mr-2" /></span>
-                            {friend.onlineStatus === 'online' ? (
+                            {friend.isOnline? (
                                 <div className="text-green-500  text-sm sm:text-lg absolute right-2">●</div>
                             ) : (
                                 <div className="text-red-500 text-sm sm:text-lg absolute right-2">●</div>

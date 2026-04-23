@@ -20,6 +20,9 @@ public class User
     public RatingStats Draws { get; set; } = new RatingStats(0, 0, 0);
     public int GamesPlayed { get; set; } = 0;
     public RoleType Role { get; set; } = RoleType.User;
+   
+   
+
 
 
     

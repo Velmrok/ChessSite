@@ -6,7 +6,7 @@ using System.Linq;
 namespace backend.Services.Mappers;
 public static class UserMappers
 {
-    public static GetMeResponse ToGetMeResponse(this User user)
+    public static GetMeResponse ToGetMeResponse(this User user, List<string> friendNicknames)
     {
         return new GetMeResponse(
             Nickname: user.Nickname,
@@ -14,7 +14,8 @@ public static class UserMappers
             ProfilePictureUrl: user.ProfilePictureUrl,
             CreatedAt: user.CreatedAt,
             LastActive: user.LastActive,
-            Rating: user.Rating
+            Rating: user.Rating,
+            FriendNicknames: friendNicknames
         );
     }
     public static UserResponse ToUserResponse(this User user)

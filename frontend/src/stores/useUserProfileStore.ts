@@ -1,11 +1,11 @@
 import { fetchUserFriends, fetchUserGameHistory, fetchUserProfile } from "@/services/userService";
-import type { UserProfile } from "@/types/user";
+import type { PublicUser, UserProfile } from "@/types/user";
 import { create } from "zustand";
 
 type UserProfileStore = {
   profile: UserProfile | null;
   games: Array<ProfileGame>;
-  friends: Friend[];
+  friends: PublicUser[];
 
   gamesPage: number;
   friendsPage: number;
@@ -24,7 +24,7 @@ type UserProfileStore = {
 
   setGames: (games : Array<ProfileGame>) => void;
   setGamesPage: (page: number) => void;
-  setFriends: (friends: Array<Friend>) => void;
+  setFriends: (friends: Array<PublicUser>) => void;
   setFriendsPage: (page: number) => void;
   setProfile: (profile: UserProfile | null) => void;
 };

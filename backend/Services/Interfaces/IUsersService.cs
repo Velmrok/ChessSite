@@ -9,5 +9,7 @@ namespace backend.Services.Interfaces
     {
         public Task<ErrorOr<UsersResult>> GetAllUsersAsync(GetUsersQuery query);
         public Task<ErrorOr<UserProfileResponse>> GetUserProfileAsync(string nickname);
-    }
+        public Task<ErrorOr<FriendsResponse>> GetFriendsAsync(string nickname, PaginationQuery pagination);
+        public Task<ErrorOr<Success>> AddFriendAsync(AddFriendRequest request   , string currentUserNickname);
+    }   
 }

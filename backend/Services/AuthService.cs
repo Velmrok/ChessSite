@@ -77,7 +77,7 @@ public class AuthService : IAuthService
         var refreshToken = await _refreshTokenService.CreateRefreshTokenAsync(newUser);
         await _dbContext.SaveChangesAsync();
         await _cacheInvalidation.InvalidateUsersCache();
-        return new AuthResult(accessToken, refreshToken, newUser.ToGetMeResponse());
+        return new AuthResult(accessToken, refreshToken, newUser.ToGetMeResponse([]));
 
     }
     public async Task<ErrorOr<AuthResult>> LoginAsync(LoginRequest request)
@@ -106,7 +106,11 @@ public class AuthService : IAuthService
         var refreshToken = await _refreshTokenService.CreateRefreshTokenAsync(user);
         await _dbContext.SaveChangesAsync();
         
-        return new AuthResult(accessToken, refreshToken, user.ToGetMeResponse());
+        var friendNicknames = await _dbContext.Friendships
+            .Where(f => f.UserId == user.Id)
+            .Select(f => f.Friend.Nickname)
+            .ToListAsync();
+        return new AuthResult(accessToken, refreshToken, user.ToGetMeResponse(friendNicknames));
     }
     public async Task<ErrorOr<AuthResult>> RefreshAsync(string refreshToken)
     {
@@ -131,7 +135,11 @@ public class AuthService : IAuthService
 
         await _dbContext.SaveChangesAsync();
 
-        return new AuthResult(newAccessToken, newRefreshToken, user.ToGetMeResponse());
+        var friendNicknames = await _dbContext.Friendships
+            .Where(f => f.UserId == user.Id)
+            .Select(f => f.Friend.Nickname)
+            .ToListAsync();
+        return new AuthResult(newAccessToken, newRefreshToken, user.ToGetMeResponse(friendNicknames));
     }
     public async Task<ErrorOr<Success>> LogoutAsync(string refreshToken)
     {
@@ -157,6 +165,11 @@ public class AuthService : IAuthService
         var userEntity = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
         if (userEntity == null)
             return Error.NotFound("userNotFound", "User account no longer exists.");
-        return userEntity.ToGetMeResponse();
+
+        var friendNicknames = await _dbContext.Friendships
+            .Where(f => f.UserId == userEntity.Id)
+            .Select(f => f.Friend.Nickname)
+            .ToListAsync();
+        return userEntity.ToGetMeResponse(friendNicknames);
     }
 }

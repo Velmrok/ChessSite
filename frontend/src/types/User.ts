@@ -11,7 +11,7 @@ export type PublicUser = {
     rating: Rating;
     isOnline: boolean;
     lastActive: string;
-    friendList: Array<string>;
+    friendNicknames: Array<string>;
     isInQueue: boolean;
     role: 'user' | 'admin';
 }

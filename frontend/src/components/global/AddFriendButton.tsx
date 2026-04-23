@@ -1,4 +1,5 @@
 
+import { useApi } from "@/hooks/useApi";
 import { addFriend, deleteFriend } from "@/services/userService";
 import useToastStore from "@/stores/useToastStore";
 import useUserStore from "@/stores/useUserStore";
@@ -15,32 +16,30 @@ type Props = {
 
 export default function AddFriendButton({ userNickname, className }: Props) {
     const user = useUserStore((state) => state.user);
-    const friendList = useUserStore((state) => state.user?.friendList);
+    const friendList = useUserStore((state) => state.user?.friendNicknames);
     const deleteFriendFromStore = useUserStore((state) => state.deleteFriend);
     const addFriendToStore = useUserStore((state) => state.addFriend);
     const setToast = useToastStore((state) => state.setToast)
     const { t: toastT } = useTranslation("toast");
-    const navigate = useNavigate();
+    const {request} = useApi();
     const handleChangeFriendStatus = async (userNickname: string) => {
-        if (!user) {
-            navigate("/login");
-            return;
-        }
-        try {
-            if (friendList!.includes(userNickname)) {
-                await deleteFriend(userNickname);
-                setToast({ msg: toastT("success.friendDeleted"), type: "success" });
+        if (!user) return;
+      
+        if (friendList!.includes(userNickname)) {
+            await request(() => deleteFriend(userNickname),{
+                onError: (message) =>  setToast({ msg: toastT(message), type: "error" })
+            });
+            setToast({ msg: toastT("success.friendDeleted"), type: "success" });
 
-                deleteFriendFromStore(userNickname);
-            } else {
-                await addFriend(userNickname);
-                setToast({ msg: toastT("success.friendAdded"), type: "success" });
-                addFriendToStore(userNickname);
-            }
-        } catch (error) {
-            console.log(error);
-            setToast({ msg: toastT("error.friendAddError"), type: "error" });
+            deleteFriendFromStore(userNickname);
+        } else {
+            await request(() => addFriend(userNickname),{
+                onError: (message) =>  setToast({ msg: toastT(message), type: "error" })
+            });
+            setToast({ msg: toastT("success.friendAdded"), type: "success" });
+            addFriendToStore(userNickname);
         }
+    
     }
     return (
         <button className={className}

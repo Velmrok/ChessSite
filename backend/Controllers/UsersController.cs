@@ -38,6 +38,16 @@ namespace backend.Controllers
             return HandleError(await _usersService.GetUserProfileAsync(nickname), Ok);
            
         }
-
+        [HttpGet("{nickname}/friends")]
+        public async Task<IActionResult> GetFriends(string nickname, [FromQuery] PaginationQuery pagination)
+        {
+            return HandleError(await _usersService.GetFriendsAsync(nickname, pagination), Ok);
+        }
+        [HttpPost("friend")]
+        public async Task<IActionResult> AddFriend([FromBody] AddFriendRequest request)
+        {
+            var currentUserNickname = User.FindFirst("nickname")?.Value;
+            return HandleError(await _usersService.AddFriendAsync(request, currentUserNickname!), _=> NoContent());
+        }
     }
 }

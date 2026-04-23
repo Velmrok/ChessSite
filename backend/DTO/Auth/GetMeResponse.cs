@@ -10,5 +10,6 @@ public record GetMeResponse(
     string ProfilePictureUrl,
     DateTime CreatedAt,
     DateTime LastActive,
-    RatingStats Rating  
+    RatingStats Rating ,
+    List<string> FriendNicknames 
 );

@@ -28,7 +28,7 @@ export default function UserProfilePage() {
     const [activeTab, setActiveTab] = useState<'history' | 'friends'|'elo'>('history');
     const user = useUserStore((state) => state.user);
     const { t } = useTranslation('profile');
-    const loggedUserFriendList = useUserStore((state) => state.friendList);
+    const loggedUserFriendList = useUserStore((state) => state.user?.friendNicknames);
     const [isDeleted, setIsDeleted] = useState(false);
     const {request} = useApi();
 
@@ -98,7 +98,7 @@ export default function UserProfilePage() {
                                 <div className="flex gap-5 text-white text-2xl mdtext-2xl lg:text-4xl  font-MyFancyFont lg:ml-4 pt-6 md:pt-0 ">
                                     {profile.nickname}
 
-                                    {user && user?.nickname !== profile.nickname &&
+                                    {user && user?.nickname !== profile.nickname && loggedUserFriendList && 
                                         <div className="text-[6px] md:text-[8px] flex flex-col items-center justify-center">
                                             <AddFriendButton userNickname={profile.nickname} className="text-2xl" />
                                             {loggedUserFriendList.includes(profile.nickname) ? t('deleteFriend') : t('addFriend')}

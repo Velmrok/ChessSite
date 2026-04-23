@@ -5,17 +5,6 @@ declare global {
 
 
 
-    type Friend = {
-        nickname: string;
-        avatar: string;
-        onlineStatus: 'online' | 'offline';
-        rating: {
-            rapid: number;
-            blitz: number;
-            bullet: number;
-        }
-    }
-    
     type Message = {
         id: string;
         nickname: string;

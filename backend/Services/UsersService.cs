@@ -108,12 +108,73 @@ public class UsersService : IUsersService
         var user = await _context.Users.FirstOrDefaultAsync(u => u.Nickname == nickname);
         if (user == null)
         {
-            return Error.NotFound("User.NotFound", "User with the given nickname was not found.");
+            return Error.NotFound("userNotFound", "User with the given nickname was not found.");
         }
         var isOnline = await _presenceService.IsOnlineAsync(user.Id);
-        var response = user.ToUserProfileResponse(isOnline); 
+        var response = user.ToUserProfileResponse(isOnline);
         return response;
     }
+    public async Task<ErrorOr<FriendsResponse>> GetFriendsAsync(string nickname, PaginationQuery pagination)
+    {
 
-    
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Nickname == nickname);
+
+        if (user == null)
+        {
+            return Error.NotFound("userNotFound", "User with the given nickname was not found.");
+        }
+
+        var friends = _context.Friendships
+            .Where(f => f.User.Nickname == nickname)
+            .Select(f => f.Friend.ToUserResponse())
+            .Skip((pagination.PageNumber - 1) * pagination.Limit)
+            .Take(pagination.Limit);
+
+        var response = new FriendsResponse(
+            await friends.ToListAsync(),
+            (int)Math.Ceiling(await friends.CountAsync() / (double)pagination.Limit)
+        );
+        return response;
+    }
+    public async Task<ErrorOr<Success>> AddFriendAsync(AddFriendRequest request, string currentUserNickname)
+    {
+        if (request.Nickname == currentUserNickname)
+        {
+            return Error.Validation("sameUser", "You cannot add yourself as a friend.");
+        }
+
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Nickname == currentUserNickname);
+        var friend = await _context.Users.FirstOrDefaultAsync(u => u.Nickname == request.Nickname);
+
+        if (user == null || friend == null)
+        {
+            return Error.NotFound("userNotFound", "One or both users were not found.");
+        }
+
+        var existingFriendship = await _context.Friendships
+            .FirstOrDefaultAsync(f => f.UserId == user.Id && f.FriendId == friend.Id);
+
+        if (existingFriendship != null)
+        {
+            return Error.Conflict("alreadyFriends", "These users are already friends.");
+        }
+
+        var friendship = new Friendship
+        {
+            UserId = user.Id,
+            FriendId = friend.Id
+        };
+        var reverseFriendship = new Friendship
+        {
+            UserId = friend.Id,
+            FriendId = user.Id
+        };
+
+        _context.Friendships.Add(friendship);
+        _context.Friendships.Add(reverseFriendship);
+        await _context.SaveChangesAsync();
+
+        return Result.Success;
+
+    }
 }

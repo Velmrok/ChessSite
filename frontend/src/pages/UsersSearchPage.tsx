@@ -34,9 +34,11 @@ export default function UsersSearchPage() {
             if (response) {
                 setList(response.users);
                 totalPagesCount.current = response.totalPages;
+                clearTimeout(timeoutId);
+                setIsLoading(false);
             }
-            clearTimeout(timeoutId);
-            setIsLoading(false);
+            
+            
         };
         fetchUsers();
     }, [params]);

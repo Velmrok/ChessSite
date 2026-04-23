@@ -6,7 +6,6 @@ import SortArrows from "./SortArrows";
 import Rating from "../global/Rating";
 import DeleteAccountButton from "../global/DeleteAccountButton";
 import { useEffect, useState } from "react";
-import EditAccountButton from "../global/EditAccountButton";
 import type { User } from "@/types/user";
 import { useTranslation } from "react-i18next";
 
@@ -76,31 +75,30 @@ export default function UserList({ users}: Props) {
                   text-white py-4 rounded-lg shadow-lg  justify-between px-1 md:px-5  items-center relative`}>
                     {isDeleted && <div className="absolute w-full h-1 bg-red-500 left-0"></div>}
                     <Link to={`/users/${user?.nickname}/profile`}
-                        className="max-w-22 md:max-w-35 w-full  text-xs md:text-sm hover:text-amber-200 transition-transform duration-300
+                        className="max-w-22 sm:max-w-35 w-full  text-xs md:text-sm hover:text-amber-200 transition-transform duration-300
                                     flex items-center justify-center ">
-                        <div className=" w-full bg-black/40 py-2  rounded-lg flex flex-col 
+                        <div className=" w-[70%] sm:w-full bg-black/40 py-2  rounded-lg flex flex-col 
                                         items-center justify-center gap-2">
 
                             <img src={`${API_URL}${user?.avatar}`} alt="Profile"
-                             className="h-12 w-12 md:w-16 md:h-16 rounded-full outline-2 border-2 border-black" />
+                             className="h-8 w-8 sm:w-16 sm:h-16 rounded-full outline-2 border-2 border-black" />
 
 
-                        <div className="text-[10px] md:text-base font-bold mt-auto">{user.nickname}</div>
+                        <div className="text-[8px] sm:text-base font-bold mt-auto">{user.nickname}</div>
                         </div>
                     </Link>
-                    <div className="pr-10 max-w-7 md:max-w-30 w-full h-full flex items-center justify-center text-sm md:text-xl font-bold  ">
+                    <div className="pr-10 max-w-7 md:max-w-30 w-full h-full flex items-center justify-center text-[8px] sm:text-xl font-bold  ">
                         <Rating rating={user.rating} />
                     </div>
-                    <div className="pr-10 max-w-7 md:max-w-30 w-full h-full flex items-center justify-center text-sm md:text-xl font-bold ">{user.onlineStatus}</div>
+                    <div className="pr-10 max-w-7 md:max-w-30 w-full h-full flex items-center justify-center text-[8px] sm:text-xl font-bold ">{user.isOnline ? t('online') : t('offline')}</div>
                     
                     <div>{/* wrapper */}
-                    <div className="pr-7 max-w-7 md:max-w-30 w-full h-full flex items-center justify-center text-sm md:text-xl font-bold ">{deltaLastActive(user.lastActive!)}</div>
+                    <div className="pr-7 max-w-7 md:max-w-30 w-full h-full flex items-center justify-center text-[8px] sm:text-xl font-bold ">{deltaLastActive(user.lastActive!)}</div>
                     
                     <div className={`${isDeleted ? 'hidden' : ''} `}>
                     <AddFriendButton userNickname={user.nickname}
                      className="text-sm md:text-2xl absolute  right-2 top-2" />
-                     <EditAccountButton nickname={user.nickname}
-                      className="text-sm md:text-2xl absolute right-2 top-[50%] translate-y-[-50%]" />
+             
                         
                     <DeleteAccountButton nickname={user.nickname} cb={() => handleDeleteAccount(user.nickname)}
                      className="text-sm md:text-2xl absolute right-2 bottom-2" />

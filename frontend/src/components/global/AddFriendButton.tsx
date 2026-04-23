@@ -42,10 +42,13 @@ export default function AddFriendButton({ userNickname, className }: Props) {
     
     }
     return (
+        <>
+        { user && user.nickname !== userNickname &&
         <button className={className}
             onClick={() => handleChangeFriendStatus(userNickname)}>
             <FaUserFriends className={` hover:scale-110
                     ${friendList && friendList.includes(userNickname) ? "text-yellow-500 hover:text-red-500/80" : "text-white"}`} />
-        </button>
+        </button>}
+        </>
     );
 }

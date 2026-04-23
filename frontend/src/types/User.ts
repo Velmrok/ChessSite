@@ -9,30 +9,29 @@ export type PublicUser = {
     nickname: string;
     avatar: string;
     rating: Rating;
-    onlineStatus: 'online' | 'offline';
+    isOnline: boolean;
     lastActive: string;
     friendList: Array<string>;
     isInQueue: boolean;
     role: 'user' | 'admin';
 }
 export type UserInfo = {
-    rating: {
-        rapid: number;
-        blitz: number;
-        bullet: number;
-    };
-    joinDate: string;
+    rating: Rating;
+    createdAt: string;
     gamesPlayed: number;
-    wins: number;
-    losses: number;
-    draws: number;
+    wins: Rating;
+    losses: Rating;
+    draws: Rating;
+    totalWins: number;
+    totalLosses: number;
+    totalDraws: number;
 }
 
 export type UserProfile = {
         nickname: string;
         avatar: string;
         bio: string;
-        onlineStatus: 'online' | 'offline';
+        isOnline: boolean;
 
         userInfo: UserInfo;
     };

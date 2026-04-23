@@ -84,7 +84,7 @@ export default function UserProfilePage() {
                             </button>
                         )}
                         {(!user || profile.nickname !== user?.nickname) && (
-                            profile.onlineStatus === 'online' ? (
+                            profile.isOnline ? (
                                 <span className="text-green-500  text-sm sm:text-2xl font-MyFancyFont absolute top-2 left-3">● {t('online')}</span>
                             ) : (
                                 <span className="text-red-500 text-sm sm:text-2xl font-MyFancyFont absolute top-2 left-3">● {t('offline')}</span>

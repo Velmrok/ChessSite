@@ -19,15 +19,15 @@ export default function UserInfo({ userInfo }: Props) {
                     <Rating className="flex flex-col" rating={userInfo.rating} />
                 </div>
                 <div className="">{t('joinDate')}</div>
-                <div className="text-center">{userInfo?.joinDate}</div>
+                <div className="text-center">{userInfo?.createdAt}</div>
                 <div className="">{t('gamesPlayed')}</div>
                 <div className="text-center">{userInfo?.gamesPlayed}</div>
                 <div className="">{t('wins')}</div>
-                <div className="text-center">{userInfo?.wins}</div>
+                <div className="text-center">{userInfo?.totalWins}</div>
                 <div className="">{t('losses')}</div>
-                <div className="text-center">{userInfo?.losses}</div>
+                <div className="text-center">{userInfo?.totalLosses}</div>
                 <div className="">{t('draws')}</div>
-                <div className="text-center">{userInfo?.draws}</div>
+                <div className="text-center">{userInfo?.totalDraws}</div>
             </div>
         </div>
     );

@@ -6,7 +6,7 @@ namespace backend.DTO.Users
 {
     public record AddFriendRequest()
     {
-        [Required]
+        [Required(ErrorMessage = "requiredNickname")]
         public string Nickname { get; init; } = string.Empty;
     }
 }

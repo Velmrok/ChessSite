@@ -49,5 +49,11 @@ namespace backend.Controllers
             var currentUserNickname = User.FindFirst("nickname")?.Value;
             return HandleError(await _usersService.AddFriendAsync(request, currentUserNickname!), _=> NoContent());
         }
+        [Authorize(Policy = "OwnerOrAdmin")]
+        [HttpPatch("{nickname}/profile/bio")]
+        public async Task<IActionResult> UpdateUserBio(string nickname, [FromBody] UpdateUserBioRequest request)
+        {
+            return HandleError(await _usersService.UpdateUserBioAsync(nickname, request), Ok);
+        }
     }
 }

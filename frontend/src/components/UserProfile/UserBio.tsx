@@ -29,7 +29,9 @@ export default function UserBio({ bio, nickname }: Props) {
 
         const updatedBio = await request(() => updateUserBio(nickname!, newValue || ""), {
             onError: (message) => {
-                setToast({ msg: toastT(message) + ` ${textAreaRef.current?.value.length}/200`, type: "error" });
+               
+                const errorMessage = toastT("error." + message) + ( message=="bioTooLong" ? ` ${textAreaRef.current?.value.length}/200` : "" );
+                setToast({ msg: errorMessage, type: "error" });
                 return;
 
             }

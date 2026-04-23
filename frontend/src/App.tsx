@@ -36,15 +36,18 @@ function App() {
         <Route path="/" element={<Home />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
-            <Route path="/users/:nickname/profile" element={<UserProfilePage />} />
+            
            
             <Route element={<OnlyLoggedInRoute />}>
               <Route path="/find-game" element={<FindGame />} />
               <Route path="/search" element={<UsersSearchPage />} />
                <Route path="/game/:gameId" element={<GamePage />} />
                <Route path ="/games" element={<SearchGamePage/>} />
+               <Route path="/users/:nickname/profile" element={<UserProfilePage />} />
             
             </Route>
+
+
             <Route path="*" element={<NotFound whatIsMissing='page'/>} />
             
       </Routes>}

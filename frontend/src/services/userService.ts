@@ -17,7 +17,7 @@ export const fetchUserOnlineFriends = async (nickname: string, page: number, lim
     return response as Promise<{ friendList: Array<PublicUser>, totalPages: number }>;
 }
 export const updateUserBio = async (nickname: string, bio: string) : Promise<{ bio: string }> => {
-    const response = await apiFetch({ url: `/users/${nickname}/profile`, method: 'PATCH', includeCredentials: true, contentType: 'application/json', body: JSON.stringify({ bio }) });
+    const response = await apiFetch({ url: `/users/${nickname}/profile/bio`, method: 'PATCH', includeCredentials: true, contentType: 'application/json', body: JSON.stringify({ bio }) });
     return response as Promise<{ bio: string }>;
 }
 export const uploadUserAvatar = async (avatarFile: File) : Promise<{ avatar: string }> => {

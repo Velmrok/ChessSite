@@ -182,4 +182,15 @@ public class UsersService : IUsersService
         return Result.Success;
 
     }
+    public async Task<ErrorOr<UpdateUserBioResponse>> UpdateUserBioAsync(string nickname, UpdateUserBioRequest request)
+    {
+        var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Nickname == nickname);
+        if (user == null)
+        {
+            return Error.NotFound("userNotFound", "User with the given nickname was not found.");
+        }
+        user.ProfileBio = request.Bio;
+        await _dbContext.SaveChangesAsync();
+        return new UpdateUserBioResponse(user.ProfileBio);
+    }
 }

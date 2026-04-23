@@ -85,9 +85,9 @@ export default function UserProfilePage() {
                         )}
                         {(!user || profile.nickname !== user?.nickname) && (
                             profile.isOnline ? (
-                                <span className="text-green-500  text-sm sm:text-2xl font-MyFancyFont absolute top-2 left-3">● {t('online')}</span>
+                                <span className="text-green-500  text-sm sm:text-2xl font-MyFancyFont absolute top-2 right-3">● {t('online')}</span>
                             ) : (
-                                <span className="text-red-500 text-sm sm:text-2xl font-MyFancyFont absolute top-2 left-3">● {t('offline')}</span>
+                                <span className="text-red-500 text-sm sm:text-2xl font-MyFancyFont absolute top-2 right-3">● {t('offline')}</span>
                             ))}
                         <div className="flex flex-col lg:flex-row relative items-center  w-full gap-5 h-full">
                             <div className="flex flex-col items-center justify-center w-full lg:w-50 self-start">

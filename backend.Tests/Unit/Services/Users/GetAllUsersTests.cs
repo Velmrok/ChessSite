@@ -1,51 +1,13 @@
-using backend.Data;
-using backend.DTO.Common;
 using backend.DTO.Users;
 using backend.Enums;
-using backend.Models;
-using backend.Services;
-using backend.Services.Interfaces;
 using FluentAssertions;
-using Microsoft.Extensions.Caching.Distributed;
-using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 
-namespace backend.Tests.Unit.Services;
+namespace backend.Tests.Unit.Services.Users;
 
-public class UsersServiceTests : TestBase
+public class GetAllUsersTests : UsersServiceTestBase
 {
-    private readonly UsersService _usersService;
-    private readonly IPresenceService _presenceService;
-
-    public UsersServiceTests()
-    {
-        var services = new ServiceCollection();
-        services.AddDistributedMemoryCache();
-        var provider = services.BuildServiceProvider();
-
-        var cache = provider.GetRequiredService<IDistributedCache>();
-        _presenceService = Substitute.For<IPresenceService>();
-        _usersService = new UsersService(DbContext, cache, _presenceService);
-    }
-
-    private User MakeUser(string name, int rapid = 1000, int blitz = 1000, int bullet = 1000,
-        DateTime? createdAt = null, DateTime? lastActive = null) => new()
-    {
-        Nickname = name,
-        Login = name,
-        Email = $"{name}@test.com",
-        PasswordHash = "hash",
-        Rating = new RatingStats(rapid, blitz, bullet),
-        CreatedAt = createdAt ?? DateTime.UtcNow,
-        LastActive = lastActive ?? DateTime.UtcNow,
-    };
-
-    private async Task SeedAsync(params User[] users)
-    {
-        DbContext.Users.AddRange(users);
-        await DbContext.SaveChangesAsync();
-    }
-
+    
 
     [Fact]
     public async Task GetAllUsersAsync_ReturnsAllUsers_WhenNoFilters()

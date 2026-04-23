@@ -1,0 +1,168 @@
+using backend.DTO.Auth;
+using backend.Models;
+using FluentAssertions;
+using Microsoft.EntityFrameworkCore;
+
+
+namespace backend.Tests.Unit.Services.Auith;
+
+public class LoginTests : AuthTestBase
+{
+
+    [Fact]
+    public async Task LoginAsync_ShouldReturnOK_WhenLoginIsSuccessful()
+    {
+
+        DbContext.Users.Add(new User
+        {
+            Nickname = "testuser",
+            Login = "testuser",
+            Email = "test@example.com",
+            PasswordHash = _passwordHasher.HashPassword(null!, "Password123!")
+        });
+        await DbContext.SaveChangesAsync();
+
+
+        var request = new LoginRequest
+        {
+            Login = "testuser",
+            Password = "Password123!"
+        };
+
+
+        var result = await _authService.LoginAsync(request);
+        result.IsError.Should().BeFalse();
+        result.Value.AccessToken.Should().NotBeNullOrEmpty();
+        result.Value.AccessToken.Should().StartWith("mocked-jwt-token");
+
+        result.Value.RefreshToken.Should().NotBeNullOrEmpty();
+
+    }
+    [Fact]
+    public async Task LoginAsync_ShouldReturnOK_ShouldTrimInput()
+    {
+        DbContext.Users.Add(new User
+        {
+            Nickname = "testuser",
+            Login = "testuser",
+            Email = "test@example.com",
+            PasswordHash = _passwordHasher.HashPassword(null!, "Password123!")
+        });
+        await DbContext.SaveChangesAsync();
+        var existingRequest = new LoginRequest
+        {
+            Login = "testuser   ",
+            Password = "Password123!            "
+        };
+        var result = await _authService.LoginAsync(existingRequest);
+        result.IsError.Should().BeFalse();
+
+        result.Value.AccessToken.Should().NotBeNullOrEmpty();
+        result.Value.AccessToken.Should().StartWith("mocked-jwt-token");
+
+        result.Value.RefreshToken.Should().NotBeNullOrEmpty();
+
+    }
+    [Fact]
+    public async Task LoginAsync_ShouldReturnValidationError_WhenFieldsAreMissing()
+    {
+        var request = new LoginRequest
+        {
+            Login = "",
+            Password = ""
+        };
+
+        var result = await _authService.LoginAsync(request);
+        result.IsError.Should().BeTrue();
+        var error = result.FirstError;
+        error.Code.Should().Be("invalidLoginOrPassword");
+    }
+
+    [Fact]
+    public async Task LoginAsync_ShouldReturnOK_WhenLoginWithEmailIsSuccessful()
+    {
+
+        DbContext.Users.Add(new User
+        {
+            Nickname = "testuser",
+            Login = "testuser",
+            Email = "test@example.com",
+            PasswordHash = _passwordHasher.HashPassword(null!, "Password123!")
+        });
+        await DbContext.SaveChangesAsync();
+
+
+        var request = new LoginRequest
+        {
+            Login = "test@example.com",
+            Password = "Password123!"
+        };
+
+        var result = await _authService.LoginAsync(request);
+        result.IsError.Should().BeFalse();
+        result.Value.AccessToken.Should().NotBeNullOrEmpty();
+        result.Value.AccessToken.Should().StartWith("mocked-jwt-token");
+
+        result.Value.RefreshToken.Should().NotBeNullOrEmpty();
+
+    }
+
+    [Fact]
+    public async Task LoginAsync_ShouldReturnNotFound_WhenUserDoesNotExist()
+    {
+        var request = new LoginRequest
+        {
+            Login = "nonexistentuser",
+            Password = "Password123!"
+        };
+
+        var result = await _authService.LoginAsync(request);
+        result.IsError.Should().BeTrue();
+        var error = result.FirstError;
+        error.Code.Should().Be("invalidLoginOrPassword");
+
+        var user = await DbContext.Users.FirstOrDefaultAsync(u => u.Login == request.Login || u.Email == request.Login);
+        user.Should().BeNull();
+    }
+    [Fact]
+    public async Task LoginAsync_ShouldReturnUnauthorized_WhenPasswordIsIncorrect()
+    {
+        DbContext.Users.Add(new User
+        {
+            Nickname = "testuser",
+            Login = "testuser",
+            Email = "test@example.com",
+            PasswordHash = _passwordHasher.HashPassword(null!, "CorrectPassword")
+        });
+        await DbContext.SaveChangesAsync();
+
+        var request = new LoginRequest
+        {
+            Login = "testuser",
+            Password = "IncorrectPassword"
+        };
+
+        var result = await _authService.LoginAsync(request);
+        result.IsError.Should().BeTrue();
+        var error = result.FirstError;
+        error.Code.Should().Be("invalidLoginOrPassword");
+        result.Value.Should().BeNull();
+    }
+    [Theory]
+    [InlineData(null, "Password123!")]
+    [InlineData("testuser", null)]
+    [InlineData("", "Password123!")]
+    [InlineData("testuser", "")]
+    [InlineData(null, null)]
+    [InlineData("", "")]
+    public async Task LoginAsync_ShouldReturnUnauthorized_WhenFieldIsNullOrEmpty(string? login, string? password)
+    {
+        var request = new LoginRequest
+        {
+            Login = login,
+            Password = password
+        };
+        var result = await _authService.LoginAsync(request);
+        result.IsError.Should().BeTrue();
+    }
+}

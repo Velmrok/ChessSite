@@ -92,6 +92,7 @@ public class GetFriendsTests : UsersServiceTestBase
         result.IsError.Should().BeFalse();
         FriendsResponse response = result.Value;
         response.Friends.Should().HaveCount(5);
+        response.TotalPages.Should().Be(3);
         
        
     }

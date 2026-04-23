@@ -123,16 +123,21 @@ public class UsersService : IUsersService
         {
             return Error.NotFound("userNotFound", "User with the given nickname was not found.");
         }
-
-        var friends = _dbContext.Friendships
+        var query = _dbContext.Friendships
             .Where(f => f.User.Nickname == nickname)
-            .Select(f => f.Friend.ToUserResponse())
+            .Select(f => f.Friend.ToUserResponse());
+
+        var totalPages = (int)Math.Ceiling(await query.CountAsync() / (double)pagination.Limit);
+
+        var friends = query
             .Skip((pagination.PageNumber - 1) * pagination.Limit)
             .Take(pagination.Limit);
 
         var response = new FriendsResponse(
             await friends.ToListAsync(),
-            (int)Math.Ceiling(await friends.CountAsync() / (double)pagination.Limit)
+            totalPages
+
+
         );
         return response;
     }

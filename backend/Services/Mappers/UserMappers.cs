@@ -2,7 +2,7 @@ using backend.DTO.Auth;
 using backend.DTO.Common;
 using backend.DTO.Users;
 using backend.Models;
-
+using System.Linq;
 namespace backend.Services.Mappers;
 public static class UserMappers
 {
@@ -14,7 +14,7 @@ public static class UserMappers
             ProfilePictureUrl: user.ProfilePictureUrl,
             CreatedAt: user.CreatedAt,
             LastActive: user.LastActive,
-            Rating: new RatingResponse(user.RapidRating, user.BlitzRating, user.BulletRating)
+            Rating: user.Rating
         );
     }
     public static UserResponse ToUserResponse(this User user)
@@ -26,7 +26,27 @@ public static class UserMappers
             CreatedAt: user.CreatedAt,
             LastActive: user.LastActive,
             Role: user.Role,
-            Rating: new RatingResponse(user.RapidRating, user.BlitzRating, user.BulletRating)
+            Rating:user.Rating
+        );
+    }
+    public static UserProfileResponse ToUserProfileResponse(this User user,bool isOnline)
+    {
+        return new UserProfileResponse(
+            Nickname: user.Nickname,
+            Avatar: user.ProfilePictureUrl,
+            Bio: user.ProfileBio,
+            IsOnline: isOnline,
+            UserInfo: new UserInfo(
+                Rating: user.Rating,
+                CreatedAt: user.CreatedAt.ToString("yyyy-MM-dd"),
+                GamesPlayed: user.GamesPlayed,
+                Wins: user.Wins,
+                Losses: user.Losses,
+                Draws: user.Draws,
+                TotalWins: user.Wins.Blitz + user.Wins.Bullet + user.Wins.Rapid,
+                TotalLosses: user.Losses.Blitz + user.Losses.Bullet + user.Losses.Rapid,
+                TotalDraws: user.Draws.Blitz + user.Draws.Bullet + user.Draws.Rapid
+            )
         );
     }
  

@@ -103,5 +103,17 @@ public class UsersService : IUsersService
         return new UsersResult(response, false);
     }
 
+    public async Task<ErrorOr<UserProfileResponse>> GetUserProfileAsync(string nickname)
+    {
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Nickname == nickname);
+        if (user == null)
+        {
+            return Error.NotFound("User.NotFound", "User with the given nickname was not found.");
+        }
+        var isOnline = await _presenceService.IsOnlineAsync(user.Id);
+        var response = user.ToUserProfileResponse(isOnline); 
+        return response;
+    }
+
     
 }

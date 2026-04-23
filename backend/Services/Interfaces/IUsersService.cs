@@ -8,5 +8,6 @@ namespace backend.Services.Interfaces
     public interface IUsersService
     {
         public Task<ErrorOr<UsersResult>> GetAllUsersAsync(GetUsersQuery query);
+        public Task<ErrorOr<UserProfileResponse>> GetUserProfileAsync(string nickname);
     }
 }

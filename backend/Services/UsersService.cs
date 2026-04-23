@@ -16,12 +16,12 @@ namespace backend.Services;
 
 public class UsersService : IUsersService
 {
-    private readonly AppDbContext _context;
+    private readonly AppDbContext _dbContext;
     private readonly IDistributedCache _cache;
     private readonly IPresenceService _presenceService;
     public UsersService(AppDbContext context, IDistributedCache cache, IPresenceService presenceService)
     {
-        _context = context;
+        _dbContext = context;
         _cache = cache;
         _presenceService = presenceService;
     }
@@ -60,7 +60,7 @@ public class UsersService : IUsersService
             return new UsersResult(cachedResponse, true);
         }
 
-        var users = _context.Users.AsQueryable();
+        var users = _dbContext.Users.AsQueryable();
         
 
         if (!string.IsNullOrEmpty(query.Search))
@@ -105,7 +105,7 @@ public class UsersService : IUsersService
 
     public async Task<ErrorOr<UserProfileResponse>> GetUserProfileAsync(string nickname)
     {
-        var user = await _context.Users.FirstOrDefaultAsync(u => u.Nickname == nickname);
+        var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Nickname == nickname);
         if (user == null)
         {
             return Error.NotFound("userNotFound", "User with the given nickname was not found.");
@@ -117,14 +117,14 @@ public class UsersService : IUsersService
     public async Task<ErrorOr<FriendsResponse>> GetFriendsAsync(string nickname, PaginationQuery pagination)
     {
 
-        var user = await _context.Users.FirstOrDefaultAsync(u => u.Nickname == nickname);
+        var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Nickname == nickname);
 
         if (user == null)
         {
             return Error.NotFound("userNotFound", "User with the given nickname was not found.");
         }
 
-        var friends = _context.Friendships
+        var friends = _dbContext.Friendships
             .Where(f => f.User.Nickname == nickname)
             .Select(f => f.Friend.ToUserResponse())
             .Skip((pagination.PageNumber - 1) * pagination.Limit)
@@ -143,15 +143,15 @@ public class UsersService : IUsersService
             return Error.Validation("sameUser", "You cannot add yourself as a friend.");
         }
 
-        var user = await _context.Users.FirstOrDefaultAsync(u => u.Nickname == currentUserNickname);
-        var friend = await _context.Users.FirstOrDefaultAsync(u => u.Nickname == request.Nickname);
+        var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Nickname == currentUserNickname);
+        var friend = await _dbContext.Users.FirstOrDefaultAsync(u => u.Nickname == request.Nickname);
 
         if (user == null || friend == null)
         {
             return Error.NotFound("userNotFound", "One or both users were not found.");
         }
 
-        var existingFriendship = await _context.Friendships
+        var existingFriendship = await _dbContext.Friendships
             .FirstOrDefaultAsync(f => f.UserId == user.Id && f.FriendId == friend.Id);
 
         if (existingFriendship != null)
@@ -170,9 +170,9 @@ public class UsersService : IUsersService
             FriendId = user.Id
         };
 
-        _context.Friendships.Add(friendship);
-        _context.Friendships.Add(reverseFriendship);
-        await _context.SaveChangesAsync();
+        _dbContext.Friendships.Add(friendship);
+        _dbContext.Friendships.Add(reverseFriendship);
+        await _dbContext.SaveChangesAsync();
 
         return Result.Success;
 

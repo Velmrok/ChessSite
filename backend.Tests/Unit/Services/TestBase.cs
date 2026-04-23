@@ -15,5 +15,6 @@ public abstract class TestBase
             .Options;
         _dbContext = new AppDbContext(options);
         _dbContext.Database.EnsureCreated();
+        
     }
 }

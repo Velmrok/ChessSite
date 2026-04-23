@@ -1,3 +1,4 @@
+using System.Data;
 using backend.Data;
 using backend.DTO.Common;
 using backend.DTO.Users;
@@ -17,7 +18,7 @@ public abstract class UsersServiceTestBase : TestBase
     protected readonly UsersService _usersService;
     protected readonly IPresenceService _presenceService;
 
-    public UsersServiceTestBase()
+    public UsersServiceTestBase() 
     {
         var services = new ServiceCollection();
         services.AddDistributedMemoryCache();
@@ -39,11 +40,21 @@ public abstract class UsersServiceTestBase : TestBase
         LastActive = lastActive ?? DateTime.UtcNow,
     };
 
-    protected async Task SeedAsync(params User[] users)
+    protected Friendship MakeFriendship(User user, User friend) => new()
     {
-        _dbContext.Users.AddRange(users);
-        await _dbContext.SaveChangesAsync();
-    }
+        UserId = user.Id,
+        FriendId = friend.Id,
+        User = user,
+        Friend = friend,
+    };
+
+
+
+    protected async Task SeedAsync<T>(params T[] entities) where T : class
+{
+    _dbContext.Set<T>().AddRange(entities);
+    await _dbContext.SaveChangesAsync();
+}
 }
 
 

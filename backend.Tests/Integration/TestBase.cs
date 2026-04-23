@@ -156,8 +156,7 @@ public class TestBase : IClassFixture<WebApplicationFactory<Program>>
         };
 
         var response = await _client.PostAsJsonAsync("/auth/login", loginRequest);
-        var body = await response.Content.ReadAsStringAsync();
-        _output.WriteLine($"Login response: {response.StatusCode}, Body: {body}");
+        
         response.EnsureSuccessStatusCode();
         
     }

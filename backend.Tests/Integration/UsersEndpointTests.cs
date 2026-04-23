@@ -8,10 +8,11 @@ using backend.Tests.Integration;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Caching.Distributed;
+using Xunit.Abstractions;
 
 public class UsersEndpointTests : TestBase
 {
-    public UsersEndpointTests(WebApplicationFactory<Program> factory) : base(factory)
+    public UsersEndpointTests(WebApplicationFactory<Program> factory, ITestOutputHelper output) : base(factory, output)
     {
     }
     

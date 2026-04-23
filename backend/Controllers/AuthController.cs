@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net;
+using System.Reflection.Metadata;
 using System.Threading.Tasks;
 using backend.DTO.Auth;
 using backend.Extensions;
@@ -17,7 +18,7 @@ namespace backend.Controllers
 {
     [ApiController]
     [Route("/auth")]
-    public class AuthController : ControllerBase
+    public class AuthController : MyControllerBase
     {
         private readonly IAuthService _authService;
         private readonly ICookieService _cookieService;
@@ -29,87 +30,70 @@ namespace backend.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterRequest request)
         {
-            var result = await _authService.RegisterAsync(request);
-            if (result.IsError)
-            {
-                var error = result.FirstError;
-                return Problem(statusCode: error.ToStatusCode(), title: error.Code, detail: error.Description);
-            }
-            var accessToken = result.Value.AccessToken;
-            var refreshToken = result.Value.RefreshToken;
-            _cookieService.SetJwtCookie(Response, accessToken);
-            _cookieService.SetRefreshTokenCookie(Response, refreshToken!);
-            return Created($"/users/{result.Value.User.Nickname}/profile", result.Value.User);
+            return HandleError(await _authService.RegisterAsync(request), authResult =>
+             {
+                 var accessToken = authResult.AccessToken;
+                 var refreshToken = authResult.RefreshToken;
+                 _cookieService.SetJwtCookie(Response, accessToken);
+                 _cookieService.SetRefreshTokenCookie(Response, refreshToken!);
+                 return Created($"/users/{authResult.User.Nickname}/profile", authResult.User);
+             });
+
         }
         [EnableRateLimiting("auth")]
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
-            var result = await _authService.LoginAsync(request); 
-            if (result.IsError)
-            {
-                var error = result.FirstError;
-                return Problem(statusCode: error.ToStatusCode(), title: error.Code, detail: error.Description);
-            }
-            var accessToken = result.Value.AccessToken;
-            _cookieService.SetJwtCookie(Response, accessToken);
-            if (result.Value.RefreshToken != null)
-            {
-                var refreshToken = result.Value.RefreshToken;
-                _cookieService.SetRefreshTokenCookie(Response, refreshToken);
-            }
-           return Ok(result.Value.User);
+            return HandleError(await _authService.LoginAsync(request), LoginResult =>
+             {
+                 var accessToken = LoginResult.AccessToken;
+                 _cookieService.SetJwtCookie(Response, accessToken);
+                 if (LoginResult.RefreshToken != null)
+                 {
+                     var refreshToken = LoginResult.RefreshToken;
+                     _cookieService.SetRefreshTokenCookie(Response, refreshToken);
+                 }
+                 return Ok(LoginResult.User);
+             });
         }
         [HttpPost("refresh")]
         public async Task<IActionResult> Refresh()
         {
             var refreshToken = Request.Cookies["refreshToken"];
-            var result = await _authService.RefreshAsync(refreshToken!);
-            if (result.IsError)
-            {
-                var error = result.FirstError;
-                return Problem(statusCode: error.ToStatusCode(), title: error.Code, detail: error.Description);
-            }
-            var accessToken = result.Value.AccessToken;
-            var newRefreshToken = result.Value.RefreshToken;
+            return HandleError(await _authService.RefreshAsync(refreshToken!), result =>
+             {
+                 var accessToken = result.AccessToken;
+                 var newRefreshToken = result.RefreshToken;
 
-            _cookieService.SetJwtCookie(Response, accessToken);
-            _cookieService.SetRefreshTokenCookie(Response, newRefreshToken);
+                 _cookieService.SetJwtCookie(Response, accessToken);
+                 _cookieService.SetRefreshTokenCookie(Response, newRefreshToken);
 
-            return Ok(result.Value.User);
+
+                 return Ok(result.User);
+             });
+
         }
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()
         {
             var refreshToken = Request.Cookies["refreshToken"];
-            var result = await _authService.LogoutAsync(refreshToken!);
+
             _cookieService.DeleteJwtCookie(Response);
             _cookieService.DeleteRefreshTokenCookie(Response);
-            if (result.IsError)
-            {
-                var error = result.FirstError;
-                
-                return Problem(statusCode: error.ToStatusCode(), title: error.Code, detail: error.Description);
-            }
-            
-            return NoContent();
+            return HandleError(await _authService.LogoutAsync(refreshToken!), _ =>
+              {
+                  return NoContent();
+              });
         }
         [Authorize]
         [HttpGet("me")]
         public async Task<IActionResult> GetMe()
         {
             var sub = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
-            var result = await _authService.GetMeAsync(sub!);
-            if (result.IsError)
-            {
-                var error = result.FirstError;
-                return Problem(statusCode: error.ToStatusCode(), title: error.Code, detail: error.Description);
-            }
-
-            return Ok(result.Value);
+            return HandleError(await _authService.GetMeAsync(sub!), Ok);
         }
 
-        
+
     }
 
 

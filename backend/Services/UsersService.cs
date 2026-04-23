@@ -31,9 +31,9 @@ public class UsersService : IUsersService
         if (sortBy == UsersSortBy.Rating)
             return ratingType switch
             {
-                RatingType.Blitz => users.OrderByField(u => u.BlitzRating, descending),
-                RatingType.Bullet => users.OrderByField(u => u.BulletRating, descending),
-                _ => users.OrderByField(u => u.RapidRating, descending),
+                RatingType.Blitz => users.OrderByField(u => u.Rating.Blitz, descending),
+                RatingType.Bullet => users.OrderByField(u => u.Rating.Bullet, descending),
+                _ => users.OrderByField(u => u.Rating.Rapid, descending),
             };
 
         return sortBy switch
@@ -69,9 +69,9 @@ public class UsersService : IUsersService
         }
         users = query.RatingType switch 
         {
-            RatingType.Blitz => users.Where(u => u.BlitzRating >= query.MinRating && u.BlitzRating <= query.MaxRating),
-            RatingType.Bullet => users.Where(u => u.BulletRating >= query.MinRating && u.BulletRating <= query.MaxRating),
-            _ => users.Where(u => u.RapidRating >= query.MinRating && u.RapidRating <= query.MaxRating),
+            RatingType.Blitz => users.Where(u => u.Rating.Blitz >= query.MinRating && u.Rating.Blitz <= query.MaxRating),
+            RatingType.Bullet => users.Where(u => u.Rating.Bullet >= query.MinRating && u.Rating.Bullet <= query.MaxRating),
+            _ => users.Where(u => u.Rating.Rapid >= query.MinRating && u.Rating.Rapid <= query.MaxRating),
         };
         
         

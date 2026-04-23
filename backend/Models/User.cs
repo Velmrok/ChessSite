@@ -1,3 +1,4 @@
+using backend.DTO.Common;
 using backend.Enums;
 
 
@@ -13,9 +14,11 @@ public class User
     public  string ProfilePictureUrl { get; set; } = "";
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime LastActive { get; set; } = DateTime.UtcNow;
-    public int RapidRating { get; set; } = 1200;
-    public int BlitzRating { get; set; } = 1200;
-    public int BulletRating { get; set; } = 1200;
+    public RatingStats Rating { get; set; } = new RatingStats(1200, 1200, 1200);
+    public RatingStats Wins { get; set; } = new RatingStats(0, 0, 0);
+    public RatingStats Losses { get; set; } = new RatingStats(0, 0, 0);
+    public RatingStats Draws { get; set; } = new RatingStats(0, 0, 0);
+    public int GamesPlayed { get; set; } = 0;
     public RoleType Role { get; set; } = RoleType.User;
 
 

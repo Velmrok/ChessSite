@@ -10,7 +10,7 @@ namespace backend.DTO.Users
         DateTime CreatedAt,
         DateTime LastActive,
         RoleType Role,
-        RatingResponse Rating);
+        RatingStats Rating);
 
     public record UsersResponse(
         List<UserResponse> Users,

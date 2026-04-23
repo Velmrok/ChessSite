@@ -10,5 +10,5 @@ public record GetMeResponse(
     string ProfilePictureUrl,
     DateTime CreatedAt,
     DateTime LastActive,
-    RatingResponse Rating  
+    RatingStats Rating  
 );

@@ -2,7 +2,9 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using backend.Data;
 using backend.Extensions;
+using backend.Policies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
@@ -20,9 +22,14 @@ builder.Services.AddApplicationServices();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
 builder.Services.AddJwtAuthentication(builder.Configuration);   
 
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("OwnerOrAdmin", policy =>
+        policy.Requirements.Add(new OwnerOrAdminRequirement()));
+});
+builder.Services.AddSingleton<IAuthorizationHandler, OwnerOrAdminHandler>();
 
 var isTestEnvironment = builder.Configuration.GetValue<bool>("IsTestEnvironment");
 

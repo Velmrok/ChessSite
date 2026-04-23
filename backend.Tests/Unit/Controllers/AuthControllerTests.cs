@@ -42,7 +42,7 @@ public class AuthControllerTests
         ProfilePictureUrl: "",
         CreatedAt: DateTime.UtcNow,
         LastActive: DateTime.UtcNow,
-        Rating: new RatingResponse(Rapid: 1000, Blitz: 1000, Bullet: 1000)
+        Rating: new RatingStats(Rapid: 1000, Blitz: 1000, Bullet: 1000)
     )
 );
 
@@ -193,7 +193,7 @@ public class AuthControllerTests
             ProfilePictureUrl: "",
             CreatedAt: DateTime.UtcNow,
             LastActive: DateTime.UtcNow,
-            Rating: new RatingResponse(Rapid: 1000, Blitz: 1000, Bullet: 1000)
+            Rating: new RatingStats(Rapid: 1000, Blitz: 1000, Bullet: 1000)
         );
         _authServiceMock.GetMeAsync(Arg.Any<string>()).Returns(expectedResponse);
         var result = await _controller.GetMe();

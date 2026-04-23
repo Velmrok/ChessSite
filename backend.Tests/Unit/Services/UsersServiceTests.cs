@@ -1,4 +1,5 @@
 using backend.Data;
+using backend.DTO.Common;
 using backend.DTO.Users;
 using backend.Enums;
 using backend.Models;
@@ -34,9 +35,7 @@ public class UsersServiceTests : TestBase
         Login = name,
         Email = $"{name}@test.com",
         PasswordHash = "hash",
-        RapidRating = rapid,
-        BlitzRating = blitz,
-        BulletRating = bullet,
+        Rating = new RatingStats(rapid, blitz, bullet),
         CreatedAt = createdAt ?? DateTime.UtcNow,
         LastActive = lastActive ?? DateTime.UtcNow,
     };

@@ -5,7 +5,7 @@ using backend.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using NSubstitute;
 
-namespace backend.Tests.Unit.Services.Auith
+namespace backend.Tests.Unit.Services.Auth
 {
     public abstract class AuthTestBase : TestBase
     {

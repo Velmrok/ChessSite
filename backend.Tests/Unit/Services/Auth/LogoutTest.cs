@@ -2,8 +2,7 @@ using backend.DTO.Auth;
 using backend.Models;
 using FluentAssertions;
 
-
-namespace backend.Tests.Unit.Services.Auith;
+namespace backend.Tests.Unit.Services.Auth;
 
 public class LogoutTests : AuthTestBase
 {

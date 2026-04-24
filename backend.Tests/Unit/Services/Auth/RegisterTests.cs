@@ -4,7 +4,7 @@ using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 
 
-namespace backend.Tests.Unit.Services.Auith;
+namespace backend.Tests.Unit.Services.Auth;
 
     public class RegisterTests : AuthTestBase
 {

@@ -4,7 +4,7 @@ using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 
 
-namespace backend.Tests.Unit.Services.Auith;
+namespace backend.Tests.Unit.Services.Auth;
 
 public class LoginTests : AuthTestBase
 {
@@ -159,8 +159,8 @@ public class LoginTests : AuthTestBase
     {
         var request = new LoginRequest
         {
-            Login = login,
-            Password = password
+            Login = login!,
+            Password = password!
         };
         var result = await _authService.LoginAsync(request);
         result.IsError.Should().BeTrue();

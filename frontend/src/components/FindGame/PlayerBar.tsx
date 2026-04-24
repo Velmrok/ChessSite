@@ -18,7 +18,7 @@ export default function PlayerBar({ nickname, avatarUrl, rating, time, withLink 
 
     const userInfo = (
         <div className={`flex gap-3 ${isInQueue && !rating ? "animate-pulse" : ""}`}>
-            <img src={API_URL + avatarUrl} alt="Player Avatar"
+            <img src={avatarUrl} alt="Player Avatar"
                 className="w-10 h-10 rounded-full outline-2" />
             <div className="h-full">
 

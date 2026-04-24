@@ -5,7 +5,7 @@ namespace backend.DTO.Users;
 
 public record UserProfileResponse(
     string Nickname,
-    string Avatar,
+    string ProfilePictureUrl,
     string Bio,
     bool IsOnline,
     UserInfo UserInfo

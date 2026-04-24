@@ -7,7 +7,7 @@ export type Rating = {
 }
 export type PublicUser = {
     nickname: string;
-    avatar: string;
+    profilePictureUrl: string;
     rating: Rating;
     isOnline: boolean;
     lastActive: string;
@@ -29,7 +29,7 @@ export type UserInfo = {
 
 export type UserProfile = {
         nickname: string;
-        avatar: string;
+        profilePictureUrl: string;
         bio: string;
         isOnline: boolean;
 

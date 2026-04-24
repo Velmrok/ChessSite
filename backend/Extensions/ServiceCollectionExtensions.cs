@@ -21,7 +21,7 @@ public static class ServiceCollectionExtensions
 
         services.AddSingleton<IPresenceService, PresenceService>();
         services.AddSingleton<IJwtGenerator, JwtGenerator>();
-        services.AddSingleton<IStorageService, LocalStorageService>();
+       
         
 
         return services;

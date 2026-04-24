@@ -56,12 +56,12 @@ export default function FriendsOnline() {
                             <div key={friend.nickname} className="aspect-square flex w-full  flex-col items-center gap-4
                  bg-gray-900/50  rounded-md w-28 justify-between  p-2 relative">
 
-                                <img src={`${friend.avatar}`} alt="Profile" className="h-13 w-13 min-h-13 min-w-13 md:w-18 md:h-18
+                                <img src={`${friend.profilePictureUrl}`} alt="Profile" className="h-13 w-13 min-h-13 min-w-13 md:w-18 md:h-18
                  md:min-h-18 md:min-w-18 rounded-full outline-2 border-2 border-black mt-2" />
 
                                 <span className="text-white font-MyFancyFont text-[10px] sm:text-base">{friend.nickname}</span>
 
-                                {friend.onlineStatus === 'online' ? (
+                                {friend.isOnline? (
                                     <div className="text-green-500  text-sm sm:text-lg absolute right-[1px] top-[1px] sm:right-2 sm:top-2">●</div>
                                 ) : (
                                     <div className="text-red-500 text-sm sm:text-lg absolute right-[1px] top-[1px] sm:right-2 sm:top-2">●</div>

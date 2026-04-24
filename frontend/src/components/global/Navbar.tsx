@@ -53,7 +53,7 @@ const UserMenu = ({ onLogout }: { onLogout: () => void }) => {
             </button>
             <Link to={`/users/${user?.nickname}/profile`} className="text-xs md:text-sm hover:text-amber-200
          transition-color duration-300 rounded-full outline-2 border-2 border-black">
-                <img src={`${user?.avatar}`} alt="Profile" className="h-8 w-8 md:w-11 md:h-11 rounded-full" />
+                <img src={`${user?.profilePictureUrl}`} alt="Profile" className="h-8 w-8 md:w-11 md:h-11 rounded-full" />
             </Link>
         </>
     );

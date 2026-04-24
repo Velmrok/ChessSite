@@ -26,4 +26,9 @@ public class LocalStorageService(IWebHostEnvironment env) : IStorageService
         if (File.Exists(path)) File.Delete(path);
         return new Success();
     }
+    public string GetAvatarUrl(string key)
+    {
+        return $"/api/uploads/avatars/{key}";
+    }
+
 }

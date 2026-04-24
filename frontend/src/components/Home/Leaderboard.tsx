@@ -106,7 +106,7 @@ export default function LeaderBoard({ leaderboard }: Props) {
                       <Link to={`/users/${user.nickname}/profile`} className="flex items-center gap-2 hover:text-amber-200
                        transition-color duration-200">
                         <img
-                          src={`${user.avatar}`}
+                          src={`${user.profilePictureUrl}`}
                           alt={user.nickname}
                           className="w-8 h-8 rounded-full mb-1 outline-2"
                         />

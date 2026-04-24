@@ -24,6 +24,12 @@ services:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:5062
       - ConnectionStrings__Default=Host=db;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      - Storage__Provider=R2
+      - Storage__AccountId=${CF_ACCOUNT_ID}
+      - Storage__AccessKey=${CF_ACCESS_KEY}
+      - Storage__SecretKey=${CF_SECRET_KEY}
+      - Storage__BucketName=${CF_BUCKET_NAME}
+      - Storage__PublicBaseUrl=${CF_PUBLIC_URL}
     depends_on:
       - db
       - redis

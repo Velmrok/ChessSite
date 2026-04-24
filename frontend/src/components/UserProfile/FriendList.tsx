@@ -67,7 +67,7 @@ export default function FriendList() {
                  bg-gray-900/50 p-2 rounded-md w-full justify-between px-3 sm:px-6 relative">
                             <Link to={`/users/${friend.nickname}/profile`} className="text-xs md:text-sm text-white hover:text-amber-200
                              transition-transform duration-300 rounded-full outline-2 border-2 border-black">
-                                <img src={`${friend.avatar}`} alt="Profile" className="h-8 w-8 min-h-8 min-w-8 md:w-12 md:h-12 md:min-h-12 md:min-w-12 rounded-full" />
+                                <img src={`${friend.profilePictureUrl}`} alt="Profile" className="h-8 w-8 min-h-8 min-w-8 md:w-12 md:h-12 md:min-h-12 md:min-w-12 rounded-full" />
                             </Link>
                             <span className="text-white font-MyFancyFont text-[10px] sm:text-base">{friend.nickname}</span>
                             <span className="text-white font-MyFancyFont text-[10px] sm:text-base">

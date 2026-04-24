@@ -80,7 +80,7 @@ export default function UserList({ users}: Props) {
                         <div className=" w-[70%] sm:w-full bg-black/40 py-2  rounded-lg flex flex-col 
                                         items-center justify-center gap-2">
 
-                            <img src={`${API_URL}${user?.avatar}`} alt="Profile"
+                            <img src={`${user?.profilePictureUrl}`} alt="Profile"
                              className="h-8 w-8 sm:w-16 sm:h-16 rounded-full outline-2 border-2 border-black" />
 
 

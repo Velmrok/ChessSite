@@ -25,10 +25,11 @@ export default function FindGame() {
              items-center xl:items-start overflow-hidden xl:gap-5">
                 <div className="h-full max-h-[800px] w-full xl:w-[70%]  max-w-[650px] xl:min-w-[500px]
                  flex flex-col items-center justify-center mt-5">
-                    <PlayerBar nickname="Opponent" avatarUrl="/uploads/avatars/default.png"
+
+                    <PlayerBar nickname="Opponent" avatarUrl="/default-avatar.webp"
                         time={currentTime} withLink={false} />
                     <ChessBoard />
-                    <PlayerBar nickname={user.nickname} avatarUrl={user.avatar} withLink={true}
+                    <PlayerBar nickname={user.nickname} avatarUrl={user.profilePictureUrl} withLink={true}
                         rating={user.rating[gameType()]} time={currentTime} />
                 </div>
                 <div className="h-full w-[70%] xl:w-[30%] flex items-start justify-center xl:mt-9">

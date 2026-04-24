@@ -31,7 +31,7 @@ export default function GameStartOverlay({ whitePlayer, blackPlayer, ratingType,
                     }`}
             >
                 <img
-                    src={API_URL + whitePlayer.avatar}
+                    src={whitePlayer.profilePictureUrl}
                     alt={whitePlayer.nickname}
                     className="w-32 h-32 rounded-full outline-12 border-white shadow-lg mb-4"
                 />
@@ -54,7 +54,7 @@ export default function GameStartOverlay({ whitePlayer, blackPlayer, ratingType,
                     }`}
             >
                 <img
-                    src={API_URL + blackPlayer.avatar}
+                    src={blackPlayer.profilePictureUrl}
                     alt={blackPlayer.nickname}
                     className="w-32 h-32 rounded-full outline-12 text-black shadow-lg mb-4"
                 />

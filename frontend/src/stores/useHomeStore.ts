@@ -1,6 +1,7 @@
 import {create} from "zustand";
 import { fetchUserOnlineFriends } from "@/services/userService";
 import { getQueueList } from "@/services/homeService";
+import type { PublicUser } from "@/types/user";
 type HomeStore = {
     usersOnline: number;
     matchesInProgress: number;
@@ -9,7 +10,7 @@ type HomeStore = {
     friendsPage: number;
     loadingFriends: boolean;
     totalFriendsPages: number;
-    friends: Array<Omit<Friend, "rating">>;
+    friends: Array<Omit<PublicUser, "rating">>;
     queueList: QueueList | null;
     deletedQueues: Array<string>;
     lobbyGameType: gameType| 'any';

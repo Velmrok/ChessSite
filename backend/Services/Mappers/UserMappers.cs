@@ -34,7 +34,7 @@ public static class UserMappers
     {
         return new UserProfileResponse(
             Nickname: user.Nickname,
-            Avatar: user.ProfilePictureUrl,
+            ProfilePictureUrl: user.ProfilePictureUrl,
             Bio: user.ProfileBio,
             IsOnline: isOnline,
             UserInfo: new UserInfo(

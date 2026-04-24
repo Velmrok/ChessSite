@@ -18,16 +18,18 @@ public class AuthService : IAuthService
     private readonly IPasswordHasher<User> _passwordHasher;
     private readonly IRefreshTokenService _refreshTokenService;
     private readonly ICacheInvalidationService _cacheInvalidation;
+    private readonly IStorageService _storageService;
 
     public AuthService(AppDbContext dbContext, IJwtGenerator jwtGenerator,
      IPasswordHasher<User> passwordHasher, ICacheInvalidationService cacheInvalidation,
-     IRefreshTokenService refreshTokenService)
+     IRefreshTokenService refreshTokenService, IStorageService storageService)
     {
         _dbContext = dbContext;
         _jwtGenerator = jwtGenerator;
         _passwordHasher = passwordHasher;
         _refreshTokenService = refreshTokenService;
         _cacheInvalidation = cacheInvalidation;
+        _storageService = storageService;
     }
     public async Task<ErrorOr<AuthResult>> RegisterAsync(RegisterRequest request)
     {   
@@ -47,7 +49,8 @@ public class AuthService : IAuthService
                 Login = request.Login,
                 Email = request.Email,
                 PasswordHash = passwordHash,
-                ProfileBio = ""
+                ProfileBio = "",
+                ProfilePictureUrl = _storageService.GetAvatarUrl("default.webp"),
             };
         await _dbContext.Users.AddAsync(newUser);
 

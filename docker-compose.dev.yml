@@ -24,11 +24,12 @@ services:
       - /app/bin
       - /app/obj
       - dotnet_packages:/root/.nuget/packages
-      # - backend_uploads:/app/wwwroot/uploads
+      - backend_uploads:/app/wwwroot/uploads
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:5062
       - DOTNET_USE_POLLING_FILE_WATCHER=1
+      
     command: >
       sh -c "
       dotnet restore &&

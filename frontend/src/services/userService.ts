@@ -20,11 +20,11 @@ export const updateUserBio = async (nickname: string, bio: string) : Promise<{ b
     const response = await apiFetch({ url: `/users/${nickname}/profile/bio`, method: 'PATCH', includeCredentials: true, contentType: 'application/json', body: JSON.stringify({ bio }) });
     return response as Promise<{ bio: string }>;
 }
-export const uploadUserAvatar = async (avatarFile: File) : Promise<{ avatar: string }> => {
+export const uploadUserAvatar = async (avatarFile: File) : Promise<{ profilePictureUrl: string }> => {
     const formData = new FormData();
     formData.append("avatar", avatarFile);
     const response = await apiFetch({ url: `/users/avatar`, method: 'PATCH', includeCredentials: true, contentType: undefined, body: formData });
-    return response as Promise<{ avatar: string }>;
+    return response as Promise<{ profilePictureUrl: string }>;
 }
 export const fetchUserGameHistory = async (nickname: string, page: number): Promise<{ gameHistory: Array<ProfileGame>, totalPages: number }> => {
     const response = await apiFetch({ url: `/users/${nickname}/games?page=${page}`, method: 'GET', includeCredentials: false, contentType: 'application/json' });

@@ -6,4 +6,5 @@ public interface IStorageService
 {
     Task<ErrorOr<string>> UploadAvatarAsync(Stream imageStream, string userId, string contentType);
     Task<ErrorOr<Success>> DeleteAsync(string objectKey);
+    string GetAvatarUrl(string key);
 }

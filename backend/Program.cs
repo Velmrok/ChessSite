@@ -1,15 +1,9 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Text;
-using backend.Data;
 using backend.Extensions;
+using backend.Options;
 using backend.Policies;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using backend.Services;
+using backend.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.RateLimiting;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -48,7 +42,14 @@ builder.Services.AddCustomRateLimiting();
 
 builder.Services.AddCustomCors();
 
+var storageProvider = builder.Configuration["Storage:Provider"] ?? "Local";
+if (storageProvider == "R2")
+    builder.Services.AddSingleton<IStorageService, R2StorageService>();
+else
+    builder.Services.AddSingleton<IStorageService, LocalStorageService>();
 
+builder.Services.Configure<StorageOptions>(
+    builder.Configuration.GetSection("Storage"));
 
 var app = builder.Build();
 
@@ -65,7 +66,9 @@ app.UseGlobalErrorHandling();
 
 app.UseHttpsRedirection();
 
-app.UseStaticFiles();
+if (storageProvider == "Local") app.UseStaticFiles();
+    
+
 app.UseCustomCors();
 
 app.UseAuthentication();

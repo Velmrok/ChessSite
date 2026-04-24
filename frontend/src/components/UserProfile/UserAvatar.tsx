@@ -29,11 +29,11 @@ export default function UserAvatar({avatar, className, onAvatarUpdate}:Props) {
             try{
                 const response = await uploadUserAvatar(file);
                 setToast({ msg: toastT('success.changedAvatar'), type: "success" });
-                const newAvatarUrl = response.avatar;
+                const newAvatarUrl = response.profilePictureUrl;
                 onAvatarUpdate!(newAvatarUrl);
                 setFile(null);
                 const uniqueUrl = `${newAvatarUrl}?t=${Date.now()}`;
-                setUser({ ...user!, avatar: uniqueUrl });
+                setUser({ ...user!, profilePictureUrl: uniqueUrl });
             }
             catch(error){
                 console.error("Error uploading avatar:", error);

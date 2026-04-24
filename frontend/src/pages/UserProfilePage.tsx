@@ -48,7 +48,7 @@ export default function UserProfilePage() {
     const handleUserAvatarUpdate = (newAvatarUrl: string) => {
         if (profile) {
             const uniqueUrl = `${newAvatarUrl}?t=${Date.now()}`;
-            setProfile({ ...profile, avatar: uniqueUrl });
+            setProfile({ ...profile, profilePictureUrl: uniqueUrl });
         }
     };
     if (isLoading) {
@@ -91,7 +91,7 @@ export default function UserProfilePage() {
                             ))}
                         <div className="flex flex-col lg:flex-row relative items-center  w-full gap-5 h-full">
                             <div className="flex flex-col items-center justify-center w-full lg:w-50 self-start">
-                            <UserAvatar avatar={profile.avatar} className="flex flex-col items-center justify-center p-6 w-60 gap-8 "
+                            <UserAvatar avatar={profile.profilePictureUrl} className="flex flex-col items-center justify-center p-6 w-60 gap-8 "
                              onAvatarUpdate={handleUserAvatarUpdate} />
                                 </div>
                             <div className="flex flex-col  w-full max-w-full gap-4 items-center lg:items-start">

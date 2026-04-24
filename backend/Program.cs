@@ -65,7 +65,7 @@ app.UseGlobalErrorHandling();
 
 app.UseHttpsRedirection();
 
-
+app.UseStaticFiles();
 app.UseCustomCors();
 
 app.UseAuthentication();

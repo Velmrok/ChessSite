@@ -11,7 +11,7 @@ public class User
     public required string Email { get; set; }
     public required string PasswordHash { get; set; }
     public  string ProfileBio { get; set; } = "";
-    public  string ProfilePictureUrl { get; set; } = "";
+    public string ProfilePictureUrl { get; set; } = "/api/uploads/avatars/default.webp";
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime LastActive { get; set; } = DateTime.UtcNow;
     public RatingStats Rating { get; set; } = new RatingStats(1200, 1200, 1200);

@@ -47,8 +47,7 @@ public class AuthService : IAuthService
                 Login = request.Login,
                 Email = request.Email,
                 PasswordHash = passwordHash,
-                ProfileBio = "",
-                ProfilePictureUrl = "",
+                ProfileBio = ""
             };
         await _dbContext.Users.AddAsync(newUser);
 

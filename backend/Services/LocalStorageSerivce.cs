@@ -17,7 +17,7 @@ public class LocalStorageService(IWebHostEnvironment env) : IStorageService
         await using var fileStream = File.Create(filePath);
         await stream.CopyToAsync(fileStream);
 
-        return $"avatars/{fileName}";
+        return $"/api/uploads/avatars/{fileName}";
     }
 
     public async Task<ErrorOr<Success>> DeleteAsync(string objectKey)

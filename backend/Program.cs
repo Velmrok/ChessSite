@@ -43,6 +43,7 @@ builder.Services.AddCustomRateLimiting();
 builder.Services.AddCustomCors();
 
 var storageProvider = builder.Configuration["Storage:Provider"] ?? "Local";
+
 if (storageProvider == "R2")
     builder.Services.AddSingleton<IStorageService, R2StorageService>();
 else
@@ -59,6 +60,7 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+     app.UseStaticFiles();
 }
 app.UseRateLimiter();
 
@@ -66,7 +68,7 @@ app.UseGlobalErrorHandling();
 
 app.UseHttpsRedirection();
 
-if (storageProvider == "Local") app.UseStaticFiles();
+
     
 
 app.UseCustomCors();

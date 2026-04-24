@@ -9,7 +9,7 @@ namespace backend.Tests.Unit.Services.Auth;
     public class RegisterTests : AuthTestBase
 {
     [Fact]
-    public async Task RegisterAsync_ShouldReturnOK_WhenRegistrationIsSuccessful()
+    public async Task ShouldReturnOK_WhenRegistrationIsSuccessful()
     {
         var request = new RegisterRequest
         {
@@ -36,7 +36,7 @@ namespace backend.Tests.Unit.Services.Auth;
     [InlineData("test", "test", "emailTaken", "emailTaken")]
     [InlineData("test", "loginTaken", "test", "loginTaken")]
     [InlineData("nicknameTaken", "test", "test", "nicknameTaken")]
-    public async Task RegisterAsync_ShouldReturnConflict_WhenUserAlreadyExists(
+    public async Task ShouldReturnConflict_WhenUserAlreadyExists(
         string existingNickname, string existingLogin, string existingEmail, string expectedErrorCode)
     {
 
@@ -69,7 +69,7 @@ namespace backend.Tests.Unit.Services.Auth;
         usersCount.Should().Be(1);
     }
     [Fact]
-    public async Task RegisterAsync_ShouldTreatIdentifiersAsCaseSensitive()
+    public async Task ShouldTreatIdentifiersAsCaseSensitive()
     {
         _dbContext.Users.Add(new User
         {
@@ -96,7 +96,7 @@ namespace backend.Tests.Unit.Services.Auth;
 
     }
     [Fact]
-    public async Task RegisterAsync_ShouldReturnValidationError_WhenFieldsAreMissing()
+    public async Task ShouldReturnValidationError_WhenFieldsAreMissing()
     {
         var request = new RegisterRequest
         {

@@ -17,7 +17,7 @@ public class UpdateUserBioTests : TestBase
     }
 
     [Fact]
-    public async Task UpdateUserBio_ShouldReturnOk_WhenBioIsUpdated()
+    public async Task ShouldReturnOk_WhenBioIsUpdated()
     {
         await LoginAsUserAsync();
         var newBio = "This is my new bio.";
@@ -28,7 +28,7 @@ public class UpdateUserBioTests : TestBase
         updatedProfile.Bio.Should().Be(newBio);
     }
     [Fact]
-    public async Task UpdateUserBio_ShouldReturnNotFound_WhenUserDoesNotExist()
+    public async Task ShouldReturnNotFound_WhenUserDoesNotExist()
     {
         await LoginAsUserAsync();
         var response = await _client.PatchAsJsonAsync("/users/TestNick/profile/bio", new UpdateUserBioRequest("New bio"));
@@ -38,7 +38,7 @@ public class UpdateUserBioTests : TestBase
         response2.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
     }
     [Fact]
-    public async Task UpdateUserBio_ShouldReturnBadRequest_WhenBioIsTooLong()
+    public async Task ShouldReturnBadRequest_WhenBioIsTooLong()
     {
         await LoginAsUserAsync();
         var longBio = new string('a', 2010);
@@ -46,7 +46,7 @@ public class UpdateUserBioTests : TestBase
         response.StatusCode.Should().Be(System.Net.HttpStatusCode.BadRequest);
     }
     [Fact]
-    public async Task UpdateUserBio_ShouldReturnForbidden_WhenUpdatingOtherUserBio()
+    public async Task ShouldReturnForbidden_WhenUpdatingOtherUserBio()
     {
         await LoginAsUserAsync();
         var otherUser = await MakeUserAsync("otheruser@example.com", "otheruser", "OtherUser", "123456");

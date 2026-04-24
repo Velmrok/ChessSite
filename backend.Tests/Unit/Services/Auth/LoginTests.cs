@@ -10,7 +10,7 @@ public class LoginTests : AuthTestBase
 {
 
     [Fact]
-    public async Task LoginAsync_ShouldReturnOK_WhenLoginIsSuccessful()
+    public async Task ShouldReturnOK_WhenLoginIsSuccessful()
     {
 
         _dbContext.Users.Add(new User
@@ -39,7 +39,7 @@ public class LoginTests : AuthTestBase
 
     }
     [Fact]
-    public async Task LoginAsync_ShouldReturnOK_ShouldTrimInput()
+    public async Task ShouldReturnOK_ShouldTrimInput()
     {
         _dbContext.Users.Add(new User
         {
@@ -64,7 +64,7 @@ public class LoginTests : AuthTestBase
 
     }
     [Fact]
-    public async Task LoginAsync_ShouldReturnValidationError_WhenFieldsAreMissing()
+    public async Task ShouldReturnValidationError_WhenFieldsAreMissing()
     {
         var request = new LoginRequest
         {
@@ -79,7 +79,7 @@ public class LoginTests : AuthTestBase
     }
 
     [Fact]
-    public async Task LoginAsync_ShouldReturnOK_WhenLoginWithEmailIsSuccessful()
+    public async Task ShouldReturnOK_WhenLoginWithEmailIsSuccessful()
     {
 
         _dbContext.Users.Add(new User
@@ -108,7 +108,7 @@ public class LoginTests : AuthTestBase
     }
 
     [Fact]
-    public async Task LoginAsync_ShouldReturnNotFound_WhenUserDoesNotExist()
+    public async Task ShouldReturnNotFound_WhenUserDoesNotExist()
     {
         var request = new LoginRequest
         {
@@ -125,7 +125,7 @@ public class LoginTests : AuthTestBase
         user.Should().BeNull();
     }
     [Fact]
-    public async Task LoginAsync_ShouldReturnUnauthorized_WhenPasswordIsIncorrect()
+    public async Task ShouldReturnUnauthorized_WhenPasswordIsIncorrect()
     {
         _dbContext.Users.Add(new User
         {
@@ -155,7 +155,7 @@ public class LoginTests : AuthTestBase
     [InlineData("testuser", "")]
     [InlineData(null, null)]
     [InlineData("", "")]
-    public async Task LoginAsync_ShouldReturnUnauthorized_WhenFieldIsNullOrEmpty(string? login, string? password)
+    public async Task ShouldReturnUnauthorized_WhenFieldIsNullOrEmpty(string? login, string? password)
     {
         var request = new LoginRequest
         {

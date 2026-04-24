@@ -7,7 +7,7 @@ namespace backend.Tests.Unit.Services.Auth;
 public class GetMeTests : AuthTestBase
 {
     [Fact]
-    public async Task GetMeAsync_ShouldReturnOK_WhenUserExists()
+    public async Task ShouldReturnOK_WhenUserExists()
     {
         var user = new User
         {
@@ -30,7 +30,7 @@ public class GetMeTests : AuthTestBase
         result.IsError.Should().BeFalse();
     }
     [Fact]
-    public async Task GetMeAsync_ShouldReturnNotFound_WhenUserDoesNotExist()
+    public async Task ShouldReturnNotFound_WhenUserDoesNotExist()
     {
         var result = await _authService.GetMeAsync(Guid.NewGuid().ToString());
         result.IsError.Should().BeTrue();

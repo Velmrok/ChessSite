@@ -1,14 +1,10 @@
 
 
 using System.Net.Http.Json;
-using backend.DTO.Auth;
-using backend.DTO.Users;
-using backend.Models;
 using backend.Tests.Integration;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Extensions.Caching.Distributed;
-using Xunit.Abstractions;
+
 
 public class AddFriendTests : TestBase
 {
@@ -17,15 +13,9 @@ public class AddFriendTests : TestBase
     }
 
     
+   
     [Fact]
-    public async Task GetFriends_ShouldReturnNotFound_WhenUserDoesNotExist()
-    {
-        await LoginAsUserAsync();
-        var response = await _client.GetAsync("/users/nonexistentuser/friends");
-        response.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
-    }
-    [Fact]
-    public async Task AddFriend_ShouldReturn204NoContent_WhenUsersExist()
+    public async Task ShouldReturn204NoContent_WhenUsersExist()
     {
         await LoginAsUserAsync();
         var user1 = await MakeUserAsync("user1@example.com", "user1", "User1", "123456");
@@ -35,21 +25,21 @@ public class AddFriendTests : TestBase
         response.StatusCode.Should().Be(System.Net.HttpStatusCode.NoContent);
     }
     [Fact]
-    public async Task AddFriend_ShouldReturnNotFound_WhenFriendDoesNotExist()
+    public async Task ShouldReturnNotFound_WhenFriendDoesNotExist()
     {
         await LoginAsUserAsync();
         var response = await _client.PostAsync($"/users/friend", JsonContent.Create(new { Nickname = "nonexistentuser" }));
         response.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
     }
     [Fact]
-    public async Task AddFriend_ShouldReturnValidationError_WhenAddingSelf()
+    public async Task ShouldReturnValidationError_WhenAddingSelf()
     {
         await LoginAsUserAsync();
         var response = await _client.PostAsync($"/users/friend", JsonContent.Create(new { Nickname = "TestNick" }));
         response.StatusCode.Should().Be(System.Net.HttpStatusCode.BadRequest);
     }
     [Fact]
-    public async Task AddFriend_ShouldReturnConflict_WhenAlreadyFriends()
+    public async Task ShouldReturnConflict_WhenAlreadyFriends()
     {
         await LoginAsUserAsync();
         var user1 = await MakeUserAsync("user1@example.com", "user1", "User1", "123456");

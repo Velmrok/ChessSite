@@ -9,7 +9,7 @@ public class LogoutTests : AuthTestBase
     
 
     [Fact]
-    public async Task LogoutAsync_ShouldReturnOK_WhenLogoutIsSuccessful()
+    public async Task ShouldReturnOK_WhenLogoutIsSuccessful()
     {
         var user = new User
         {

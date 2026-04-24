@@ -12,7 +12,7 @@ public class LoginTests : TestBase
     {
     }
     [Fact]
-    public async Task LoginEndpoint_ShouldReturnOk_WhenCredentialsAreValid()
+    public async Task ShouldReturnOk_WhenCredentialsAreValid()
     {
        await MakeUserAsync("test@test.com", "testUser", "testKozak", "123456");
 
@@ -35,7 +35,7 @@ public class LoginTests : TestBase
     }
     
     [Fact]
-    public async Task LoginEndpoint_ShouldReturnUnauthorized_WhenCredentialsAreInvalid()
+    public async Task ShouldReturnUnauthorized_WhenCredentialsAreInvalid()
     {
         
         var request = new LoginRequest
@@ -49,7 +49,7 @@ public class LoginTests : TestBase
         response.StatusCode.Should().Be(System.Net.HttpStatusCode.Unauthorized);
     }
     [Fact]
-    public async Task LoginEndpoint_ShouldReturn429TooManyRequests_WhenRateLimitExceeded()
+    public async Task ShouldReturn429TooManyRequests_WhenRateLimitExceeded()
     {
         var loginRequest = new LoginRequest
         {

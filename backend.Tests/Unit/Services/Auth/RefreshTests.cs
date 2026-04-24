@@ -11,7 +11,7 @@ public class RefreshTests : AuthTestBase
 
    
     [Fact]
-    public async Task RefreshTokenAsync_ShouldReturnOK_WhenRefreshIsSuccessful()
+    public async Task ShouldReturnOK_WhenRefreshIsSuccessful()
     {
         var user = new User
         {
@@ -40,7 +40,7 @@ public class RefreshTests : AuthTestBase
     
     }
     [Fact]
-    public async Task RefreshTokenAsync_ShouldReturnUnauthorized_WhenRefreshTokenIsInvalid()
+    public async Task ShouldReturnUnauthorized_WhenRefreshTokenIsInvalid()
     {
         var result = await _authService.RefreshAsync("invalid-refresh-token");
         result.IsError.Should().BeTrue();
@@ -48,7 +48,7 @@ public class RefreshTests : AuthTestBase
         error.Code.Should().Be("invalidRefreshToken");
     }
     [Fact]
-    public async Task RefreshTokenAsync_ShouldReturnUnauthorized_WhenRefreshTokenIsMissing()
+    public async Task ShouldReturnUnauthorized_WhenRefreshTokenIsMissing()
     {
         var result = await _authService.RefreshAsync("");
         result.IsError.Should().BeTrue();
@@ -56,7 +56,7 @@ public class RefreshTests : AuthTestBase
         error.Code.Should().Be("invalidRefreshToken");
     }
     [Fact]
-    public async Task RefreshTokenAsync_ShouldReturnUnauthorized_WhenRefreshTokenIsExpired()
+    public async Task ShouldReturnUnauthorized_WhenRefreshTokenIsExpired()
     {
         var user = new User
         {
@@ -84,7 +84,7 @@ public class RefreshTests : AuthTestBase
         error.Code.Should().Be("invalidRefreshToken");
     }
     [Fact]
-    public async Task RefreshTokenAsync_ShouldReturnUnauthorized_WhenRefreshTokenIsRevoked()
+    public async Task ShouldReturnUnauthorized_WhenRefreshTokenIsRevoked()
     {
         var user = new User
         {

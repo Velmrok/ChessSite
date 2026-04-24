@@ -17,7 +17,7 @@ public class GetUserProfileTests : TestBase
     }
 
     [Fact]
-    public async Task GetUserProfile_ShouldReturnUserProfile_WhenUserExists()
+    public async Task ShouldReturnUserProfile_WhenUserExists()
     {
         await LoginAsUserAsync();
        
@@ -29,7 +29,7 @@ public class GetUserProfileTests : TestBase
        
     }
     [Fact]
-    public async Task GetUserProfile_ShouldReturnNotFound_WhenUserDoesNotExist()
+    public async Task ShouldReturnNotFound_WhenUserDoesNotExist()
     {
         await LoginAsUserAsync();
         var response = await _client.GetAsync("/users/nonexistentuser");

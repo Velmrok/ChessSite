@@ -17,7 +17,8 @@ public class GetUsersTests : TestBase
     }
     
     [Fact]
-    public async Task GetUsersEndpoint_WithNoUsers_ShouldReturnOk()
+    public async Task ShouldReturnOk_WhenNoUsers()
+
     {
         await LoginAsUserAsync();
         var response = await _client.GetAsync("/users");
@@ -30,7 +31,7 @@ public class GetUsersTests : TestBase
     }
 
     [Fact]
-    public async Task GetUsersEndpoint_WithUsers_ShouldReturnOk()
+    public async Task ShouldReturnOk_WhenUsersExist()
     {
         await LoginAsUserAsync();
 
@@ -47,7 +48,7 @@ public class GetUsersTests : TestBase
         users[0].Nickname.Should().Be("TestNick");
     }
     [Fact]
-    public async Task GetUsersEndpoint_ShouldReturnNotCachedResponse()
+    public async Task ShouldReturnNotCachedResponse()
     {
         await LoginAsUserAsync();
 
@@ -62,7 +63,7 @@ public class GetUsersTests : TestBase
         secondResponse.Headers.GetValues("X-Cache").First().Should().Be("HIT");
     }
     [Fact]
-    public async Task GetUsersEndpoint_WithDifferentQueries_ShouldNotCache()
+    public async Task ShouldNotCacheResponses_WithDifferentQueries()
     {
         await LoginAsUserAsync();
 
@@ -79,7 +80,7 @@ public class GetUsersTests : TestBase
         response.Headers.GetValues("X-Cache").First().Should().Be("MISS");
     }
     [Fact]
-    public async Task GetUsersEndpoint_ShouldCacheResponses()
+    public async Task ShouldCacheResponses()
     {
         await LoginAsUserAsync();
 
@@ -94,7 +95,7 @@ public class GetUsersTests : TestBase
         secondResponse.Headers.GetValues("X-Cache").First().Should().Be("HIT");
     }
     [Fact]
-    public async Task GetUsersEndpoint_ShouldReturnNotCachedResponse_AfterUserRegistration()
+    public async Task ShouldReturnNotCachedResponse_AfterUserRegistration()
     {
         await LoginAsUserAsync();
 
@@ -116,7 +117,7 @@ public class GetUsersTests : TestBase
         thirdResponse.Headers.GetValues("X-Cache").First().Should().Be("MISS");
     }
     [Fact]
-    public async Task GetUsersEndpoint_ShouldReturnOnlyOnlineUsers_WhenFilterOnlineIsTrue()
+    public async Task ShouldReturnOnlyOnlineUsers_WhenFilterOnlineIsTrue()
     {
         await LoginAsUserAsync();
         var onlineUser = await MakeUserAsync("onlineuser@example.com", "onlineuser", "OnlineUser", "123456");

@@ -12,5 +12,6 @@ namespace backend.Services.Interfaces
         public Task<ErrorOr<FriendsResponse>> GetFriendsAsync(string nickname, PaginationQuery pagination);
         public Task<ErrorOr<Success>> AddFriendAsync(AddFriendRequest request   , string currentUserNickname);
         public Task<ErrorOr<UpdateUserBioResponse>> UpdateUserBioAsync(string nickname, UpdateUserBioRequest request);
+        public Task<ErrorOr<UpdateUserProfilePictureResponse>> UpdateUserProfilePictureAsync(string nickname, UpdateUserProfilePictureRequest request);
     }   
 }

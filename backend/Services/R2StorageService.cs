@@ -33,6 +33,7 @@ public class R2StorageService : IStorageService
             ForcePathStyle = true,
             
             AuthenticationRegion = "auto"
+          
         };
 
         var credentials = new BasicAWSCredentials(
@@ -56,7 +57,7 @@ public class R2StorageService : IStorageService
         try
         {
             using var processedImage = await ProcessImageAsync(imageStream);
-
+            processedImage.Position = 0;
             var request = new PutObjectRequest
             {
                 BucketName = _options.BucketName,
@@ -67,7 +68,9 @@ public class R2StorageService : IStorageService
                 Headers =
                 {
                     CacheControl = "public, max-age=31536000"
-                }
+                },
+                DisablePayloadSigning = true,
+                UseChunkEncoding = false
             };
 
             await _s3.PutObjectAsync(request);
@@ -106,7 +109,7 @@ public class R2StorageService : IStorageService
         
         using var image = await Image.LoadAsync(input);
         
-        // Przytnij do kwadratu zachowując środek
+    
         var squareSize = Math.Min(image.Width, image.Height);
         image.Mutate(ctx =>
         {

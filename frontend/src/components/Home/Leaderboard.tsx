@@ -6,6 +6,7 @@ import { MdAccessTime } from "react-icons/md";
 import { SiPushbullet, SiStackblitz } from "react-icons/si";
 import { TfiCup } from "react-icons/tfi";
 import { Link } from "react-router-dom";
+import Avatar from "../global/Avatar";
 
 
 type Props = {
@@ -105,11 +106,7 @@ export default function LeaderBoard({ leaderboard }: Props) {
                     <div >
                       <Link to={`/users/${user.nickname}/profile`} className="flex items-center gap-2 hover:text-amber-200
                        transition-color duration-200">
-                        <img
-                          src={`${user.profilePictureUrl}`}
-                          alt={user.nickname}
-                          className="w-8 h-8 rounded-full mb-1 outline-2"
-                        />
+                        <Avatar avatarUrl={user.profilePictureUrl} className="w-8 h-8 rounded-full mb-1 outline-2" />
                         <span className="font-MyFancyFont">{user.nickname}</span>
                       </Link>
                     </div>

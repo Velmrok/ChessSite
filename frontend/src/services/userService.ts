@@ -22,8 +22,8 @@ export const updateUserBio = async (bio: string) : Promise<{ bio: string }> => {
 }
 export const uploadUserAvatar = async (avatarFile: File) : Promise<{ profilePictureUrl: string }> => {
     const formData = new FormData();
-    formData.append("userProfilePicture", avatarFile);
-    const response = await apiFetch({ url: `/users/profile`, method: 'PATCH', includeCredentials: true, contentType: undefined, body: formData });
+    formData.append("ProfilePictureFile", avatarFile);
+    const response = await apiFetch({ url: `/users/me/profile/picture`, method: 'PATCH', includeCredentials: true, contentType: undefined, body: formData });
     return response as Promise<{ profilePictureUrl: string }>;
 }
 export const fetchUserGameHistory = async (nickname: string, page: number): Promise<{ gameHistory: Array<ProfileGame>, totalPages: number }> => {

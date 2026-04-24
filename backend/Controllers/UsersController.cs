@@ -49,11 +49,18 @@ namespace backend.Controllers
             var currentUserNickname = User.FindFirst("nickname")?.Value;
             return HandleError(await _usersService.AddFriendAsync(request, currentUserNickname!), _=> NoContent());
         }
-        [Authorize(Policy = "OwnerOrAdmin")]
-        [HttpPatch("{nickname}/profile/bio")]
-        public async Task<IActionResult> UpdateUserBio(string nickname, [FromBody] UpdateUserBioRequest request)
+        
+        [HttpPatch("me/profile/bio")]
+        public async Task<IActionResult> UpdateUserBio([FromBody] UpdateUserBioRequest request)
         {
-            return HandleError(await _usersService.UpdateUserBioAsync(nickname, request), Ok);
+            var currentUserNickname = User.FindFirst("nickname")?.Value;
+            return HandleError(await _usersService.UpdateUserBioAsync(currentUserNickname!, request), Ok);
+        }
+        [HttpPatch("me/profile/picture")]
+        public async Task<IActionResult> UploadUserAvatar([FromForm] UpdateUserProfilePictureRequest request)
+        {
+            var currentUserNickname = User.FindFirst("nickname")?.Value;
+            return HandleError(await _usersService.UpdateUserProfilePictureAsync(currentUserNickname!, request), Ok);
         }
     }
 }

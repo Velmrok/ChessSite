@@ -19,11 +19,13 @@ public class UsersService : IUsersService
     private readonly AppDbContext _dbContext;
     private readonly IDistributedCache _cache;
     private readonly IPresenceService _presenceService;
-    public UsersService(AppDbContext context, IDistributedCache cache, IPresenceService presenceService)
+    private readonly IStorageService _storageService;
+    public UsersService(AppDbContext context, IDistributedCache cache, IPresenceService presenceService, IStorageService storageService)
     {
         _dbContext = context;
         _cache = cache;
         _presenceService = presenceService;
+        _storageService = storageService;
     }
 
     private static IQueryable<User> ApplySort(IQueryable<User> users, UsersSortBy sortBy, RatingType ratingType, bool descending)
@@ -184,6 +186,10 @@ public class UsersService : IUsersService
     }
     public async Task<ErrorOr<UpdateUserBioResponse>> UpdateUserBioAsync(string nickname, UpdateUserBioRequest request)
     {
+        if(nickname is null)
+        {
+            return Error.Unauthorized("invalidAccessToken", "Access token is invalid.");
+        }
         var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Nickname == nickname);
         if (user == null)
         {
@@ -192,5 +198,21 @@ public class UsersService : IUsersService
         user.ProfileBio = request.Bio;
         await _dbContext.SaveChangesAsync();
         return new UpdateUserBioResponse(user.ProfileBio);
+    }
+    public async Task<ErrorOr<UpdateUserProfilePictureResponse>> UpdateUserProfilePictureAsync(string nickname, UpdateUserProfilePictureRequest request)
+    {
+        var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Nickname == nickname);
+        if (user == null)
+        {
+            return Error.NotFound("userNotFound", "User with the given nickname was not found.");
+        }
+        var avatarUrl = await _storageService.UploadAvatarAsync(request.ProfilePictureFile.OpenReadStream(), user.Id.ToString(), request.ProfilePictureFile.ContentType);
+        if (avatarUrl.IsError)
+        {
+            return Error.Failure("uploadFailed", "Failed to upload avatar.");
+        }
+        user.ProfilePictureUrl = avatarUrl.Value;
+        await _dbContext.SaveChangesAsync();
+        return new UpdateUserProfilePictureResponse(user.ProfilePictureUrl);
     }
 }

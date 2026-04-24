@@ -27,7 +27,7 @@ export default function UserBio({ bio, nickname }: Props) {
     const handleEditClick = async () => {
         const newValue = textAreaRef.current?.value;
 
-        const updatedBio = await request(() => updateUserBio(nickname!, newValue || ""), {
+        const updatedBio = await request(() => updateUserBio(newValue || ""), {
             onError: (message) => {
                
                 const errorMessage = toastT("error." + message) + ( message=="bioTooLong" ? ` ${textAreaRef.current?.value.length}/200` : "" );

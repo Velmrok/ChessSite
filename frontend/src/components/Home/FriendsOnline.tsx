@@ -6,6 +6,7 @@ import Loading from "../global/Loading";
 import PaginationButtons from "../global/Pagination_buttons";
 import useHomeStore from "@/stores/useHomeStore";
 import { useTranslation } from "react-i18next";
+import Avatar from "../global/Avatar";
 
 
 
@@ -56,7 +57,7 @@ export default function FriendsOnline() {
                             <div key={friend.nickname} className="aspect-square flex w-full  flex-col items-center gap-4
                  bg-gray-900/50  rounded-md w-28 justify-between  p-2 relative">
 
-                                <img src={`${friend.profilePictureUrl}`} alt="Profile" className="h-13 w-13 min-h-13 min-w-13 md:w-18 md:h-18
+                                <Avatar avatarUrl={friend.profilePictureUrl} className="h-13 w-13 min-h-13 min-w-13 md:w-18 md:h-18
                  md:min-h-18 md:min-w-18 rounded-full outline-2 border-2 border-black mt-2" />
 
                                 <span className="text-white font-MyFancyFont text-[10px] sm:text-base">{friend.nickname}</span>

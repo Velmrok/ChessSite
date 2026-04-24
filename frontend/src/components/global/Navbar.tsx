@@ -10,6 +10,7 @@ import SmallScreenMenu from "./SmallScreenMenu";
 import { disconnectSocket } from "@/services/socket/socketService";
 import { useTranslation } from "react-i18next";
 import i18n from "@/i18n/config";
+import Avatar from "./Avatar";
 
 
 const GuestMenu = () => {
@@ -53,7 +54,7 @@ const UserMenu = ({ onLogout }: { onLogout: () => void }) => {
             </button>
             <Link to={`/users/${user?.nickname}/profile`} className="text-xs md:text-sm hover:text-amber-200
          transition-color duration-300 rounded-full outline-2 border-2 border-black">
-                <img src={`${user?.profilePictureUrl}`} alt="Profile" className="h-8 w-8 md:w-11 md:h-11 rounded-full" />
+                <Avatar avatarUrl={user?.profilePictureUrl} className="h-8 w-8 md:w-11 md:h-11 rounded-full" />
             </Link>
         </>
     );

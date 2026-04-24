@@ -16,14 +16,14 @@ export const fetchUserOnlineFriends = async (nickname: string, page: number, lim
     const response = await apiFetch({ url: `/users/${nickname}/friends/online?page=${page}&limit=${limit}`, method: 'GET', includeCredentials: false, contentType: 'application/json' });
     return response as Promise<{ friendList: Array<PublicUser>, totalPages: number }>;
 }
-export const updateUserBio = async (nickname: string, bio: string) : Promise<{ bio: string }> => {
-    const response = await apiFetch({ url: `/users/${nickname}/profile/bio`, method: 'PATCH', includeCredentials: true, contentType: 'application/json', body: JSON.stringify({ bio }) });
+export const updateUserBio = async (bio: string) : Promise<{ bio: string }> => {
+    const response = await apiFetch({ url: `/users/me/profile/bio`, method: 'PATCH', includeCredentials: true, contentType: 'application/json', body: JSON.stringify({ bio }) });
     return response as Promise<{ bio: string }>;
 }
 export const uploadUserAvatar = async (avatarFile: File) : Promise<{ profilePictureUrl: string }> => {
     const formData = new FormData();
-    formData.append("avatar", avatarFile);
-    const response = await apiFetch({ url: `/users/avatar`, method: 'PATCH', includeCredentials: true, contentType: undefined, body: formData });
+    formData.append("userProfilePicture", avatarFile);
+    const response = await apiFetch({ url: `/users/profile`, method: 'PATCH', includeCredentials: true, contentType: undefined, body: formData });
     return response as Promise<{ profilePictureUrl: string }>;
 }
 export const fetchUserGameHistory = async (nickname: string, page: number): Promise<{ gameHistory: Array<ProfileGame>, totalPages: number }> => {

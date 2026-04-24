@@ -8,6 +8,7 @@ import DeleteAccountButton from "../global/DeleteAccountButton";
 import { useEffect, useState } from "react";
 import type { User } from "@/types/user";
 import { useTranslation } from "react-i18next";
+import Avatar from "../global/Avatar";
 
 const API_URL = import.meta.env.VITE_API_URL;
 type Props = {
@@ -80,8 +81,7 @@ export default function UserList({ users}: Props) {
                         <div className=" w-[70%] sm:w-full bg-black/40 py-2  rounded-lg flex flex-col 
                                         items-center justify-center gap-2">
 
-                            <img src={`${user?.profilePictureUrl}`} alt="Profile"
-                             className="h-8 w-8 sm:w-16 sm:h-16 rounded-full outline-2 border-2 border-black" />
+                           <Avatar avatarUrl={user.profilePictureUrl} className="h-8 w-8 sm:w-16 sm:h-16 rounded-full outline-2 border-2 border-black" />
 
 
                         <div className="text-[8px] sm:text-base font-bold mt-auto">{user.nickname}</div>

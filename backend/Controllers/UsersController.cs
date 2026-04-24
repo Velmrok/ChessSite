@@ -43,13 +43,18 @@ namespace backend.Controllers
         {
             return HandleError(await _usersService.GetFriendsAsync(nickname, pagination), Ok);
         }
-        [HttpPost("friend")]
-        public async Task<IActionResult> AddFriend([FromBody] AddFriendRequest request)
+        [HttpPost("{nickname}/friend")]
+        public async Task<IActionResult> AddFriend(string nickname)
         {
             var currentUserNickname = User.FindFirst("nickname")?.Value;
-            return HandleError(await _usersService.AddFriendAsync(request, currentUserNickname!), _=> NoContent());
+            return HandleError(await _usersService.AddFriendAsync(nickname, currentUserNickname!), _=> NoContent());
         }
-        
+        [HttpDelete("{nickname}/friend")]
+        public async Task<IActionResult> RemoveFriend(string nickname)
+        {
+            var currentUserNickname = User.FindFirst("nickname")?.Value;
+            return HandleError(await _usersService.RemoveFriendAsync(nickname, currentUserNickname!), _=> NoContent());
+        }
         [HttpPatch("me/profile/bio")]
         public async Task<IActionResult> UpdateUserBio([FromBody] UpdateUserBioRequest request)
         {

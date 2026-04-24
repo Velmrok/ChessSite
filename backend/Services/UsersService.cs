@@ -143,15 +143,15 @@ public class UsersService : IUsersService
         );
         return response;
     }
-    public async Task<ErrorOr<Success>> AddFriendAsync(AddFriendRequest request, string currentUserNickname)
+    public async Task<ErrorOr<Success>> AddFriendAsync(string nickname, string currentUserNickname)
     {
-        if (request.Nickname == currentUserNickname)
+        if (nickname == currentUserNickname)
         {
             return Error.Validation("sameUser", "You cannot add yourself as a friend.");
         }
 
         var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Nickname == currentUserNickname);
-        var friend = await _dbContext.Users.FirstOrDefaultAsync(u => u.Nickname == request.Nickname);
+        var friend = await _dbContext.Users.FirstOrDefaultAsync(u => u.Nickname == nickname);
 
         if (user == null || friend == null)
         {
@@ -183,6 +183,36 @@ public class UsersService : IUsersService
 
         return Result.Success;
 
+    }
+    public async Task<ErrorOr<Success>> RemoveFriendAsync(string nickname, string currentUserNickname)
+    {
+        var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Nickname == currentUserNickname);
+        var friend = await _dbContext.Users.FirstOrDefaultAsync(u => u.Nickname == nickname);
+
+        if (user == null || friend == null)
+        {
+            return Error.NotFound("userNotFound", "One or both users were not found.");
+        }
+
+        var friendship = await _dbContext.Friendships
+            .FirstOrDefaultAsync(f => f.UserId == user.Id && f.FriendId == friend.Id);
+
+        if (friendship == null)
+        {
+            return Error.NotFound("friendshipNotFound", "These users are not friends.");
+        }
+
+        var reverseFriendship = await _dbContext.Friendships
+            .FirstOrDefaultAsync(f => f.UserId == friend.Id && f.FriendId == user.Id);
+
+        _dbContext.Friendships.Remove(friendship);
+        if (reverseFriendship != null)
+        {
+            _dbContext.Friendships.Remove(reverseFriendship);
+        }
+        await _dbContext.SaveChangesAsync();
+
+        return Result.Success;
     }
     public async Task<ErrorOr<UpdateUserBioResponse>> UpdateUserBioAsync(string nickname, UpdateUserBioRequest request)
     {

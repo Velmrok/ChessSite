@@ -32,11 +32,11 @@ export const fetchUserGameHistory = async (nickname: string, page: number): Prom
 }
 
 export const addFriend = async (nickname: string) => {
-    const response = await apiFetch({ url: `/users/friend`, method: 'POST', includeCredentials: true, contentType: 'application/json', body: JSON.stringify({Nickname:nickname }) });
+    const response = await apiFetch({ url: `/users/${nickname}/friend`, method: 'POST', includeCredentials: true, contentType: 'application/json' });
     return response;
 }
 export const deleteFriend = async (friendNickname: string) => {
-     const response = await apiFetch({ url: `/users/friend`, method: 'DELETE', includeCredentials: true, contentType: 'application/json', body: JSON.stringify({ Nickname: friendNickname }) });
+     const response = await apiFetch({ url: `/users/${friendNickname}/friend`, method: 'DELETE', includeCredentials: true, contentType: 'application/json' });
     return response;
 }
 export const deleteAccount = async (nickname: string) => {

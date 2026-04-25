@@ -55,15 +55,15 @@ const useUsersSearchStore = create<SearchStore>((set) => ({
             query.append(key, String(value));
         };
 
-        append("Search", params.search);
-        append("Limit", params.limit, 10);
-        append("MinRating", params.minRating, 0);
-        append("MaxRating", params.maxRating, 3000);
-        append("JustOnline", params.online, false);
-        append("SortBy", params.sortBy, "CreatedAt");
-        append("SortDescending", params.sortDescending, true);
-        append("Page", params.page, 1);
-        append("RatingType", params.ratingType, "Rapid");
+        append("search", params.search);
+        append("limit", params.limit, 10);
+        append("minRating", params.minRating, 0);
+        append("maxRating", params.maxRating, 3000);
+        append("online", params.online, false);
+        append("sortBy", params.sortBy, "createdAt");
+        append("sortDescending", params.sortDescending, true);
+        append("page", params.page, 1);
+        append("ratingType", params.ratingType, "Rapid");
 
         const queryString = query.toString();
         return queryString ? `?${queryString}` : "";

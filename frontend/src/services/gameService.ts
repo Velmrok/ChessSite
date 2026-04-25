@@ -1,3 +1,4 @@
+import type { GameState, GameSummary } from "@/types/game";
 import apiFetch from "./api";
 
 

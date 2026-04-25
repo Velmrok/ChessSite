@@ -4,9 +4,10 @@ import FilterMenu from "@/components/SearchGame/FilterMenu";
 import { getAllGames } from "@/services/gameService";
 import GameList from "@/components/SearchGame/GameList";
 import { useTranslation } from "react-i18next";
+import type { GameSummary } from "@/types/game";
 
 
-export default function SearchGamePage() {
+export default function GamesSearchPage() {
     const params = useGameSearchStore((state) => state.params);
     const resetFilters = useGameSearchStore((state) => state.resetFilters);
     const getParamsLink = useGameSearchStore((state) => state.getParamsLink);

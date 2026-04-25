@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using backend.Data;
@@ -12,9 +13,11 @@ using backend.Data;
 namespace backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260425124241_AddGames")]
+    partial class AddGames
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -50,7 +53,7 @@ namespace backend.Migrations
                     b.Property<Guid>("BlackPlayerId")
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime?>("FinishedAt")
+                    b.Property<DateTime>("FinishedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("Increment")
@@ -72,7 +75,7 @@ namespace backend.Migrations
                     b.Property<Guid>("WhitePlayerId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid?>("WinnerId")
+                    b.Property<Guid>("WinnerId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
@@ -269,7 +272,8 @@ namespace backend.Migrations
                     b.HasOne("backend.Models.User", "Winner")
                         .WithMany()
                         .HasForeignKey("WinnerId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("BlackPlayer");
 

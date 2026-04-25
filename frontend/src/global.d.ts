@@ -12,28 +12,7 @@ declare global {
         timestamp: string;
 
     }
-    type GameState = {
-        id: string;
-        winnerNickname: string | null;
-        date: string;
-        status: GameStatus;
-        white: Omit<User>;
-        black: Omit<User>;
-        fen: string;
-        moves: Array<MoveInfo>;
-        gameType: gameType;
-        time: number;
-        increment: number;
-        currentTurn: 'white' | 'black';
-        currentWhiteTime: number;
-        currentBlackTime: number;
-        messages: Array<Message>;
-        isDrawOffered: string | null;
-        reason?: string;
-
-
-
-    }
+    
     type Move = {
         from: string;
         to: string;
@@ -88,15 +67,5 @@ declare global {
     }
 
 
-    type GameSummary = {
-        id: string;
-        whitePlayer: {nickname: string;avatar: string;};
-        blackPlayer: {nickname: string;avatar: string;};
-        gameType: string;
-        time: number;
-        increment: number;
-        status: string;
-        date: string;
-        moves: Array<MoveInfo>;
-    };
+    
 }

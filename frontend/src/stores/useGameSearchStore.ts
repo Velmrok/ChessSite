@@ -1,14 +1,6 @@
+import type { GameSearchParams } from '@/types/game';
 import { create } from 'zustand';
 
-export type GameSearchParams = {
-    query: string; 
-    limit: number;
-    gameType: 'rapid' | 'blitz' | 'bullet' | 'all';
-    status: 'active' | 'finished' | 'all';
-    page: number;
-    sortBy : 'date' | 'time' | 'nicknames' ;
-    sortOrder: boolean; // 1 for ASC,0 for DESC
-};
 
 type GameSearchStore = {
     params: GameSearchParams;
@@ -22,11 +14,11 @@ const useGameSearchStore = create<GameSearchStore>((set, get) => ({
     params: {
         query: '',
         limit: 10,
-        gameType: 'all',
-        status: 'all',
+        gameType: null,
+        status: null,
         page: 1,
         sortBy: 'date',
-        sortOrder: false,
+        SortDescending: false,
     },
     setQuery: (query) => set((state) => ({ params: { ...state.params, query, page: 1 } })),
     setFilters: (filters) => set((state) => ({ params: { ...state.params, ...filters} })),
@@ -34,23 +26,37 @@ const useGameSearchStore = create<GameSearchStore>((set, get) => ({
         params: {
             query: '',
             limit: 10,
-            gameType: 'all',
-            status: 'all',
+            gameType: null,
+            status: null,
             page: 1,
             sortBy: 'date',
-            sortOrder: false,
+            SortDescending: false,
         }
     }),
     getParamsLink: () => {
-        const p = get().params;
-        return `?query=${encodeURIComponent(p.query)}
-        &limit=${p.limit}
-        &gameType=${p.gameType}
-        &status=${p.status}
-        &page=${p.page}
-        &sortBy=${p.sortBy}
-        &sortOrder=${p.sortOrder?'ASC':'DESC'}
-        `;
+
+        const params = useGameSearchStore.getState().params;
+
+        const query = new URLSearchParams();
+
+        const append = (key: string, value: unknown, defaultValue?: unknown) => {
+            if (value === undefined || value === null) return;
+            if (value === "") return;
+            if (defaultValue !== undefined && value === defaultValue) return;
+            query.append(key, String(value));
+        };
+
+        append("query", params.query);
+        append("limit", params.limit, 10);
+        append("gameType", params.gameType, null);
+        append("status", params.status, null);
+        append("page", params.page, 1);
+        append("sortBy", params.sortBy, 'date');
+        append("SortDescending", params.SortDescending, false);
+
+        const queryString = query.toString();
+        return queryString ? `?${queryString}` : '';
+       
     },
 }));
 

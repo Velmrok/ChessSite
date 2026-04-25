@@ -6,7 +6,7 @@ export type GameSearchParams = {
     gameType: GameType | null;
     status: GameStatus | null;
     page: number;
-    sortBy : 'date' | 'time' | 'nicknames' ;
+    sortBy : 'date' | 'time' | 'nickname' ;
     SortDescending: boolean; 
 };
 

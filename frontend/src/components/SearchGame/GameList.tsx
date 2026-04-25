@@ -8,6 +8,8 @@ import PaginationButtons from "../global/Pagination_buttons";
 import useGameSearchStore from "@/stores/useGameSearchStore";
 import SortArrows from "./SortArrows";
 import { useTranslation } from "react-i18next";
+import Avatar from "../global/Avatar";
+import type { GameSummary } from "@/types/game";
 
 type Props = {
     isLoading: boolean;
@@ -35,14 +37,14 @@ export default function GameList({ isLoading, games, totalPages }: Props) {
 
     const handleSort = (field: string) => {
         const isSameField = params.sortBy === field;
-        const newOrder = isSameField ? !params.sortOrder : true;
-        setFilters({ sortBy: field as "date" | "time" | "nicknames", sortOrder: newOrder });
+        const newOrder = isSameField ? !params.SortDescending : true;
+        setFilters({ sortBy: field as "date" | "time" | "nickname", SortDescending: newOrder });
     };
 
 
     const renderSortArrow = (field: string) => {
-        if (params.sortBy !== field) return <SortArrows sortOrder={null} />;
-        return <SortArrows sortOrder={params.sortOrder ? 'asc' : 'desc'} />;
+        if (params.sortBy !== field) return <SortArrows sortDescending={null} />;
+        return <SortArrows sortDescending={params.SortDescending} />;
     };
 
     return (
@@ -61,19 +63,23 @@ export default function GameList({ isLoading, games, totalPages }: Props) {
                             <div className="bg-cyan-800 p-2 h-10 rounded grid grid-cols-10 place-items-center text-xs md:text-lg font-MyFancyFont text-white">
 
 
-                                <div className="col-span-2 flex items-center justify-center gap-2 cursor-pointer hover:text-cyan-300 transition-colors" onClick={() => handleSort("nicknames")}>
+                                <div className="col-span-2 flex items-center justify-center gap-2 cursor-pointer hover:text-cyan-300 transition-colors" 
+                                onClick={() => handleSort("nickname")}>
+
                                     {t('players')}
-                                    {renderSortArrow("nicknames")}
+                                    {renderSortArrow("nickname")}
                                 </div>
 
                                 <div className="col-span-3 text-center">{t('moves')}</div>
 
 
-                                <div className="col-span-1 flex items-center justify-center gap-2 cursor-pointer hover:text-cyan-300 transition-colors" onClick={() => handleSort("time")}>
+                                <div className="col-span-1 flex items-center justify-center gap-2 cursor-pointer hover:text-cyan-300 transition-colors" 
+                                onClick={() => handleSort("time")}>
                                     {t('time')}
                                     {renderSortArrow("time")}
                                 </div>
-                                <div className="col-span-2 flex items-center justify-center gap-2 cursor-pointer hover:text-cyan-300 transition-colors" onClick={() => handleSort("date")}>
+                                <div className="col-span-2 flex items-center justify-center gap-2 cursor-pointer hover:text-cyan-300 transition-colors" 
+                                onClick={() => handleSort("date")}>
                                     {t('date')}
                                     {renderSortArrow("date")}
                                 </div>
@@ -91,12 +97,12 @@ export default function GameList({ isLoading, games, totalPages }: Props) {
 
                                         <div className="flex items-center justify-center gap-2 md:gap-4 col-span-2 w-full">
                                             <div className="text-xs bg-black/50 rounded-md p-1 w-14 h-14 md:w-16 md:h-16 font-MyFancyFont text-white flex flex-col items-center justify-center shrink-0">
-                                                <img src={`${game.whitePlayer.avatar}`} alt="White" className="w-8 h-8 md:w-10 md:h-10 rounded-full border-2 border-white object-cover" />
+                                                <Avatar avatarUrl={game.whitePlayer.avatar}className="w-8 h-8 md:w-10 md:h-10 rounded-full border-2 border-white object-cover" />
                                                 <span className="truncate max-w-[50px] md:max-w-[60px]">{game.whitePlayer.nickname}</span>
                                             </div>
                                             <span className="font-bold text-sm">vs</span>
                                             <div className="text-xs bg-black/50 rounded-md p-1 w-14 h-14 md:w-16 md:h-16 font-MyFancyFont text-white flex flex-col items-center justify-center shrink-0">
-                                                <img src={`${game.blackPlayer.avatar}`} alt="Black" className="w-8 h-8 md:w-10 md:h-10 rounded-full border-2 border-white object-cover" />
+                                                <Avatar avatarUrl={game.blackPlayer.avatar}className="w-8 h-8 md:w-10 md:h-10 rounded-full border-2 border-white object-cover" />
                                                 <span className="truncate max-w-[50px] md:max-w-[60px]">{game.blackPlayer.nickname}</span>
                                             </div>
                                         </div>
@@ -119,7 +125,7 @@ export default function GameList({ isLoading, games, totalPages }: Props) {
                                             {game.time} + {game.increment}s
                                         </div>
 
-                                        <div className="col-span-2 text-xs md:text-sm whitespace-nowrap">{game.date}</div>
+                                        <div className="col-span-2 text-xs md:text-sm whitespace-nowrap">{game.finishedAt}</div>
 
 
                                         <div className="col-span-1 text-sm text-cyan-300 flex items-center gap-1">

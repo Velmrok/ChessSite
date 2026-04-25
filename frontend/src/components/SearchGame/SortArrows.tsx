@@ -1,11 +1,11 @@
 import { FaLongArrowAltDown, FaLongArrowAltUp } from "react-icons/fa";
 
 type Props = {
-    sortOrder: 'asc' | 'desc' | null;
+    sortDescending: boolean | null;
 };
-export default function SortArrows({ sortOrder }: Props) {
-    const arrowUpSyle = sortOrder == 'asc' ? "text-green-500 text-base" : " text-sm text-gray-400";
-    const arrowDownStyle = sortOrder == 'desc' ? "text-green-500 text-base" : " text-sm text-gray-400";
+export default function SortArrows({ sortDescending }: Props) {
+    const arrowUpSyle = sortDescending === true ? "text-green-500 text-base" : " text-sm text-gray-400";
+    const arrowDownStyle = sortDescending === false ? "text-green-500 text-base" : " text-sm text-gray-400";
     return (
         <>
             <div className={arrowUpSyle + " transition-all duration-400"}>

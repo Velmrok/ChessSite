@@ -5,6 +5,7 @@ import { getAllGames } from "@/services/gameService";
 import GameList from "@/components/SearchGame/GameList";
 import { useTranslation } from "react-i18next";
 import type { GameSummary } from "@/types/game";
+import { useApi } from "@/hooks/useApi";
 
 
 export default function GamesSearchPage() {
@@ -15,31 +16,26 @@ export default function GamesSearchPage() {
     const [isLoading, setIsLoading] = useState(false);
     const { t } = useTranslation('search');
     const [totalPages, setTotalPages] = useState(1);
+    const {request } = useApi();
     useEffect(() => {
         resetFilters();
     }, []);
 
-  
+
     useEffect(() => {
-        const fetchGamesData = async () => {
+        const fetch = async () => {
+            
             const timeoutId = setTimeout(() => setIsLoading(true), 300);
-            try {
-                
-                const response = await getAllGames(getParamsLink());
-                setGames(response.games);       
+
+            const response = await request(() => getAllGames(getParamsLink()));
+            if (response) {
+                setGames(response.games);
                 setTotalPages(response.totalPages);
-            
-            } catch (error) {
-                console.error("Fetching games error", error);
-            } finally {
-                clearTimeout(timeoutId);
                 setIsLoading(false);
+                clearTimeout(timeoutId);
             }
-            
         };
-        fetchGamesData();
-        
-       
+        fetch();
     }, [params]);
    
     return (

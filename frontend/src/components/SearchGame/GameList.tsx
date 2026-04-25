@@ -125,7 +125,7 @@ export default function GameList({ isLoading, games, totalPages }: Props) {
                                             {game.time} + {game.increment}s
                                         </div>
 
-                                        <div className="col-span-2 text-xs md:text-sm whitespace-nowrap">{game.finishedAt}</div>
+                                        <div className="col-span-2 text-xs md:text-sm whitespace-nowrap">{game.finishedAt ? game.finishedAt : '-'}</div>
 
 
                                         <div className="col-span-1 text-sm text-cyan-300 flex items-center gap-1">

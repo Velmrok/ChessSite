@@ -59,7 +59,7 @@ const useUsersSearchStore = create<SearchStore>((set) => ({
         append("limit", params.limit, 10);
         append("minRating", params.minRating, 0);
         append("maxRating", params.maxRating, 3000);
-        append("online", params.online, false);
+        append("justOnline", params.online, false);
         append("sortBy", params.sortBy, "createdAt");
         append("sortDescending", params.sortDescending, true);
         append("page", params.page, 1);

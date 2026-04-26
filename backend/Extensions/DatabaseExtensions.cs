@@ -6,11 +6,17 @@ namespace backend.Extensions;
 public static class DatabaseExtensions
 {
     public static IServiceCollection AddDatabase(
-        this IServiceCollection services, 
+        this IServiceCollection services,
         IConfiguration configuration)
     {
+        var host = configuration["ConnectionStrings:Host"];
+        var db = configuration["ConnectionStrings:Database"];
+        var user = configuration["ConnectionStrings:Username"];
+        var password = File.ReadAllText("/run/secrets/db_password").Trim();
+        var connectionString = $"Host={host};Database={db};Username={user};Password={password}";
+        
         services.AddDbContext<AppDbContext>(options =>
-            options.UseNpgsql(configuration.GetConnectionString("Default"))
+            options.UseNpgsql(connectionString)
         );
 
         return services;

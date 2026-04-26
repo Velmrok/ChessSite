@@ -1,12 +1,19 @@
 version: '3.8'
 
+secrets:
+  db_password:
+    file: ./.secrets/db_password.txt
+  cf_access_key:
+    file: ./.secrets/cf_access_key.txt
+  cf_secret_key:
+    file: ./.secrets/cf_secret_key.txt
 services:
   db:
     image: postgres:15
     container_name: chess_db_production
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
       POSTGRES_DB: ${POSTGRES_DB}
     volumes:
       - postgres_data_production:/var/lib/postgresql/data
@@ -18,6 +25,8 @@ services:
       retries: 5
     networks:
       - backend-net
+    secrets:
+      - db_password
 
   backend:
     build: ./backend
@@ -25,11 +34,11 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:5062
-      - ConnectionStrings__Default=Host=db;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      - ConnectionStrings__Host=db
+      - ConnectionStrings__Database=${POSTGRES_DB}
+      - ConnectionStrings__Username=${POSTGRES_USER}
       - Storage__Provider=R2
       - Storage__AccountId=${CF_ACCOUNT_ID}
-      - Storage__AccessKey=${CF_ACCESS_KEY}
-      - Storage__SecretKey=${CF_SECRET_KEY}
       - Storage__BucketName=${CF_BUCKET_NAME}
       - Storage__PublicBaseUrl=${CF_PUBLIC_URL}
     depends_on:
@@ -39,6 +48,10 @@ services:
     networks:
       - backend-net
       - frontend-net
+    secrets:
+      - db_password
+      - cf_access_key
+      - cf_secret_key
    
   frontend:
     build: ./frontend

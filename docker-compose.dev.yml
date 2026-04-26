@@ -1,19 +1,25 @@
 version: '3.8'
 
+secrets:
+  db_password:
+    file: ./.secrets/db_password.txt
+  
 services:
   db:
     image: postgres:15
     container_name: chess_db
     environment:
-      POSTGRES_USER: test_user
-      POSTGRES_PASSWORD: test
-      POSTGRES_DB: test_db
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - backend-net
+    secrets:
+      - db_password
   backend:
     image: mcr.microsoft.com/dotnet/sdk:8.0
     container_name: chess_backend
@@ -31,6 +37,11 @@ services:
       - ASPNETCORE_URLS=http://+:5062
       - DOTNET_USE_POLLING_FILE_WATCHER=1
       - Storage__Provider=Local
+      - ConnectionStrings__Host=db
+      - ConnectionStrings__Database=${POSTGRES_DB}
+      - ConnectionStrings__Username=${POSTGRES_USER}
+    secrets:
+      - db_password
     command: >
       sh -c "
       dotnet restore &&

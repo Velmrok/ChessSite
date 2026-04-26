@@ -35,10 +35,12 @@ public class R2StorageService : IStorageService
             AuthenticationRegion = "auto"
           
         };
+        var accessKey = File.ReadAllText("/run/secrets/cf_access_key").Trim();
+        var secretKey = File.ReadAllText("/run/secrets/cf_secret_key").Trim();
 
         var credentials = new BasicAWSCredentials(
-            _options.AccessKey, 
-            _options.SecretKey);
+            accessKey, 
+            secretKey);
             
         _s3 = new AmazonS3Client(credentials, config);
     }

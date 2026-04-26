@@ -59,8 +59,8 @@ public class UsersService : IUsersService
         var cached = await _cache.GetStringAsync(cacheKey);
         if (!string.IsNullOrEmpty(cached))
         {
-            var cachedResponse = JsonSerializer.Deserialize<UsersResponse>(cached)!;
-            return new UsersResult(cachedResponse, true);
+            var cachedResponse = JsonSerializer.Deserialize<UsersSearchResponse>(cached)!;
+            return new UsersResult(cachedResponse, true); 
         }
 
         var users = _dbContext.Users.AsQueryable();
@@ -78,24 +78,28 @@ public class UsersService : IUsersService
         };
         
         
-       
+       var onlineIds = await _presenceService.GetOnlineIdsAsync(users.Select(u => u.Id));
         if (query.JustOnline)
         {
-            var onlineIds = await _presenceService.GetOnlineIdsAsync(users.Select(u => u.Id));
+            
             users = users.Where(u => onlineIds.Contains(u.Id));
         }
 
         users = ApplySort(users, query.SortBy, query.RatingType, query.SortDescending);
 
-        var result = await users
-            .Skip((query.Page - 1) * query.Limit)
-            .Take(query.Limit)
-            .Select(u => u.ToUserResponse())
-            .ToListAsync();
         var totalCount = await users.CountAsync();
         var totalPages = (int)Math.Ceiling(totalCount / (double)query.Limit);
 
-        var response = new UsersResponse(result, totalPages);
+        var result = await users
+            .Skip((query.Page - 1) * query.Limit)
+            .Take(query.Limit)
+            .Select(u => u.ToUserResponse(query.JustOnline || onlineIds.Contains(u.Id)))
+            .ToListAsync();
+
+
+        
+
+        var response = new UsersSearchResponse(result, totalPages);
 
         var options = new DistributedCacheEntryOptions
         {

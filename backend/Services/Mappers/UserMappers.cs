@@ -20,11 +20,12 @@ public static class UserMappers
             FriendNicknames: friendNicknames
         );
     }
-    public static UserResponse ToUserResponse(this User user)
+    public static UserSearchSummary ToUserResponse(this User user, bool isOnline)
     {
-        return new UserResponse(
+        return new UserSearchSummary(
             Nickname: user.Nickname,
             ProfilePictureUrl: user.ProfilePictureUrl,
+            IsOnline: isOnline,
             CreatedAt: user.CreatedAt,
             LastActive: user.LastActive,
             Role: user.Role,

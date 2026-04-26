@@ -4,6 +4,6 @@ using backend.DTO.Users;
 namespace backend.Services.Results;
 
 public record UsersResult(
-    UsersResponse Response,
+    UsersSearchResponse Response,
     bool IsCached
 );

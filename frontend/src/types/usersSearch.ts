@@ -1,4 +1,4 @@
-import type { PublicUser } from "./user";
+import type { PublicUser, Rating } from "./user";
 
 export type SearchParams = {
     search: string;
@@ -14,8 +14,15 @@ export type SearchParams = {
 
 export type SortByOption = 'Rating' | 'Nickname' | 'OnlineStatus' | 'LastActive' | 'CreatedAt';
 
-export type UsersResponse = {
-    users: PublicUser[];
+export type UsersSearchResponse = {
+    users: Array<{
+        nickname: string;
+        profilePictureUrl: string;
+        rating: Rating;
+        isOnline: boolean;
+        createdAt: string;
+        lastActive: string;
+        role: 'user' | 'admin';
+    }>;
     totalPages: number;
 }
-

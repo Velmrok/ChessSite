@@ -35,21 +35,33 @@ export type UserProfile = {
 
         userInfo: UserInfo;
     };
-export type UserSummary = {
-    nickname: string;
-    profilePictureUrl: string;
-    rating: Rating;
-    isOnline: boolean;
 
+export type FriendsOnlineResponse = {
+    friends: Array<{
+        nickname: string;
+        profilePictureUrl: string;
+    }>,
+    totalPages: number;
 }
-export type UserSearchItem = Pick<UserSummary, "nickname" | "profilePictureUrl" | "rating" | "isOnline"> &{
-    lastActive: string;
-};
-export type UserLeaderboardItem = {
-    nickname: string;
-    profilePictureUrl: string;
-    rating: number;
-}
-export type UserOnlineItem = Pick<UserSummary, "nickname" | "profilePictureUrl">
 
+export type FriendsProfileResponse = {
+    friends: Array<{
+        nickname: string;
+        profilePictureUrl: string;
+        rating: Rating;
+        isOnline: boolean;
+    }>,
+    totalPages: number;
+}
+
+
+
+export type UsersLeaderboardResponse = {
+    users: Array<{
+        nickname: string;
+        profilePictureUrl: string;
+        rating: number;
+    }>;
+    totalPages: number;
+}
 export type User = PublicUser & {};

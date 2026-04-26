@@ -26,29 +26,5 @@ public class GamesController : MyControllerBase
     {
         return HandleError(await _gamesService.GetAllGamesAsync(query), Ok);
     }
-    [HttpPost]
-    public async Task<IActionResult> AddGame([FromBody] AddGameRequest request)
-    {
-        var whitePlayer = await _dbContext.Users.FirstOrDefaultAsync(u => u.Nickname == request.WhitePlayerNickname);
-        var blackPlayer = await _dbContext.Users.FirstOrDefaultAsync(u => u.Nickname == request.BlackPlayerNickname);
-        _dbContext.Games.Add(new Game
-        {
-            WhitePlayerId = whitePlayer.Id,
-            BlackPlayerId = blackPlayer.Id,
-            Type = request.Type,
-            Time = request.Time,
-            Increment = request.Increment,
-        });
-        await _dbContext.SaveChangesAsync();
-        return Ok();
-    }
+   
 }
-public class AddGameRequest
-{
-    public string WhitePlayerNickname { get; set; }
-    public string BlackPlayerNickname { get; set; }
-    public GameType Type { get; set; }
-    public int Time { get; set; }
-    public int Increment { get; set; }
-}
-

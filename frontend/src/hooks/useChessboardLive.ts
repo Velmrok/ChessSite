@@ -18,7 +18,7 @@ export function useChessboardLive() {
     const [kingPosition, setKingPosition] = useState<string>("");
     const [allPossibleMoves, setAllPossibleMoves] = useState<Move[]>([]);
 const [lastMove, setLastMove] = useState<Move | undefined>(undefined);
-const isLive = game?.status === "live";
+const isLive = game?.status === "active";
     useEffect(() => {
         if(!game) return;
         if(!isLive) return

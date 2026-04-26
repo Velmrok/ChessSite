@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import useUserStore from "@/stores/useUserStore";
 import EndGameWindow from "./EndGameWindow";
 import { useTranslation } from "react-i18next";
+import type { GameState } from "@/types/game";
 
 type Props = {
   game: GameState;

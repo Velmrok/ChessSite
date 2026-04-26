@@ -85,7 +85,7 @@ export default function useGame() {
     if (!game) return;
 
 
-    if (game.status == "live") return;
+    if (game.status == "active") return;
     if (currentMoveIndex < 0) {
       setCurrentWhiteTime(game.time * 60 * 1000);
       setCurrentBlackTime(game.time * 60 * 1000);

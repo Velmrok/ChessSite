@@ -20,7 +20,7 @@ export default function GamePage() {
     const currentBlackTime = useGameStore((state) => state.currentBlackTime);
     const currentWhiteTime = useGameStore((state) => state.currentWhiteTime);
     const user = useUserStore((state) => state.user);
-    const isLive = useGameStore((state) => state.game?.status === "live");
+    const isLive = useGameStore((state) => state.game?.status === "active");
     const isInAnalysisTree = useGameStore((state) => state.isInAnalysisTree);
     const gameHasJustStarted = useGameStore((state) => state.gameHasJustStarted);
     const resetGame = useGameStore((state) => state.resetGame);
@@ -94,25 +94,25 @@ export default function GamePage() {
 
                     {orientation === "black" ?
                         <>
-                            <PlayerBar nickname={game.white.nickname} avatarUrl={game.white.avatar} withLink={true}
+                            <PlayerBar nickname={game.white.nickname} avatarUrl={game.white.profilePictureUrl} withLink={true}
                                 rating={game.white.rating[ratingType]} time={currentWhiteTime} />
 
                             <ChessBoard game={game} boardOrientation="black" gameJustEnded={gameJustEnded} endData={formatEndData}
                                 pushAnalysisMove={pushAnalysisMove} />
 
-                            <PlayerBar nickname={game.black.nickname} avatarUrl={game.black.avatar} withLink={true}
+                            <PlayerBar nickname={game.black.nickname} avatarUrl={game.black.profilePictureUrl} withLink={true}
                                 rating={game.black.rating[ratingType]} time={currentBlackTime} />
 
                         </>
                         :
                         <>
-                            <PlayerBar nickname={game.black.nickname} avatarUrl={game.black.avatar} withLink={true}
+                            <PlayerBar nickname={game.black.nickname} avatarUrl={game.black.profilePictureUrl} withLink={true}
                                 rating={game.black.rating[ratingType]} time={currentBlackTime} />
 
                             <ChessBoard game={game} boardOrientation="white" gameJustEnded={gameJustEnded} endData={formatEndData}
                                 pushAnalysisMove={pushAnalysisMove} />
 
-                            <PlayerBar nickname={game.white.nickname} avatarUrl={game.white.avatar} withLink={true}
+                            <PlayerBar nickname={game.white.nickname} avatarUrl={game.white.profilePictureUrl} withLink={true}
                                 rating={game.white.rating[ratingType]} time={currentWhiteTime} />
                         </>
                     }

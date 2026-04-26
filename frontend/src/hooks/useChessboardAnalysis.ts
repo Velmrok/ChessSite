@@ -24,7 +24,7 @@ export function useChessboardAnalysis({ pushAnalysisMove }: Props) {
     const [allPossibleMoves, setAllPossibleMoves] = useState<Move[]>([]);
     
 const [lastMove, setLastMove] = useState<Move | undefined>(undefined);
-const isLive = game?.status === "live";
+const isLive = game?.status === "active";
 const prevStatusRef = useRef(game?.status);
 
 useEffect(() => {
@@ -72,7 +72,7 @@ useEffect(() => {
         prevStatusRef.current = game?.status;
 
        if (newLastMove && !isLive) {
-            if (prevStatus === 'live' && game?.status === 'finished') {
+            if (prevStatus === 'active' && game?.status === 'finished') {
             } else {
                 if (c.inCheck()) {
                     playCheck();

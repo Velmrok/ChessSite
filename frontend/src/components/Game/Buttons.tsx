@@ -8,7 +8,7 @@ export function Buttons() {
     const gameId = useParams().gameId!;
     const user = useUserStore((state) => state.user);
     const { t } = useTranslation("game");
-    const isLive = useGameStore((state) => state.game?.status === "live");
+    const isLive = useGameStore((state) => state.game?.status === "active");
     const game = useGameStore((state) => state.game);
 
     if (!game || !user) return null;

@@ -29,7 +29,7 @@ export default function useLivesGame() {
     }, [game?.status]);
 
     useEffect(() => {
-        if (game?.status !== "live") return;
+        if (game?.status !== "active") return;
         if (game.moves.length === 0) return;
 
         setTimer(game?.currentTurn || "white");

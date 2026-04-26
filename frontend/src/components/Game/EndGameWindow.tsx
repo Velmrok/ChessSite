@@ -1,3 +1,4 @@
+import type { GameState } from "@/types/game";
 import type { User } from "@/types/user";
 import { FaWindowClose } from "react-icons/fa";
 

@@ -4,6 +4,7 @@ import { useChessboardAnalysis } from "@/hooks/useChessboardAnalysis";
 import useGameStore from "@/stores/useGameStore";
 import useUserStore from "@/stores/useUserStore";
 import type { PieceDataType } from 'react-chessboard';
+import type { GameState } from '@/types/game';
 
 
 
@@ -16,7 +17,7 @@ export function useChessboardInteraction({ game, pushAnalysisMove }: Props) {
     const live = useChessboardLive();
     const analysis = useChessboardAnalysis({ pushAnalysisMove });
     const user = useUserStore((state) => state.user);
-    const isLive = game.status === "live";
+    const isLive = game.status === "active";
 
     const isInAnalysisTree = useGameStore((state) => state.isInAnalysisTree);
     const currentMoveIndex = useGameStore((state) => state.currentMoveIndex);

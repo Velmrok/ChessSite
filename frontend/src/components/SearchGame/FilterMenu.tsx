@@ -27,8 +27,8 @@ export default function FilterMenu() {
         setFilters({
             ...params,
             query: debouncedQuery,
-            gameType: formik.values.gameType as 'rapid' | 'blitz' | 'bullet' | 'all',
-            status: formik.values.status as 'active' | 'finished' | 'all',
+            gameType: formik.values.gameType as 'rapid' | 'blitz' | 'bullet' | null,
+            status: formik.values.status as 'active' | 'finished' | null,
         });
     }, [
         debouncedQuery,

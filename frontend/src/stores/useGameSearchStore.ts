@@ -17,7 +17,7 @@ const useGameSearchStore = create<GameSearchStore>((set, get) => ({
         gameType: null,
         status: null,
         page: 1,
-        sortBy: 'date',
+        sortBy: "date",
         SortDescending: false,
     },
     setQuery: (query) => set((state) => ({ params: { ...state.params, query, page: 1 } })),
@@ -35,7 +35,7 @@ const useGameSearchStore = create<GameSearchStore>((set, get) => ({
     }),
     getParamsLink: () => {
 
-        const params = useGameSearchStore.getState().params;
+        const params = get().params;
 
         const query = new URLSearchParams();
 

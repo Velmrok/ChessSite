@@ -18,6 +18,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ICookieService, CookieService>();
         services.AddScoped<ICacheInvalidationService, CacheInvalidationService>();
         services.AddScoped<IGamesService, GamesService>();
+        services.AddScoped<IHomeService, HomeService>();
 
         services.AddSingleton<IPresenceService, PresenceService>();
         services.AddSingleton<IJwtGenerator, JwtGenerator>();

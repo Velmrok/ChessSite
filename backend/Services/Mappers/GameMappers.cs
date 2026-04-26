@@ -13,13 +13,13 @@ namespace backend.Services.Mappers
             return new GameSummary
             (
                 Id: game.Id.ToString(),
-                WhitePlayer: new PlayerSummary
+                WhitePlayer: new UserSummary
                 (
                     Nickname: game.WhitePlayer.Nickname,
                     ProfilePictureUrl: game.WhitePlayer.ProfilePictureUrl,
                     Rating: game.WhitePlayer.Rating.GetRatingByType(game.Type)
                 ),
-                BlackPlayer: new PlayerSummary
+                BlackPlayer: new UserSummary
                 (
                     Nickname: game.BlackPlayer.Nickname,
                     ProfilePictureUrl: game.BlackPlayer.ProfilePictureUrl,

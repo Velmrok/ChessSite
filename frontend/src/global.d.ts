@@ -45,14 +45,7 @@ declare global {
         blackRating: number;
 
     }
-    type HomeInfo = {
-        leaderboard: {
-            rapid: Array<User>;
-            blitz: Array<User>;
-            bullet: Array<User>;
-        };
-        friendsOnline: Array<Friend>;
-    }
+    
     type gameType = 'bullet' | 'blitz' | 'rapid';
     type QueueList = {
         queues: Array<

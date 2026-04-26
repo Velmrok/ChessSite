@@ -6,12 +6,14 @@ import { socket } from "../../services/socket/socketService";
 import QuickMenu from "./QuickMenu";
 import FriendsOnline from "./FriendsOnline";
 import LeaderBoard from "./Leaderboard";
-import { getHomeInfo } from "@/services/homeService";
+import { getLeaderboard,getFriendsOnline } from "@/services/homeService";
 import Lobby from "./Lobby";
 import { useHomeSocket } from "@/hooks/useHomeSocket";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import type { User } from "@/types/user";
+import { useApi } from "@/hooks/useApi";
+import type { Leaderboard } from "@/types/home";
 
 export default function HomeUser() {
     const {t} = useTranslation("home");
@@ -20,26 +22,24 @@ export default function HomeUser() {
     const matchesInProgress = useHomeStore((state) => state.matchesInProgress);
     const createdAccounts = useHomeStore((state) => state.createdAccounts);
     const queueSize = useHomeStore((state) => state.queueSize);
-    const [leaderboard, setLeaderboard] = useState<{ rapid: Array<User>; blitz: Array<User>; bullet: Array<User>; }>({ rapid: [], blitz: [], bullet: [] });
+    const [leaderboard, setLeaderboard] = useState<Leaderboard | undefined>({ topRapidPlayers: [], topBlitzPlayers: [], topBulletPlayers: [] });
     const [qmViewMode, setQmViewMode] = useState<string>('queue');
     const navigate = useNavigate();
+    const {request} = useApi();
     useHomeSocket();
-     useEffect(() => {
-        try {
-            if (!socket.connected) {
-                socket.connect();
-            }
-            const fetchHomeInfo=async()=>{
-                const data = await getHomeInfo();
-                setLeaderboard(data.leaderboard);
-            }
-            fetchHomeInfo();
-        } catch (error) {
-            console.error(error);
-        }
-        }, []);
 
-  
+     useEffect(() => {
+        const fetchLeaderboard = async () => {
+            const response = await request(getLeaderboard);
+            setLeaderboard(response);
+        };
+        // const fetchFriendsOnline = async () => {
+        //     const response = await request(() => getFriendsOnline(1, 5));
+        //     // handle friends online data if needed
+        // }
+        fetchLeaderboard();
+    }, []);
+
     const changeQMViewMode=(mode:string)=>{
         return () => setQmViewMode(mode);
     }

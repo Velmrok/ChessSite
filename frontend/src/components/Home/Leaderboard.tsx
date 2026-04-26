@@ -1,5 +1,4 @@
 
-import type { User } from "@/types/user";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { MdAccessTime } from "react-icons/md";
@@ -7,22 +6,19 @@ import { SiPushbullet, SiStackblitz } from "react-icons/si";
 import { TfiCup } from "react-icons/tfi";
 import { Link } from "react-router-dom";
 import Avatar from "../global/Avatar";
+import type { Leaderboard } from "@/types/home";
 
 
 type Props = {
-  leaderboard: {
-    rapid: Array<User>;
-    blitz: Array<User>;
-    bullet: Array<User>;
-  };
+  leaderboard: Leaderboard | undefined;
 };
 
 export default function LeaderBoard({ leaderboard }: Props) {
   const { t } = useTranslation("home");
-  const [gameType, setGameType] = useState<"rapid" | "blitz" | "bullet">("rapid");
+  const [gameType, setGameType] = useState<"topRapidPlayers" | "topBlitzPlayers" | "topBulletPlayers">("topRapidPlayers");
 
 
-  const handleChangeGameType = (e: any, type: "rapid" | "blitz" | "bullet") => {
+  const handleChangeGameType = (e: any, type: "topRapidPlayers" | "topBlitzPlayers" | "topBulletPlayers") => {
     e.preventDefault();
     setGameType(type);
   };
@@ -37,9 +33,9 @@ export default function LeaderBoard({ leaderboard }: Props) {
     );
   }
   const gameTypeIcon = {
-    rapid: <MdAccessTime className="text-green-500 text-base md:text-xl inline" />,
-    blitz: <SiStackblitz className="text-yellow-300 text-base md:text-xl inline" />,
-    bullet: <SiPushbullet className="text-red-500 text-base md:text-xl inline" />,
+    topRapidPlayers: <MdAccessTime className="text-green-500 text-base md:text-xl inline" />,
+    topBlitzPlayers: <SiStackblitz className="text-yellow-300 text-base md:text-xl inline" />,
+    topBulletPlayers: <SiPushbullet className="text-red-500 text-base md:text-xl inline" />,
   }
 
 
@@ -49,15 +45,15 @@ export default function LeaderBoard({ leaderboard }: Props) {
       <div className="flex flex-col gap-3 items-center justify-between items-center mb-4">
         <div className="text-2xl">{t('leaderboardTitle')}</div>
         <div className="flex gap-2 md:gap-3">
-          <button className={`hover:scale-110 ${gameType === 'rapid' ? 'scale-80 border-b-3 border-green-500' : ''}`}
-            onClick={(e) => handleChangeGameType(e, 'rapid')}>
-            {gameTypeIcon.rapid}</button>
-          <button className={`hover:scale-110 ${gameType === 'blitz' ? 'scale-80 border-b-3 border-yellow-300' : ''}`}
-            onClick={(e) => handleChangeGameType(e, 'blitz')}>
-            {gameTypeIcon.blitz}</button>
-          <button className={`hover:scale-110 ${gameType === 'bullet' ? 'scale-80 border-b-3 border-red-500' : ''}`}
-            onClick={(e) => handleChangeGameType(e, 'bullet')}>
-            {gameTypeIcon.bullet}</button>
+          <button className={`hover:scale-110 ${gameType === 'topRapidPlayers' ? 'scale-80 border-b-3 border-green-500' : ''}`}
+            onClick={(e) => handleChangeGameType(e, 'topRapidPlayers')}>
+            {gameTypeIcon.topRapidPlayers}</button>
+          <button className={`hover:scale-110 ${gameType === 'topBlitzPlayers' ? 'scale-80 border-b-3 border-yellow-300' : ''}`}
+            onClick={(e) => handleChangeGameType(e, 'topBlitzPlayers')}>
+            {gameTypeIcon.topBlitzPlayers}</button>
+          <button className={`hover:scale-110 ${gameType === 'topBulletPlayers' ? 'scale-80 border-b-3 border-red-500' : ''}`}
+            onClick={(e) => handleChangeGameType(e, 'topBulletPlayers')}>
+            {gameTypeIcon.topBulletPlayers}</button>
 
 
         </div>

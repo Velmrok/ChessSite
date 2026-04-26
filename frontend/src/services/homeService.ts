@@ -1,10 +1,17 @@
+import type { Leaderboard } from "@/types/home";
 import apiFetch from "./api";
+import type { PublicUser } from "@/types/user";
 
-export const getHomeInfo = async (): Promise<HomeInfo>=>{
-    const response = await apiFetch({ url: `/home/info`, method: 'GET', includeCredentials: true, contentType: 'application/json' });
-    return response.json() as Promise<HomeInfo>;
+
+export const getLeaderboard = async (): Promise<Leaderboard> => {
+    const response = await apiFetch({ url: `/home/leaderboard`, method: 'GET', includeCredentials: true, contentType: 'application/json' });
+    return response as Promise<Leaderboard>;
+}
+export const getFriendsOnline = async (page: number, limit: number): Promise<{ friendsOnline: Array<PublicUser>, totalPages: number }> => {
+    const response = await apiFetch({ url: `/home/friends-online?page=${page}&limit=${limit}`, method: 'GET', includeCredentials: true, contentType: 'application/json' });
+    return response as Promise<{ friendsOnline: Array<PublicUser>, totalPages: number }>;
 }
 export const getQueueList = async (gameType:gameType| 'any'): Promise<QueueList>=>{
     const response = await apiFetch({ url: `/home/queue?gameType=${gameType}`, method: 'GET', includeCredentials: true, contentType: 'application/json' });
-    return response.json() as Promise<QueueList>;
+    return response as Promise<QueueList>;
 }

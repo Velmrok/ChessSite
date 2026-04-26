@@ -35,4 +35,9 @@ export type UserProfile = {
 
         userInfo: UserInfo;
     };
+export type UserSummary = {
+    nickname: string;
+    profilePictureUrl: string;
+    rating: number;
+}
 export type User = PublicUser & {};

@@ -97,12 +97,12 @@ export default function GameList({ isLoading, games, totalPages }: Props) {
 
                                         <div className="flex items-center justify-center gap-2 md:gap-4 col-span-2 w-full">
                                             <div className="text-xs bg-black/50 rounded-md p-1 w-14 h-14 md:w-16 md:h-16 font-MyFancyFont text-white flex flex-col items-center justify-center shrink-0">
-                                                <Avatar avatarUrl={game.whitePlayer.avatar}className="w-8 h-8 md:w-10 md:h-10 rounded-full border-2 border-white object-cover" />
+                                                <Avatar avatarUrl={game.whitePlayer.profilePictureUrl}className="w-8 h-8 md:w-10 md:h-10 rounded-full border-2 border-white object-cover" />
                                                 <span className="truncate max-w-[50px] md:max-w-[60px]">{game.whitePlayer.nickname}</span>
                                             </div>
                                             <span className="font-bold text-sm">vs</span>
                                             <div className="text-xs bg-black/50 rounded-md p-1 w-14 h-14 md:w-16 md:h-16 font-MyFancyFont text-white flex flex-col items-center justify-center shrink-0">
-                                                <Avatar avatarUrl={game.blackPlayer.avatar}className="w-8 h-8 md:w-10 md:h-10 rounded-full border-2 border-white object-cover" />
+                                                <Avatar avatarUrl={game.blackPlayer.profilePictureUrl}className="w-8 h-8 md:w-10 md:h-10 rounded-full border-2 border-white object-cover" />
                                                 <span className="truncate max-w-[50px] md:max-w-[60px]">{game.blackPlayer.nickname}</span>
                                             </div>
                                         </div>

@@ -6,7 +6,8 @@ import { socket } from "../../services/socket/socketService";
 import QuickMenu from "./QuickMenu";
 import FriendsOnline from "./FriendsOnline";
 import LeaderBoard from "./Leaderboard";
-import { getLeaderboard,getFriendsOnline } from "@/services/homeService";
+import { getLeaderboard} from "@/services/homeService";
+import {fetchFriendsOnline} from "@/services/userService";
 import Lobby from "./Lobby";
 import { useHomeSocket } from "@/hooks/useHomeSocket";
 import { useNavigate } from "react-router-dom";
@@ -25,6 +26,7 @@ export default function HomeUser() {
     const [leaderboard, setLeaderboard] = useState<Leaderboard | undefined>({ topRapidPlayers: [], topBlitzPlayers: [], topBulletPlayers: [] });
     const [qmViewMode, setQmViewMode] = useState<string>('queue');
     const navigate = useNavigate();
+    const setFriends = useHomeStore(state => state.setFriends);
     const {request} = useApi();
     useHomeSocket();
 
@@ -33,12 +35,19 @@ export default function HomeUser() {
             const response = await request(getLeaderboard);
             setLeaderboard(response);
         };
-        // const fetchFriendsOnline = async () => {
-        //     const response = await request(() => getFriendsOnline(1, 5));
-        //     // handle friends online data if needed
-        // }
+        
         fetchLeaderboard();
     }, []);
+
+    useEffect(() => {
+        const fetchFriends = async () => {
+            const response = await request(() => fetchFriendsOnline(1, 5));
+            if(response) {
+                setFriends(response.friends);
+            }
+        }
+        fetchFriends();
+    },[]);
 
     const changeQMViewMode=(mode:string)=>{
         return () => setQmViewMode(mode);

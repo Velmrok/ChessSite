@@ -70,8 +70,8 @@ export default function FriendList() {
                                 <img src={`${friend.profilePictureUrl}`} alt="Profile" className="h-8 w-8 min-h-8 min-w-8 md:w-12 md:h-12 md:min-h-12 md:min-w-12 rounded-full" />
                             </Link>
                             <span className="text-white font-MyFancyFont text-[10px] sm:text-base">{friend.nickname}</span>
-                            <span className="text-white font-MyFancyFont text-[10px] sm:text-base">
-                                <Rating rating={friend.rating} className="text-white mr-2" /></span>
+                             <span className="text-white font-MyFancyFont text-[10px] sm:text-base">
+                                <Rating rating={{rapid:1000,blitz:1200,bullet:1000}} className="text-white mr-2" /></span> 
                             {friend.isOnline? (
                                 <div className="text-green-500  text-sm sm:text-lg absolute right-2">●</div>
                             ) : (

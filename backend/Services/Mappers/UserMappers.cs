@@ -51,12 +51,5 @@ public static class UserMappers
         );
     }
     
-    public static UserSummary ToUserSummary(this User user)
-    {
-        return new UserSummary(
-            Nickname: user.Nickname,
-            ProfilePictureUrl: user.ProfilePictureUrl,
-            Rating: user.Rating.Rapid
-        );
-    }
+   
 }

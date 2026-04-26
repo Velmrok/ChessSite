@@ -7,7 +7,7 @@ import FilterMenu from "../components/UsersSearch/FilterMenu";
 import Loading from "../components/global/Loading";
 import PaginationButtons from "../components/global/Pagination_buttons";
 import useUsersSearchStore from "../stores/useUsersSearchStore";
-import type { PublicUser } from "@/types/user";
+import type { PublicUser, UserSearchItem } from "@/types/user";
 import { useApi } from "@/hooks/useApi";
 
 
@@ -17,7 +17,7 @@ export default function UsersSearchPage() {
     const { request } = useApi();
     const setFilters = useUsersSearchStore((state) => state.setFilters);
     const resetFilters = useUsersSearchStore((state) => state.resetFilters);
-    const [list, setList] = useState<PublicUser[]>([]);
+    const [list, setList] = useState<UserSearchItem[]>([]);
     const totalPagesCount = useRef<number>(1);
     const [isLoading, setIsLoading] = useState(false);
 
@@ -30,7 +30,7 @@ export default function UsersSearchPage() {
         }, 300);
         const fetchUsers = async () => {
             const response = await request(() => fetchAllUsers(getParamsLink()), { onError: (e) => console.error(e) });
-            console.log(response);
+
             if (response) {
                 setList(response.users);
                 totalPagesCount.current = response.totalPages;

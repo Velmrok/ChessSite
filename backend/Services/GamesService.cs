@@ -10,10 +10,12 @@ namespace backend.Services
     public class GamesService : IGamesService
     {
         private readonly AppDbContext _dbContext;
+        private readonly IPresenceService _presenceService;
 
-        public GamesService(AppDbContext dbContext)
+        public GamesService(AppDbContext dbContext, IPresenceService presenceService)
         {
             _dbContext = dbContext;
+            _presenceService = presenceService;
         }
 
         public async Task<ErrorOr<GamesResponse>> GetAllGamesAsync(GetGamesQuery query)
@@ -25,13 +27,18 @@ namespace backend.Services
                 .Include(g => g.Winner)
                 .ToListAsync();
 
+            var onlineIds = await _presenceService.GetOnlineIdsAsync([.. games.Select(g => g.WhitePlayerId), .. games.Select(g => g.BlackPlayerId)]);
 
             var totalCount = games.Count;
             var totalPages = (int)Math.Ceiling(totalCount / (double)query.Limit);
 
             var response = new GamesResponse
             (
-                Games: [.. games.Select(g => g.MapToGamesResponse(null))],
+                Games: [.. games.Select(g => g.MapToGamesResponse(
+                    winnerNickname: g.Winner?.Nickname,
+                    isWhitePlayerOnline: onlineIds.Contains(g.WhitePlayerId),
+                    isBlackPlayerOnline: onlineIds.Contains(g.BlackPlayerId)))],
+
                 TotalPages: totalPages
             );
 

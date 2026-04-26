@@ -1,7 +1,6 @@
 import {create} from "zustand";
-import { fetchUserOnlineFriends } from "@/services/userService";
 import { getQueueList } from "@/services/homeService";
-import type { PublicUser } from "@/types/user";
+import type {UserSummary } from "@/types/user";
 type HomeStore = {
     usersOnline: number;
     matchesInProgress: number;
@@ -10,7 +9,7 @@ type HomeStore = {
     friendsPage: number;
     loadingFriends: boolean;
     totalFriendsPages: number;
-    friends: Array<Omit<PublicUser, "rating">>;
+    friends: Array<Omit<UserSummary, "rating">>;
     queueList: QueueList | null;
     deletedQueues: Array<string>;
     lobbyGameType: gameType| 'any';
@@ -19,7 +18,7 @@ type HomeStore = {
     setUsersOnline: (count: number) => void;
     setMatchesInProgress: (count: number) => void;
     setCreatedAccounts: (count: number) => void;
-    fetchOnlineFriends: (nickname: string) => Promise<void>;
+    setFriends: (friends: Array<Omit<UserSummary, "rating">>) => void;
     setFriendsPage: (page: number) => void;
     setQueueList: (queueList: QueueList) => void;
     fetchQueueList: (gameType: gameType| 'any') => Promise<void>;
@@ -43,23 +42,8 @@ const useHomeStore = create<HomeStore>((set, get) => ({
     setUsersOnline: (count: number) => set({usersOnline: count}),
     setMatchesInProgress: (count: number) => set({matchesInProgress: count}),
     setCreatedAccounts: (count: number) => set({createdAccounts: count}),
-
-     async fetchOnlineFriends(nickname) {
-        const page = get().friendsPage;
-        const timeoutid = setTimeout(() => set({ loadingFriends: true }), 300);
-        try{
-        const res = await fetchUserOnlineFriends(nickname, page,9);
-        if(res.totalPages < get().friendsPage){
-            set({ friendsPage: res.totalPages });
-        }
-        set({ friends: res.friendList, loadingFriends: false, totalFriendsPages: res.totalPages });
-        } catch (error) {
-          console.error("Error fetching friends:", error);
-          set({ friends: [], loadingFriends: false, totalFriendsPages: 1 });
-        }finally {
-          clearTimeout(timeoutid);
-        }
-    },
+    setFriends: (friends: Array<Omit<UserSummary, "rating">>) => set({friends}),
+ 
     async fetchQueueList(gameType) {
         try {
           const data = await getQueueList(gameType);

@@ -7,24 +7,26 @@ namespace backend.Services.Mappers
 {
     public static class GameMappers
     {
-        public static GameSummary MapToGamesResponse(this Game game, string? winnerNickname)
+        public static GameSummary MapToGamesResponse(this Game game, string? winnerNickname, bool isWhitePlayerOnline, bool isBlackPlayerOnline)
         {
 
             return new GameSummary
             (
                 Id: game.Id.ToString(),
                 WhitePlayer: new UserSummary
-                (
-                    Nickname: game.WhitePlayer.Nickname,
-                    ProfilePictureUrl: game.WhitePlayer.ProfilePictureUrl,
-                    Rating: game.WhitePlayer.Rating.GetRatingByType(game.Type)
-                ),
+                {
+                    Nickname = game.WhitePlayer.Nickname,
+                    ProfilePictureUrl = game.WhitePlayer.ProfilePictureUrl,
+                    Rating = game.WhitePlayer.Rating.GetRatingByType(game.Type),
+                    IsOnline = isWhitePlayerOnline
+                },
                 BlackPlayer: new UserSummary
-                (
-                    Nickname: game.BlackPlayer.Nickname,
-                    ProfilePictureUrl: game.BlackPlayer.ProfilePictureUrl,
-                    Rating: game.BlackPlayer.Rating.GetRatingByType(game.Type)
-                ),
+                {
+                    Nickname = game.BlackPlayer.Nickname,
+                    ProfilePictureUrl = game.BlackPlayer.ProfilePictureUrl,
+                    Rating = game.BlackPlayer.Rating.GetRatingByType(game.Type),
+                    IsOnline = isBlackPlayerOnline
+                },
                 WinnerNickname: winnerNickname,
                 Type: game.Type,
                 Status: game.Status,

@@ -1,7 +1,8 @@
 
+using backend.DTO.Common;
 using backend.DTO.Users;
 
 public record FriendsResponse(
-    List<UserResponse> Friends,
+    List<UserSummary> Friends,
     int TotalPages
     );

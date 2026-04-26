@@ -16,19 +16,14 @@ export default function FriendsOnline() {
     const user = useUserStore((state) => state.user);
     if (!user) throw new Error("User not found");
 
-    const fetchOnlineFriends = useHomeStore(state => state.fetchOnlineFriends);
-    const nickname = user.nickname;
     const friends = useHomeStore(state => state.friends);
     const loadingFriends = useHomeStore(state => state.loadingFriends);
     const friendsPage = useHomeStore(state => state.friendsPage);
     const totalFriendsPages = useHomeStore(state => state.totalFriendsPages);
     const setFriendsPage = useHomeStore(state => state.setFriendsPage);
 
-    useEffect(() => {
 
-        fetchOnlineFriends(nickname!);
-    }, [nickname, friendsPage]);
-    if (friends.length === 0) {
+    if (!friends || friends.length === 0) {
         return (
             <>
 
@@ -52,7 +47,7 @@ export default function FriendsOnline() {
                 <div className="font-MyFancyFont col-span-3 text-2xl text-white flex justify-center ">{t("friendsOnline")}</div>
                 {loadingFriends ? <Loading /> :
                     friends && friends.map((friend) => (
-                        <Link to={`/users/${friend.nickname}/profile`} className="text-xs md:text-sm text-white hover:outline-2 rounded-md
+                        <Link key={friend.nickname} to={`/users/${friend.nickname}/profile`} className="text-xs md:text-sm text-white hover:outline-2 rounded-md
                      transition-transform hover:scale-105">
                             <div key={friend.nickname} className="aspect-square flex w-full  flex-col items-center gap-4
                  bg-gray-900/50  rounded-md w-28 justify-between  p-2 relative">
@@ -62,14 +57,8 @@ export default function FriendsOnline() {
 
                                 <span className="text-white font-MyFancyFont text-[10px] sm:text-base">{friend.nickname}</span>
 
-                                {friend.isOnline? (
+                                
                                     <div className="text-green-500  text-sm sm:text-lg absolute right-[1px] top-[1px] sm:right-2 sm:top-2">●</div>
-                                ) : (
-                                    <div className="text-red-500 text-sm sm:text-lg absolute right-[1px] top-[1px] sm:right-2 sm:top-2">●</div>
-                                )}
-
-
-
 
                             </div>
                         </Link>

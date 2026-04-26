@@ -7,35 +7,72 @@ using backend.DTO.Home;
 using backend.Services.Interfaces;
 using backend.Services.Mappers;
 using ErrorOr;
+using Microsoft.EntityFrameworkCore;
 
 namespace backend.Services;
 
 public class HomeService : IHomeService
 {
-    private readonly AppDbContext   _context;
-    public HomeService(AppDbContext context)
+    private readonly AppDbContext   _dbcontext;
+    private readonly IPresenceService _presenceService;
+    public HomeService(AppDbContext context, IPresenceService presenceService)
     {
-        _context = context;    
+        _dbcontext = context;    
+        _presenceService = presenceService; 
     }
 
-    public Task<ErrorOr<LeaderBoardResponse>> GetLeaderboardAsync()
+    public async Task<ErrorOr<LeaderBoardResponse>> GetLeaderboardAsync()
     {
-        var topRapidPlayers = _context.Users.OrderByDescending(u => u.Rating.Rapid)
-        .Take(9)
-        .Select(u => u.ToUserSummary()).ToList();
+        var topRapid = await _dbcontext.Users
+            .OrderByDescending(u => u.Rating.Rapid)
+            .Take(9)
+            .ToListAsync();
 
-        var topBlitzPlayers = _context.Users.OrderByDescending(u => u.Rating.Blitz)
-        .Take(9)
-        .Select(u => u.ToUserSummary()).ToList();
+        var topBlitz = await _dbcontext.Users
+            .OrderByDescending(u => u.Rating.Blitz)
+            .Take(9)
+            .ToListAsync();
 
-        var topBulletPlayers = _context.Users.OrderByDescending(u => u.Rating.Bullet)
-        .Take(9)
-        .Select(u => u.ToUserSummary()).ToList();
+        var topBullet = await _dbcontext.Users
+            .OrderByDescending(u => u.Rating.Bullet)
+            .Take(9)
+            .ToListAsync();
 
-        return Task.FromResult<ErrorOr<LeaderBoardResponse>>(new LeaderBoardResponse(
+        var allUserIds = topRapid.Concat(topBlitz).Concat(topBullet)
+            .Select(u => u.Id)
+            .Distinct()
+            .ToList();
+
+        var onlineStatuses = await _presenceService.GetOnlineIdsAsync(allUserIds);
+
+        var topRapidPlayers = topRapid.Select(u => new UserSummary
+        {
+            Nickname = u.Nickname,
+            ProfilePictureUrl = u.ProfilePictureUrl,
+            Rating = u.Rating.Rapid,
+            IsOnline = onlineStatuses.Contains(u.Id)
+        }).ToList();
+
+        var topBlitzPlayers = topBlitz.Select(u => new UserSummary
+        {
+            Nickname = u.Nickname,
+            ProfilePictureUrl = u.ProfilePictureUrl,
+            Rating = u.Rating.Blitz,
+            IsOnline = onlineStatuses.Contains(u.Id)
+        }).ToList();
+
+        var topBulletPlayers = topBullet.Select(u => new UserSummary
+        {
+            Nickname = u.Nickname,
+            ProfilePictureUrl = u.ProfilePictureUrl,
+            Rating = u.Rating.Bullet,
+            IsOnline = onlineStatuses.Contains(u.Id)
+        }).ToList();
+
+        return new LeaderBoardResponse(
             topRapidPlayers,
             topBlitzPlayers,
             topBulletPlayers
-        ));
+        );
     }
 }

@@ -1,11 +1,14 @@
 
 import HomeUser from "@/components/Home/HomeUser";
 import useUserStore from "@/stores/useUserStore";
+import { useEffect } from "react";
 
 
 export default function Home() {
     const user = useUserStore((state) => state.user);
 
+
+  
 
 
     return (

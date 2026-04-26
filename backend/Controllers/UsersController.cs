@@ -67,5 +67,11 @@ namespace backend.Controllers
             var currentUserNickname = User.FindFirst("nickname")?.Value;
             return HandleError(await _usersService.UpdateUserProfilePictureAsync(currentUserNickname!, request), Ok);
         }
+        [HttpGet("me/friends-online")]
+        public async Task<IActionResult> GetOnlineFriends([FromQuery] PaginationQuery pagination)
+        {
+            var currentUserNickname = User.FindFirst("nickname")?.Value;
+            return HandleError(await _usersService.GetOnlineFriendsAsync(currentUserNickname!, pagination), Ok);
+        }
     }
 }

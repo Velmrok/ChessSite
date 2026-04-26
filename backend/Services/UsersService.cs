@@ -2,6 +2,7 @@
 using System.Linq.Expressions;
 using System.Text.Json;
 using backend.Data;
+using backend.DTO.Common;
 using backend.DTO.Users;
 using backend.Enums;
 using backend.Models;
@@ -125,9 +126,20 @@ public class UsersService : IUsersService
         {
             return Error.NotFound("userNotFound", "User with the given nickname was not found.");
         }
-        var query = _dbContext.Friendships
-            .Where(f => f.User.Nickname == nickname)
-            .Select(f => f.Friend.ToUserResponse());
+        var allFriends = _dbContext.Friendships
+            .Where(f => f.User.Nickname == nickname);
+            
+
+        var onlineIds = await _presenceService.GetOnlineIdsAsync(allFriends.Select(f => f.FriendId));
+
+        var query = allFriends
+            .Select(f => new UserSummary
+            {
+                Nickname = f.Friend.Nickname,
+                ProfilePictureUrl = f.Friend.ProfilePictureUrl,
+                Rating = f.Friend.Rating.Rapid,
+                IsOnline = onlineIds.Contains(f.FriendId)
+            });
 
         var totalPages = (int)Math.Ceiling(await query.CountAsync() / (double)pagination.Limit);
 
@@ -244,5 +256,38 @@ public class UsersService : IUsersService
         user.ProfilePictureUrl = avatarUrl.Value;
         await _dbContext.SaveChangesAsync();
         return new UpdateUserProfilePictureResponse(user.ProfilePictureUrl);
+    }
+    public async Task<ErrorOr<FriendsResponse>> GetOnlineFriendsAsync(string nickname,PaginationQuery pagination)
+    {
+        var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Nickname == nickname);
+
+        if (user == null)
+        {
+            return Error.NotFound("userNotFound", "User with the given nickname was not found.");
+        }
+            var friends = await _dbContext.Friendships
+                .Where(f => f.UserId == user.Id)
+                .Select(f => f.Friend)
+                .ToListAsync();
+            var friendIds = friends.Select(f => f.Id).ToList();
+            var onlineSet = await _presenceService.GetOnlineIdsAsync(friendIds);
+
+            var onlineFriends = friends
+                .Where(f => onlineSet.Contains(f.Id))
+                .Select(f => new UserSummary
+                {
+                    Nickname = f.Nickname,
+                    ProfilePictureUrl = f.ProfilePictureUrl,
+                    Rating = f.Rating.Rapid
+                })
+                .ToList();
+            var totalPages = (int)Math.Ceiling(onlineFriends.Count / (double)pagination.Limit);
+
+            var paged = onlineFriends
+                .Skip((pagination.PageNumber - 1) * pagination.Limit)
+                .Take(pagination.Limit)
+                .ToList();
+            return new FriendsResponse(Friends:paged, TotalPages:totalPages);
+        
     }
 }

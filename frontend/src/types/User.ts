@@ -38,6 +38,16 @@ export type UserProfile = {
 export type UserSummary = {
     nickname: string;
     profilePictureUrl: string;
-    rating: number;
+    rating: Rating;
+    isOnline: boolean;
+
 }
+export type UserSearchItem = Pick<UserSummary, "nickname" | "profilePictureUrl" | "rating" | "isOnline"> &{
+    lastActive: string;
+};
+
+export type UserOnlineItem = Pick<UserSummary, "nickname" | "profilePictureUrl"> & {
+  isOnline: boolean;
+};
+
 export type User = PublicUser & {};

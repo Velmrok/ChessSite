@@ -1,4 +1,4 @@
-import type { PublicUser, UserProfile } from "@/types/user";
+import type { PublicUser, UserOnlineItem, UserProfile, UserSummary } from "@/types/user";
 import apiFetch from "./api";
 
 
@@ -7,14 +7,14 @@ export const fetchUserProfile = async (nickname: string): Promise<UserProfile> =
     const response = await apiFetch({ url: `/users/${nickname}/profile`, method: 'GET', includeCredentials: false, contentType: 'application/json' });
     return response as Promise<UserProfile>;
 };
-export const fetchUserFriends = async (nickname: string, page: number, limit: number = 5): Promise<{ friends: Array<PublicUser>, totalPages: number }> => {
+export const fetchUserFriends = async (nickname: string, page: number, limit: number = 5): Promise<{ friends: Array<UserSummary>, totalPages: number }> => {
     const response = await apiFetch({ url: `/users/${nickname}/friends?page=${page}&limit=${limit}`, method: 'GET', includeCredentials: false, contentType: 'application/json' });
     
-    return response as Promise<{ friends: Array<PublicUser>, totalPages: number }>;
+    return response as Promise<{ friends: Array<UserSummary>, totalPages: number }>;
 }
-export const fetchUserOnlineFriends = async (nickname: string, page: number, limit: number = 5): Promise<{ friendList: Array<Omit<PublicUser, "rating">>, totalPages: number }> => {
-    const response = await apiFetch({ url: `/users/${nickname}/friends/online?page=${page}&limit=${limit}`, method: 'GET', includeCredentials: false, contentType: 'application/json' });
-    return response as Promise<{ friendList: Array<PublicUser>, totalPages: number }>;
+export const fetchFriendsOnline = async (page: number, limit: number): Promise<{ friends: Array<Omit<UserOnlineItem, "rating">>, totalPages: number }> => {
+    const response = await apiFetch({ url: `/users/me/friends-online?page=${page}&limit=${limit}`, method: 'GET', includeCredentials: true, contentType: 'application/json' });
+    return response as Promise<{ friends: Array<Omit<UserOnlineItem, "rating">>, totalPages: number }>;
 }
 export const updateUserBio = async (bio: string) : Promise<{ bio: string }> => {
     const response = await apiFetch({ url: `/users/me/profile/bio`, method: 'PATCH', includeCredentials: true, contentType: 'application/json', body: JSON.stringify({ bio }) });

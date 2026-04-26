@@ -7,8 +7,8 @@ public record GamesResponse(List<GameSummary> Games, int TotalPages);
 
 public record GameSummary(
     string Id,
-    UserSummary WhitePlayer,
-    UserSummary BlackPlayer,
+    UserGameSummary WhitePlayer,
+    UserGameSummary BlackPlayer,
     string? WinnerNickname,
     GameType Type,
     GameStatus Status,

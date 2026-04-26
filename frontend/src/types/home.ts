@@ -1,10 +1,10 @@
-import type { PublicUser, UserSummary } from "./user";
+import type { UserLeaderboardItem } from "./user";
 
 export type Leaderboard = {
 
-    topRapidPlayers: Array<UserSummary>;
-    topBlitzPlayers: Array<UserSummary>;
-    topBulletPlayers: Array<UserSummary>;
+    topRapidPlayers: Array<UserLeaderboardItem>;
+    topBlitzPlayers: Array<UserLeaderboardItem>;
+    topBulletPlayers: Array<UserLeaderboardItem>;
        
         
 }

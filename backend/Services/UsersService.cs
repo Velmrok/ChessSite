@@ -117,7 +117,7 @@ public class UsersService : IUsersService
         var response = user.ToUserProfileResponse(isOnline);
         return response;
     }
-    public async Task<ErrorOr<FriendsResponse>> GetFriendsAsync(string nickname, PaginationQuery pagination)
+    public async Task<ErrorOr<FriendsProfileResponse>> GetFriendsAsync(string nickname, PaginationQuery pagination)
     {
 
         var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Nickname == nickname);
@@ -133,13 +133,7 @@ public class UsersService : IUsersService
         var onlineIds = await _presenceService.GetOnlineIdsAsync(allFriends.Select(f => f.FriendId));
 
         var query = allFriends
-            .Select(f => new UserSummary
-            {
-                Nickname = f.Friend.Nickname,
-                ProfilePictureUrl = f.Friend.ProfilePictureUrl,
-                Rating = f.Friend.Rating.Rapid,
-                IsOnline = onlineIds.Contains(f.FriendId)
-            });
+            .Select(f => f.Friend.ToFriendProfileSummary(onlineIds.Contains(f.FriendId)));
 
         var totalPages = (int)Math.Ceiling(await query.CountAsync() / (double)pagination.Limit);
 
@@ -147,7 +141,7 @@ public class UsersService : IUsersService
             .Skip((pagination.PageNumber - 1) * pagination.Limit)
             .Take(pagination.Limit);
 
-        var response = new FriendsResponse(
+        var response = new FriendsProfileResponse(
             await friends.ToListAsync(),
             totalPages
 
@@ -257,7 +251,7 @@ public class UsersService : IUsersService
         await _dbContext.SaveChangesAsync();
         return new UpdateUserProfilePictureResponse(user.ProfilePictureUrl);
     }
-    public async Task<ErrorOr<FriendsResponse>> GetOnlineFriendsAsync(string nickname,PaginationQuery pagination)
+    public async Task<ErrorOr<OnlineFriendsResponse>> GetOnlineFriendsAsync(string nickname,PaginationQuery pagination)
     {
         var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Nickname == nickname);
 
@@ -274,12 +268,7 @@ public class UsersService : IUsersService
 
             var onlineFriends = friends
                 .Where(f => onlineSet.Contains(f.Id))
-                .Select(f => new UserSummary
-                {
-                    Nickname = f.Nickname,
-                    ProfilePictureUrl = f.ProfilePictureUrl,
-                    Rating = f.Rating.Rapid
-                })
+                .Select(f => f.ToFriendOnlineSummary())
                 .ToList();
             var totalPages = (int)Math.Ceiling(onlineFriends.Count / (double)pagination.Limit);
 
@@ -287,7 +276,7 @@ public class UsersService : IUsersService
                 .Skip((pagination.PageNumber - 1) * pagination.Limit)
                 .Take(pagination.Limit)
                 .ToList();
-            return new FriendsResponse(Friends:paged, TotalPages:totalPages);
+            return new OnlineFriendsResponse(Friends:paged, TotalPages:totalPages);
         
     }
 }

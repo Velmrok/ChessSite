@@ -5,7 +5,6 @@ namespace backend.DTO.Users
 {
     public record UserResponse(
         string Nickname,
-        string ProfileBio,
         string ProfilePictureUrl,
         DateTime CreatedAt,
         DateTime LastActive,

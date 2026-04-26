@@ -13,20 +13,18 @@ namespace backend.Services.Mappers
             return new GameSummary
             (
                 Id: game.Id.ToString(),
-                WhitePlayer: new UserSummary
-                {
-                    Nickname = game.WhitePlayer.Nickname,
-                    ProfilePictureUrl = game.WhitePlayer.ProfilePictureUrl,
-                    Rating = game.WhitePlayer.Rating.GetRatingByType(game.Type),
-                    IsOnline = isWhitePlayerOnline
-                },
-                BlackPlayer: new UserSummary
-                {
-                    Nickname = game.BlackPlayer.Nickname,
-                    ProfilePictureUrl = game.BlackPlayer.ProfilePictureUrl,
-                    Rating = game.BlackPlayer.Rating.GetRatingByType(game.Type),
-                    IsOnline = isBlackPlayerOnline
-                },
+                WhitePlayer: new UserGameSummary
+                (
+                    Nickname : game.WhitePlayer.Nickname,
+                    ProfilePictureUrl : game.WhitePlayer.ProfilePictureUrl,
+                    Rating : game.WhitePlayer.Rating.GetRatingByType(game.Type)
+                ),
+                BlackPlayer: new UserGameSummary
+                (
+                    Nickname : game.BlackPlayer.Nickname,
+                    ProfilePictureUrl : game.BlackPlayer.ProfilePictureUrl,
+                    Rating : game.BlackPlayer.Rating.GetRatingByType(game.Type)
+                ),
                 WinnerNickname: winnerNickname,
                 Type: game.Type,
                 Status: game.Status,

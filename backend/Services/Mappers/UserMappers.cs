@@ -1,6 +1,8 @@
 using backend.DTO.Auth;
 using backend.DTO.Common;
+using backend.DTO.Home;
 using backend.DTO.Users;
+using backend.Enums;
 using backend.Models;
 using System.Linq;
 namespace backend.Services.Mappers;
@@ -22,7 +24,6 @@ public static class UserMappers
     {
         return new UserResponse(
             Nickname: user.Nickname,
-            ProfileBio: user.ProfileBio,
             ProfilePictureUrl: user.ProfilePictureUrl,
             CreatedAt: user.CreatedAt,
             LastActive: user.LastActive,
@@ -51,5 +52,28 @@ public static class UserMappers
         );
     }
     
-   
+   public static FriendProfileSummary ToFriendProfileSummary(this User user,bool isOnline)
+    {
+        return new FriendProfileSummary(
+            Nickname: user.Nickname,
+            ProfilePictureUrl: user.ProfilePictureUrl,
+            Rating: user.Rating,
+            IsOnline: isOnline
+        );
+    }
+    public static FriendOnlineSummary ToFriendOnlineSummary(this User user)
+    {
+        return new FriendOnlineSummary(
+            Nickname: user.Nickname,
+            ProfilePictureUrl: user.ProfilePictureUrl
+        );
+    }
+    public static UserLeaderboardSummary ToUserLeaderboardSummary(this User user, GameType gameType)
+    {
+        return new UserLeaderboardSummary(
+            Nickname: user.Nickname,
+            ProfilePictureUrl: user.ProfilePictureUrl,
+            Rating: user.Rating.GetRatingByType(gameType)
+        );
+    }
 }

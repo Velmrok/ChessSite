@@ -4,6 +4,7 @@
 using backend.Data;
 using backend.DTO.Common;
 using backend.DTO.Home;
+using backend.Enums;
 using backend.Services.Interfaces;
 using backend.Services.Mappers;
 using ErrorOr;
@@ -45,29 +46,11 @@ public class HomeService : IHomeService
 
         var onlineStatuses = await _presenceService.GetOnlineIdsAsync(allUserIds);
 
-        var topRapidPlayers = topRapid.Select(u => new UserSummary
-        {
-            Nickname = u.Nickname,
-            ProfilePictureUrl = u.ProfilePictureUrl,
-            Rating = u.Rating.Rapid,
-            IsOnline = onlineStatuses.Contains(u.Id)
-        }).ToList();
+        var topRapidPlayers = topRapid.Select(u => u.ToUserLeaderboardSummary(GameType.Rapid)).ToList();
 
-        var topBlitzPlayers = topBlitz.Select(u => new UserSummary
-        {
-            Nickname = u.Nickname,
-            ProfilePictureUrl = u.ProfilePictureUrl,
-            Rating = u.Rating.Blitz,
-            IsOnline = onlineStatuses.Contains(u.Id)
-        }).ToList();
+        var topBlitzPlayers = topBlitz.Select(u => u.ToUserLeaderboardSummary(GameType.Blitz)).ToList();
 
-        var topBulletPlayers = topBullet.Select(u => new UserSummary
-        {
-            Nickname = u.Nickname,
-            ProfilePictureUrl = u.ProfilePictureUrl,
-            Rating = u.Rating.Bullet,
-            IsOnline = onlineStatuses.Contains(u.Id)
-        }).ToList();
+        var topBulletPlayers = topBullet.Select(u => u.ToUserLeaderboardSummary(GameType.Bullet)).ToList();
 
         return new LeaderBoardResponse(
             topRapidPlayers,

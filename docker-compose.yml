@@ -16,6 +16,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - backend-net
 
   backend:
     build: ./backend
@@ -34,6 +36,9 @@ services:
       - db
       - redis
     restart: unless-stopped
+    networks:
+      - backend-net
+      - frontend-net
    
   frontend:
     build: ./frontend
@@ -44,6 +49,8 @@ services:
     depends_on:
       - backend
     restart: unless-stopped
+    networks:
+      - frontend-net
   
   redis:
     image: redis:7-alpine
@@ -52,7 +59,13 @@ services:
       - redis_data_production:/data
     command: redis-server --appendonly yes
     restart: unless-stopped
+    networks:
+      - backend-net
 
 volumes:
   redis_data_production:
   postgres_data_production:
+networks:
+  frontend-net:
+  backend-net:
+

@@ -12,7 +12,8 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-
+    networks:
+      - backend-net
   backend:
     image: mcr.microsoft.com/dotnet/sdk:8.0
     container_name: chess_backend
@@ -38,6 +39,9 @@ services:
     depends_on:
       - db
       - redis
+    networks:
+      - backend-net
+      - frontend-net
 
   frontend:
     image: node:20-alpine
@@ -57,6 +61,8 @@ services:
       "
     depends_on:
       - backend
+    networks:
+      - frontend-net
 
   redis:
     image: redis:7-alpine
@@ -66,9 +72,15 @@ services:
     volumes:
       - redis_data:/data
     command: redis-server --appendonly yes
+    networks:
+      - backend-net
 
 volumes:
   redis_data:
   postgres_data:
   dotnet_packages:
   frontend_node_modules:
+networks:
+  frontend-net:
+  backend-net:
+    

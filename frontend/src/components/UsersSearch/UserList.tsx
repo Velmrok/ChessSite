@@ -44,19 +44,19 @@ export default function UserList({ users}: Props) {
     return (
         <>
             <div className="flex flex-row w-full bg-black/[50%] md:gap-5 
-                  text-white py-1 sm:py-4 rounded-lg shadow-lg justify-between font-MyFancyFont px-2 md:px-5 lg:px-10 ">
-                <button className="text-[10px] md:text-lg flex items-center" onClick={() => setOrder('Nickname')}>
+                  text-white py-1 sm:py-4 rounded-lg shadow-lg justify-between font-MyFancyFont px-2 sm:px-5 lg:px-10 ">
+                <button className="text-[10px] sm:text-lg flex items-center" onClick={() => setOrder('Nickname')}>
                     {t('nickname')}
                     <SortArrows   sortBy="Nickname"/>
                     </button>
                     
                     
-                <button className="text-[10px] md:text-lg flex items-center" onClick={() => setOrder('Rating')}>
+                <button className="text-[10px] sm:text-lg flex items-center" onClick={() => setOrder('Rating')}>
                     {t('rating')}
                     <SortArrows   sortBy="Rating"/>
                     </button>
                     
-                <button className="text-[10px] md:text-lg flex items-center" onClick={() => setOrder('OnlineStatus')}>
+                <button className="text-[10px] sm:text-lg flex items-center" onClick={() => setOrder('OnlineStatus')}>
                     {t('status')}
                     <SortArrows   sortBy="OnlineStatus"/>
                     </button>
@@ -73,15 +73,15 @@ export default function UserList({ users}: Props) {
                 return(
                 <div key={user.nickname}
                     className={`flex w-full bg-gray-900/[60%] 
-                  text-white py-4 rounded-lg shadow-lg  justify-between px-1 md:px-5  items-center relative`}>
+                  text-white py-2 rounded-lg shadow-lg  justify-between px-1 md:px-5  items-center relative`}>
                     {isDeleted && <div className="absolute w-full h-1 bg-red-500 left-0"></div>}
                     <Link to={`/users/${user?.nickname}/profile`}
-                        className="max-w-22 sm:max-w-35 w-full  text-xs md:text-sm hover:text-amber-200 transition-transform duration-300
+                        className="w-14  sm:w-28 text-xs md:text-sm hover:text-amber-200 transition-transform duration-300
                                     flex items-center justify-center ">
-                        <div className=" w-[70%] sm:w-full bg-black/40 py-2  rounded-lg flex flex-col 
+                        <div className="w-full bg-black/40 py-2  rounded-lg flex flex-col 
                                         items-center justify-center gap-2">
 
-                           <Avatar avatarUrl={user.profilePictureUrl} className="h-8 w-8 sm:w-16 sm:h-16 rounded-full outline-2 border-2 border-black" />
+                           <Avatar avatarUrl={user.profilePictureUrl} className="h-8 w-8 sm:w-14 sm:h-14 rounded-full outline-2 border-2 border-black" />
 
 
                         <div className="text-[8px] sm:text-base font-bold mt-auto">{user.nickname}</div>

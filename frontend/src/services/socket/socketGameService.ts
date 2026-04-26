@@ -1,18 +1,18 @@
-import { socket } from "./socketService";
+import {invokeSignalR} from '../signalR/connection';
 
 export const joinGameRoom = (gameId: string) => {
-    socket.emit('game:join', { gameId });
+    return invokeSignalR('JoinGameRoom', gameId);
 }
 export const sendMessage = (text: string, gameId: string) => {
-        socket.emit('chat:send_message', { gameId, message: text });
+       return invokeSignalR('SendGameMessage', gameId, text);
     };
 export const surrenderGame = (gameId: string) => {
-    socket.emit('game:surrender', {gameId});
+    return invokeSignalR('SurrenderGame', gameId);
   }
   export const offerDraw = (gameId: string) => {
-    socket.emit('game:offer_draw', {gameId});
+    return invokeSignalR('OfferDraw', gameId);
   }
 
 export const makeMove = (gameId: string, move: string) => {
-    socket.emit('game:make_move', { gameId, move });
+    return invokeSignalR('MakeMove', gameId, move);
 }

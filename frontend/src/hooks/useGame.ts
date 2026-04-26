@@ -1,5 +1,4 @@
 import useToastStore from "@/stores/useToastStore";
-import { socket } from '../services/socket/socketService';
 import { useNavigate, useParams } from "react-router-dom";
 
 import { useEffect, useState } from "react";
@@ -8,6 +7,7 @@ import useGameStore from "@/stores/useGameStore";
 import useUserStore from "@/stores/useUserStore";
 import { joinGameRoom } from "@/services/socket/socketGameService";
 import { useTranslation } from "react-i18next";
+import { getConnection , invokeSignalR} from "@/services/signalR/connection";
 
 
 export default function useGame() {
@@ -45,7 +45,9 @@ export default function useGame() {
     };
     fetch();
 
-    socket.on('game:end', (data: { gameId: string; winner: string; reason: string }) => {
+    const conn = getConnection();
+
+    conn.on('GameEnded', (data: { gameId: string; winner: string; reason: string }) => {
       if (data.gameId === gameId) {
         setTimeout(() => {
           useGameStore.getState().endGame(data.winner);
@@ -55,14 +57,14 @@ export default function useGame() {
       }
     }
     );
-    socket.on('game:move_made', (data: { gameId: string, move: MoveInfo }) => {
+    conn.on('MoveMade', (data: { gameId: string, move: MoveInfo }) => {
       if (data.gameId === gameId) {
         pushMove(data.move);
       }
 
     });
 
-    socket.on('game:draw_offered', (data: { gameId: string, isDrawOffered: string | null }) => {
+    conn.on('DrawOffered', (data: { gameId: string, isDrawOffered: string | null }) => {
       const currentGame = useGameStore.getState().game;
       console.log(currentGame);
       if (data.gameId === gameId && currentGame) {
@@ -73,10 +75,10 @@ export default function useGame() {
       }
     });
     return () => {
-      socket.off('game:end');
-      socket.off('game:move_made');
-      socket.off('game:draw_offered');
-      socket.emit('game:leave_room', { gameId });
+      conn.off('GameEnded');
+      conn.off('MoveMade');
+      conn.off('DrawOffered');
+      invokeSignalR('LeaveGameRoom', { gameId });
     };
   }, [gameId]);
 

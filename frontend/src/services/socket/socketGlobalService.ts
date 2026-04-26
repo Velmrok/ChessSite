@@ -1,15 +1,14 @@
-import { socket } from "./socketService";
+import {invokeSignalR} from '../signalR/connection';
 
 export const leaveQueue = () => {
-    socket.emit("queue:leave");
+    return invokeSignalR('LeaveQueue');
 }
 export const joinGame = ( time: number, increment: number) => {
     const gameType = time<3 ? 'bullet' : time<10 ? 'blitz' : 'rapid';
-    socket.emit("queue:join", { gameType, time, increment });
+    return invokeSignalR('JoinQueue', gameType, time, increment);
 }
 export const rejoinQueue = () => {
-    socket.emit("queue:rejoin");
-    
+    return invokeSignalR('RejoinQueue');
 }
 export const formatTimeFromMs = (ms: number | undefined): string => {
     if (ms === undefined || ms < 0) {

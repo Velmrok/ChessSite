@@ -52,6 +52,9 @@ else
 builder.Services.Configure<StorageOptions>(
     builder.Configuration.GetSection("Storage"));
 
+builder.Services.AddSignalR();
+
+
 var app = builder.Build();
 
 app.MigrateDatabase();
@@ -77,7 +80,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-
+app.MapHub<backend.Hubs.MainHub>("/mainhub");
 app.Run();
 
 public partial class Program { }

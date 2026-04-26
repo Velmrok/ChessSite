@@ -8,9 +8,10 @@ public static class CorsExtensions
         {
             options.AddDefaultPolicy(policy =>
             {
-                policy.AllowAnyOrigin()
+                policy.WithOrigins("http://localhost:5173")
                       .AllowAnyMethod()
-                      .AllowAnyHeader();
+                      .AllowAnyHeader()
+                      .AllowCredentials();
             });
         });
 
@@ -19,9 +20,11 @@ public static class CorsExtensions
     public static WebApplication UseCustomCors(this WebApplication app)
     {
         app.UseCors(policy =>
-            policy.AllowAnyOrigin()
-                .AllowAnyMethod()
-                .AllowAnyHeader()
+            policy
+            .WithOrigins("http://localhost:5173")
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials()
         );
         return app;
     }

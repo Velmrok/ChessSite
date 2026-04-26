@@ -7,10 +7,10 @@ import { formatTimeFromMs, leaveQueue } from "@/services/socket/socketGlobalServ
 import { CiMenuBurger } from "react-icons/ci";
 import { useState } from "react";
 import SmallScreenMenu from "./SmallScreenMenu";
-import { disconnectSocket } from "@/services/socket/socketService";
 import { useTranslation } from "react-i18next";
 import i18n from "@/i18n/config";
 import Avatar from "./Avatar";
+import { disconnectSignalR } from "@/services/signalR/connection";
 
 
 const GuestMenu = () => {
@@ -72,7 +72,7 @@ export default function Navbar() {
     const handleLogout = async () => {
         try {
             await logoutUser();
-            disconnectSocket();
+            disconnectSignalR();
             useUserStore.getState().setUser(null);
             navigate('/login');
         } catch (error: any) {

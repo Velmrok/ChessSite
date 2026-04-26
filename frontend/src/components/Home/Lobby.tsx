@@ -1,7 +1,6 @@
 import useHomeStore from "@/stores/useHomeStore";
 import { useEffect } from "react";
 import Loading from "../global/Loading";
-import { socket } from '../../services/socket/socketService';
 import { MdAccessTime } from "react-icons/md";
 import { SiPushbullet, SiStackblitz } from "react-icons/si";
 import { IoIosInfinite } from "react-icons/io";
@@ -20,18 +19,18 @@ export default function Lobby() {
         setLobbyGameType(type);
         await fetchQueueList(type);
     }
-    useEffect(() => {
-        socket.emit('join:lobbyRoom');
-        const loadQueueList = async () => {
-            await fetchQueueList('any');
+    // useEffect(() => {
+    //     socket.emit('join:lobbyRoom');
+    //     const loadQueueList = async () => {
+    //         await fetchQueueList('any');
 
 
-        }
-        loadQueueList();
-        return () => {
-            socket.emit('leave:lobbyRoom');
-        }
-    }, [fetchQueueList]);
+    //     }
+    //     loadQueueList();
+    //     return () => {
+    //         socket.emit('leave:lobbyRoom');
+    //     }
+    // }, [fetchQueueList]);
 
     if (!queueList) {
         return (

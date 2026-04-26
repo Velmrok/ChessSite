@@ -1,8 +1,9 @@
 import useUserStore from "@/stores/useUserStore";
 import { useApi } from "./useApi";
 import { useEffect, useState } from "react";
-import { connectSocket, disconnectSocket } from "@/services/socket/socketService";
+
 import { getMe, refresh } from "@/services/authService";
+import { connectSignalR, disconnectSignalR } from "@/services/signalR/connection";
 
 
 export function useAuth() {
@@ -23,25 +24,29 @@ export function useAuth() {
 
             if (me) {
                 setUser(me);
+                await connectSignalR();
             } else if (shouldRefresh) {
                 const refreshResult = await request(refresh);
-                if (refreshResult) setUser(refreshResult);
+                if (refreshResult) {
+                    await connectSignalR();
+                    setUser(refreshResult);
+                }
             }
 
-            setLoading(false); 
+            setLoading(false);
         };
 
         if (!user) {
             checkAuth();
         } else {
+
             setLoading(false);
         }
+        return () => void disconnectSignalR();
     }, []);
 
-    useEffect(() => {
-        if (!user) return;
-        connectSocket();
-        return () => disconnectSocket();
-    }, [user?.nickname]);
-    return {loading };
+
+
+
+    return { loading };
 }

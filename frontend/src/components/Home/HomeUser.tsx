@@ -2,7 +2,6 @@
 import {  useEffect, useState } from "react";
 import QuickQueue from "./QuickQueue";
 import useHomeStore from "@/stores/useHomeStore";
-import { socket } from "../../services/socket/socketService";
 import QuickMenu from "./QuickMenu";
 import FriendsOnline from "./FriendsOnline";
 import LeaderBoard from "./Leaderboard";
@@ -12,9 +11,9 @@ import Lobby from "./Lobby";
 import { useHomeSocket } from "@/hooks/useHomeSocket";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import type { User } from "@/types/user";
 import { useApi } from "@/hooks/useApi";
 import type { Leaderboard } from "@/types/home";
+import { joinHomeGroup } from "@/services/socket/signalRHomeService";
 
 export default function HomeUser() {
     const {t} = useTranslation("home");
@@ -35,19 +34,19 @@ export default function HomeUser() {
             const response = await request(getLeaderboard);
             setLeaderboard(response);
         };
-        
-        fetchLeaderboard();
-    }, []);
-
-    useEffect(() => {
         const fetchFriends = async () => {
             const response = await request(() => fetchFriendsOnline(1, 5));
             if(response) {
                 setFriends(response.friends);
             }
         }
+        
+        fetchLeaderboard();
         fetchFriends();
-    },[]);
+        console.log(joinHomeGroup())
+    }, []);
+
+   
 
     const changeQMViewMode=(mode:string)=>{
         return () => setQmViewMode(mode);

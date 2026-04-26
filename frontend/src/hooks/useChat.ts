@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { socket } from '../services/socket/socketService'; 
+import { getConnection, invokeSignalR } from '@/services/signalR/connection';
 
 type Props = {
     gameId: string;
@@ -8,11 +8,12 @@ type Props = {
 export const useChat = ({gameId, previousMessages}: Props) => {
     const [messages, setMessages] = useState<Array<Message>>(previousMessages);
     useEffect(() => {
-        socket.emit('chat:join', gameId);
-        socket.on('chat:receive_message', handleReceiveMessage);
+        const conn = getConnection();
+        invokeSignalR('JoinChat', gameId);
+        conn.on('MessageReceived', handleReceiveMessage);
         return () => {
-            socket.off('chat:receive_message', handleReceiveMessage);
-            socket.emit('chat:leave', gameId);
+            conn.off('MessageReceived', handleReceiveMessage);
+            invokeSignalR('LeaveChat', gameId);
         }
     }, []);
     const handleReceiveMessage = (msg: Message) => {

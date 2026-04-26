@@ -16,10 +16,12 @@ public class HomeService : IHomeService
 {
     private readonly AppDbContext   _dbcontext;
     private readonly IPresenceService _presenceService;
-    public HomeService(AppDbContext context, IPresenceService presenceService)
+    private readonly AppDbContext _dbContext;
+    public HomeService(AppDbContext context, IPresenceService presenceService, AppDbContext dbContext)
     {
         _dbcontext = context;    
         _presenceService = presenceService; 
+        _dbContext = dbContext;
     }
 
     public async Task<ErrorOr<LeaderBoardResponse>> GetLeaderboardAsync()
@@ -57,5 +59,18 @@ public class HomeService : IHomeService
             topBlitzPlayers,
             topBulletPlayers
         );
+    }
+
+    public async Task<ErrorOr<Success>> JoinHomeGroupAsync(string id)
+    {
+        if (!Guid.TryParse(id, out var guid))
+            return Error.Unauthorized("invalidToken", "Token is invalid.");
+            
+        var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == guid);
+
+        if (user == null)
+            return Error.Unauthorized("invalidToken", "Token is invalid.");
+        await _presenceService.SetOnlineAsync(guid);
+        return new Success();
     }
 }

@@ -28,15 +28,19 @@ namespace backend.Hubs
             
             await base.OnConnectedAsync();
         }
-        public async Task Heartbeat()
+        public async Task<string> Heartbeat()
         {
             string? userId = GetUserId();
-            if (userId != null)
+            if (userId != null){
                 await _presenceService.SetOnlineAsync(Guid.Parse(userId));
+                return "ok";
+            }
+           return "not_ok";
         }
+        
 
         protected string? GetUserId() =>
-            Context.UserIdentifier;
+            Context.User?.FindFirst("sub")?.Value; 
 
         protected string? GetNickname() =>
             Context.User?.FindFirst("nickname")?.Value;

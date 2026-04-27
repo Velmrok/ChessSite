@@ -22,8 +22,8 @@ function App() {
   const { loading } = useAuth();
   
   useEffect(() => {
-    const initializeSignalR = async () =>  await connectSignalR();
-    initializeSignalR();
+    connectSignalR();
+    
   }, []);
 
   

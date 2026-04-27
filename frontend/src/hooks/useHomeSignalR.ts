@@ -16,18 +16,16 @@ export function useHomeSignalR() {
   const setQueueSize = useHomeStore((state) => state.setQueueSize);
   useEffect(() => {
     if (isInitialized) return;
-    invokeSignalR('JoinHomeGroup').then(x=>console.log(x));
+    invokeSignalR('JoinHomeGroup');
     const conn = getConnection();
 
     conn.on("StatsUpdated", (stats: HomeStats) => {
-      console.log("Received StatsUpdated:", stats);
       setUsersOnline(stats.usersOnline);
       setMatchesInProgress(stats.matchesInProgress);
       setCreatedAccounts(stats.createdAccounts);
     });
     
     conn.on("queueList:delete", (q: { queueId: string }) => {
-      console.log("Received queueList:delete for queueId:", q.queueId);
       const queueId = q.queueId;
       setDeletedQueuesById(queueId);
     })

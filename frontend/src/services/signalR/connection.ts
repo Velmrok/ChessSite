@@ -1,4 +1,4 @@
-import { HubConnectionBuilder, HubConnection, HubConnectionState, LogLevel } from '@microsoft/signalr';
+import { HubConnectionBuilder, HubConnection, HubConnectionState } from '@microsoft/signalr';
 
 let connection: HubConnection | null = null;
 let heartBeatInterval: ReturnType<typeof setTimeout> | null = null;
@@ -9,14 +9,12 @@ export const getConnection = (): HubConnection => {
 
 export const connectSignalR = async (): Promise<void> => {
     console.log('Attempting to connect to SignalR...');
-
     if (connection?.state === HubConnectionState.Connected || connection?.state === HubConnectionState.Connecting) return;
 
     if (!connection) {
         connection = new HubConnectionBuilder()
             .withUrl('/api/mainhub', { withCredentials: true })
             .withAutomaticReconnect()
-            .configureLogging(LogLevel.Information)
             .build();
 
         connection.onclose(err => {
@@ -26,7 +24,6 @@ export const connectSignalR = async (): Promise<void> => {
 
     try {
         await connection.start();
-        console.log("SignalR connected");
     } catch (err) {
         console.error("SignalR start failed:", err);
 
@@ -37,10 +34,7 @@ export const startHeartBeat = () => {
     if (heartBeatInterval) return; 
     heartBeatInterval = setInterval(() => {
         if (connection?.state === HubConnectionState.Connected) {
-            console.log('Sending heartbeat');
             connection.invoke('Heartbeat')
-            .then(result => console.log('Heartbeat result:', result))
-            .catch(err => console.error('Heartbeat error:', err));
         }
     }, 20000); 
 };

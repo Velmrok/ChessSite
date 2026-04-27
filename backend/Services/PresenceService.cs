@@ -1,49 +1,54 @@
 using backend.Services.Interfaces;
 using Microsoft.Extensions.Caching.Distributed;
+using StackExchange.Redis;
 
 
 
 public class PresenceService : IPresenceService
 {
-    private readonly IDistributedCache _cache; 
-    private static readonly TimeSpan OnlineTtl = TimeSpan.FromSeconds(30);
+    private readonly IConnectionMultiplexer _redis;
+    private readonly IDatabase _db;
+    private const string OnlineSetKey = "users:online";
 
-    public PresenceService(IDistributedCache cache)
+    public PresenceService(IConnectionMultiplexer redis)
     {
-        _cache = cache;
+        _redis = redis;
+        _db = redis.GetDatabase();
     }
-
-    private static string Key(Guid userId) => $"user:online:{userId}";
 
     public async Task SetOnlineAsync(Guid userId)
     {
-        await _cache.SetStringAsync(Key(userId), "1", new DistributedCacheEntryOptions
-        {
-            AbsoluteExpirationRelativeToNow = OnlineTtl
-        });
+        await _db.SetAddAsync(OnlineSetKey, userId.ToString());
     }
 
     public async Task SetOfflineAsync(Guid userId)
     {
-        await _cache.RemoveAsync(Key(userId));
+        await _db.SetRemoveAsync(OnlineSetKey, userId.ToString());
+    }
+
+    public async Task<int> GetOnlineCountAsync()
+    {
+        return (int)await _db.SetLengthAsync(OnlineSetKey);
     }
 
     public async Task<bool> IsOnlineAsync(Guid userId)
     {
-        return await _cache.GetStringAsync(Key(userId)) != null;
+        return await _db.SetContainsAsync(OnlineSetKey, userId.ToString());
     }
 
     public async Task<HashSet<Guid>> GetOnlineIdsAsync(IEnumerable<Guid> userIds)
     {
-        var result = new HashSet<Guid>();
+        var ids = userIds.ToList();
+        if (ids.Count == 0) return [];
 
-        var checks = userIds.Select(async id =>
-        {
-            if (await _cache.GetStringAsync(Key(id)) != null)
-                result.Add(id);
-        });
+        var tasks = ids.Select(id => _db.SetContainsAsync(OnlineSetKey, id.ToString()));
+        var results = await Task.WhenAll(tasks);
 
-        await Task.WhenAll(checks);
-        return result;
+        return [.. ids
+            .Zip(results)
+            .Where(x => x.Second)
+            .Select(x => x.First)];
     }
+
+    
 }

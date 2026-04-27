@@ -12,6 +12,13 @@ public partial class MainHub : Hub
         var userNickname = GetNickname();
         await Groups.AddToGroupAsync(Context.ConnectionId, "Home");
         await Clients.Caller.SendAsync("LobbyJoined");
-        return "ok";
+        return "Joined home group";
+    }
+    public async Task<string> LeaveHomeGroup()
+    {
+        var userNickname = GetNickname();
+        await Groups.RemoveFromGroupAsync(Context.ConnectionId, "Home");
+        await Clients.Caller.SendAsync("LobbyLeft");
+        return "Left home group";
     }
 }

@@ -2,10 +2,11 @@ import { getConnection, invokeSignalR } from "@/services/signalR/connection";
 import useHomeStore from "@/stores/useHomeStore";
 
 import useUserStore from "@/stores/useUserStore";
+import type { HomeStats } from "@/types/home";
 import { useEffect, useState } from "react";
 
 
-export function useHomeSocket() {
+export function useHomeSignalR() {
   const [isInitialized, setIsInitialized] = useState(false);
   const setIsInQueue = useUserStore((state) => state.setIsInQueue);
   const setUsersOnline = useHomeStore((state) => state.setUsersOnline);
@@ -18,19 +19,13 @@ export function useHomeSocket() {
     invokeSignalR('JoinHomeGroup').then(x=>console.log(x));
     const conn = getConnection();
 
-
-    conn.on("usersOnline", (count: number) => {
-
-      setUsersOnline(count);
+    conn.on("StatsUpdated", (stats: HomeStats) => {
+      console.log("Received StatsUpdated:", stats);
+      setUsersOnline(stats.usersOnline);
+      setMatchesInProgress(stats.matchesInProgress);
+      setCreatedAccounts(stats.createdAccounts);
     });
-
-    conn.on("matchesInProgress", (count: number) => {
-      setMatchesInProgress(count);
-    });
-
-    conn.on("createdAccounts", (count: number) => {
-      setCreatedAccounts(count);
-    });
+    
     conn.on("queueList:delete", (q: { queueId: string }) => {
       console.log("Received queueList:delete for queueId:", q.queueId);
       const queueId = q.queueId;
@@ -46,10 +41,8 @@ export function useHomeSocket() {
     setIsInitialized(true);
 
     return () => {
-      invokeSignalR('lobbyRoom:leave');
-      conn.off("usersOnline");
-      conn.off("matchesInProgress");
-      conn.off("createdAccounts");
+      invokeSignalR("LeaveHomeGroup");
+      conn.off("StatsUpdated");
       conn.off("queueList:delete");
       conn.off("queue:enter");
       conn.off("queueSize");

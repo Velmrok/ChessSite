@@ -8,7 +8,7 @@ import LeaderBoard from "./Leaderboard";
 import { getLeaderboard} from "@/services/homeService";
 import {fetchFriendsOnline} from "@/services/userService";
 import Lobby from "./Lobby";
-import { useHomeSocket } from "@/hooks/useHomeSocket";
+import { useHomeSignalR } from "@/hooks/useHomeSignalR";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useApi } from "@/hooks/useApi";
@@ -27,7 +27,7 @@ export default function HomeUser() {
     const navigate = useNavigate();
     const setFriends = useHomeStore(state => state.setFriends);
     const {request} = useApi();
-    useHomeSocket();
+    useHomeSignalR();
 
      useEffect(() => {
         const fetchLeaderboard = async () => {

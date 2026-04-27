@@ -5,4 +5,5 @@ public interface IPresenceService
     Task<bool> IsOnlineAsync(Guid userId);
     Task SetOfflineAsync(Guid userId);
     Task SetOnlineAsync(Guid userId);
+    Task<int> GetOnlineCountAsync();
 }

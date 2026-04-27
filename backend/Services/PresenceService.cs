@@ -9,7 +9,6 @@ public class PresenceService : IPresenceService
     private readonly IConnectionMultiplexer _redis;
     private readonly IDatabase _db;
     private const string OnlineSetKey = "users:online";
-
     public PresenceService(IConnectionMultiplexer redis)
     {
         _redis = redis;
@@ -18,13 +17,10 @@ public class PresenceService : IPresenceService
 
     public async Task SetOnlineAsync(Guid userId)
     {
+        await _db.StringSetAsync($"user:online:{userId}", "1", TimeSpan.FromSeconds(30));
         await _db.SetAddAsync(OnlineSetKey, userId.ToString());
     }
 
-    public async Task SetOfflineAsync(Guid userId)
-    {
-        await _db.SetRemoveAsync(OnlineSetKey, userId.ToString());
-    }
 
     public async Task<int> GetOnlineCountAsync()
     {
@@ -50,5 +46,14 @@ public class PresenceService : IPresenceService
             .Select(x => x.First)];
     }
 
-    
+    public async Task CleanUpAsync()
+    {
+        foreach (var member in await _db.SetMembersAsync(OnlineSetKey))
+        {
+            if (!await _db.KeyExistsAsync($"user:online:{member}"))
+                await _db.SetRemoveAsync(OnlineSetKey, member);
+        }
+    }
+
+
 }

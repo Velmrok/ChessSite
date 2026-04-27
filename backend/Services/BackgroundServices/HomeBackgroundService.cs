@@ -4,22 +4,22 @@ using backend.Services.Interfaces;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Caching.Distributed;
 
+
+namespace backend.Services.BackgroundServices;
 public class HomeBackgroundService : BackgroundService
 {
     private readonly IHubContext<MainHub> _hubContext;
     private readonly IServiceScopeFactory _scopeFactory;
-    private readonly IDistributedCache _cache;
     private readonly ILogger<HomeBackgroundService> _logger;
 
     public HomeBackgroundService(
         IHubContext<MainHub> hubContext,
         IServiceScopeFactory scopeFactory, 
-        IDistributedCache cache,
         ILogger<HomeBackgroundService> logger)
     {
         _hubContext = hubContext;
         _scopeFactory = scopeFactory;
-        _cache = cache;
+ 
         _logger = logger;
     }
 

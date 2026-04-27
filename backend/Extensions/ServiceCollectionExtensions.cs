@@ -1,5 +1,6 @@
 using backend.Models;
 using backend.Services;
+using backend.Services.BackgroundServices;
 using backend.Services.Helpers.Auth;
 using backend.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
@@ -23,8 +24,9 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IPresenceService, PresenceService>();
         services.AddSingleton<IJwtGenerator, JwtGenerator>();
 
-        
+
         services.AddHostedService<HomeBackgroundService>();
+        services.AddHostedService<PresenceBackgroundService>();
        
         
 

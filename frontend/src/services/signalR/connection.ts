@@ -2,6 +2,7 @@ import { HubConnectionBuilder, HubConnection, HubConnectionState } from '@micros
 
 let connection: HubConnection | null = null;
 let connectionPromise: Promise<void> | null = null;
+let heartBeatInterval: ReturnType<typeof setTimeout> | null = null;
 export const getConnection = (): HubConnection => {
     if (!connection) throw new Error('SignalR not connected');
     return connection;
@@ -26,17 +27,16 @@ export const connectSignalR = async (): Promise<void> => {
 
     return connectionPromise;
 };
-
-export const disconnectSignalR = async () => {
-    if (!connection) return;
-    if (
-        connection.state !== HubConnectionState.Connected &&
-        connection.state !== HubConnectionState.Connecting
-    ) return;
-
-    await connection.stop();
-    connection = null;
+export const startHeartBeat = () => {
+    if (heartBeatInterval) return; 
+    heartBeatInterval = setInterval(() => {
+        if (connection?.state === HubConnectionState.Connected) {
+            console.log('Sending heartbeat');
+            connection.invoke('Heartbeat').catch(err => console.error('Heartbeat error:', err));
+        }
+    }, 20000); 
 };
+
 
 export const invokeSignalR = async (methodName: string, ...args: any[]) => {
     if (!connection) throw new Error('SignalR not connected');

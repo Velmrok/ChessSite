@@ -22,28 +22,23 @@ namespace backend.Hubs
 
         public override async Task OnConnectedAsync()
         {
-            if (Context.User?.Identity?.IsAuthenticated == true)
-            {
-                var userId = GetUserId();
+            var userId = GetUserId();
+            if (userId != null)
                 await _presenceService.SetOnlineAsync(Guid.Parse(userId));
-            }
+            
             await base.OnConnectedAsync();
         }
-        public override async Task OnDisconnectedAsync(Exception? exception)
+        public async Task Heartbeat()
         {
-            if (Context.User?.Identity?.IsAuthenticated == true)
-            {
-                var userId = GetUserId();
-                await _presenceService.SetOfflineAsync(Guid.Parse(userId));
-            }
-            await base.OnDisconnectedAsync(exception);
+            string? userId = GetUserId();
+            if (userId != null)
+                await _presenceService.SetOnlineAsync(Guid.Parse(userId));
         }
-        protected string GetUserId() =>
-            Context.UserIdentifier
-            ?? throw new HubException("unauthorized");
 
-        protected string GetNickname() =>
-            Context.User?.FindFirst("nickname")?.Value
-            ?? throw new HubException("unauthorized");
+        protected string? GetUserId() =>
+            Context.UserIdentifier;
+
+        protected string? GetNickname() =>
+            Context.User?.FindFirst("nickname")?.Value;
     }
 }

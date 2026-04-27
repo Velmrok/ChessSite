@@ -27,7 +27,7 @@ export default function HomeUser() {
     const navigate = useNavigate();
     const setFriends = useHomeStore(state => state.setFriends);
     const {request} = useApi();
-    useHomeSignalR();
+    
 
      useEffect(() => {
         const fetchLeaderboard = async () => {
@@ -43,7 +43,6 @@ export default function HomeUser() {
         
         fetchLeaderboard();
         fetchFriends();
-        console.log(joinHomeGroup())
     }, []);
 
    

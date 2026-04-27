@@ -13,12 +13,18 @@ import LoginPage from './pages/LoginPage'
 import { useAuth } from './hooks/useAuth'
 import UsersSearchPage from './pages/UsersSearchPage'
 import GamesSearchPage from './pages/GamesSearchPage'
+import { useEffect } from 'react'
+import { connectSignalR } from './services/signalR/connection'
 
 function App() {
   
   
   const { loading } = useAuth();
- 
+  
+  useEffect(() => {
+    const initializeSignalR = async () =>  await connectSignalR();
+    initializeSignalR();
+  }, []);
 
   
 

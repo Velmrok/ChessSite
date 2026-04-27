@@ -3,7 +3,7 @@ import { useApi } from "./useApi";
 import { useEffect, useState } from "react";
 
 import { getMe, refresh } from "@/services/authService";
-import { connectSignalR, disconnectSignalR } from "@/services/signalR/connection";
+import { startHeartBeat } from "@/services/signalR/connection";
 
 
 export function useAuth() {
@@ -24,11 +24,12 @@ export function useAuth() {
 
             if (me) {
                 setUser(me);
-                await connectSignalR();
+                startHeartBeat();
             } else if (shouldRefresh) {
                 const refreshResult = await request(refresh);
                 if (refreshResult) {
-                    await connectSignalR();
+                    
+                    startHeartBeat();
                     setUser(refreshResult);
                 }
             }
@@ -42,7 +43,7 @@ export function useAuth() {
 
             setLoading(false);
         }
-        return () => void disconnectSignalR();
+       
     }, []);
 
 

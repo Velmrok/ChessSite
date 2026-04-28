@@ -14,8 +14,7 @@ export type SearchParams = {
 
 export type SortByOption = 'Rating' | 'Nickname' | 'OnlineStatus' | 'LastActive' | 'CreatedAt';
 
-export type UsersSearchResponse = {
-    users: Array<{
+export type UsersSearch = Array<{
         nickname: string;
         profilePictureUrl: string;
         rating: Rating;
@@ -23,6 +22,9 @@ export type UsersSearchResponse = {
         createdAt: string;
         lastActive: string;
         role: 'user' | 'admin';
-    }>;
+    }>
+
+export type UsersSearchResponse = {
+    users: UsersSearch ;
     totalPages: number;
 }

@@ -1,10 +1,15 @@
-import type { UsersLeaderboardResponse } from "./user";
 
-export type Leaderboard = {
 
-    topRapidPlayers: Array<UsersLeaderboardResponse>;
-    topBlitzPlayers: Array<UsersLeaderboardResponse>;
-    topBulletPlayers: Array<UsersLeaderboardResponse>;
+export type UsersLeaderboardSummary= {
+    nickname: string;
+    profilePictureUrl: string;
+    rating: number;
+}
+export type LeaderboardResponse = {
+
+    topRapidPlayers: Array<UsersLeaderboardSummary>;
+    topBlitzPlayers: Array<UsersLeaderboardSummary>;
+    topBulletPlayers: Array<UsersLeaderboardSummary>;
        
         
 }

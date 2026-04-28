@@ -35,33 +35,42 @@ export type UserProfile = {
 
         userInfo: UserInfo;
     };
+export type PlayerSummary = {
+    nickname: string;
+    profilePictureUrl: string;
+    rating: number;
+}
 
-export type FriendsOnlineResponse = {
-    friends: Array<{
+
+export type FriendsOnline = Array<{
         nickname: string;
         profilePictureUrl: string;
-    }>,
+    }>
+export type FriendsOnlineResponse = {
+    friends: FriendsOnline,
     totalPages: number;
 }
 
-export type FriendsProfileResponse = {
-    friends: Array<{
+
+
+export type FriendsProfile = Array<{
         nickname: string;
         profilePictureUrl: string;
         rating: Rating;
         isOnline: boolean;
-    }>,
+    }>
+
+
+export type FriendsProfileResponse = {
+    friends: FriendsProfile,
     totalPages: number;
 }
 
 
-
-export type UsersLeaderboardResponse = {
-    users: Array<{
+export type UsersLeaderboard = Array<{
         nickname: string;
         profilePictureUrl: string;
         rating: number;
-    }>;
-    totalPages: number;
-}
+    }>
+
 export type User = PublicUser & {};

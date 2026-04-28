@@ -1,6 +1,6 @@
 import {create} from "zustand";
 import { getQueueList } from "@/services/homeService";
-import type {UserOnlineItem, UserSummary } from "@/types/user";
+import type {FriendsOnline } from "@/types/user";
 type HomeStore = {
     usersOnline: number;
     matchesInProgress: number;
@@ -9,7 +9,7 @@ type HomeStore = {
     friendsPage: number;
     loadingFriends: boolean;
     totalFriendsPages: number;
-    friends: Array<UserOnlineItem>;
+    friends: FriendsOnline;
     queueList: QueueList | null;
     deletedQueues: Array<string>;
     lobbyGameType: gameType| 'any';
@@ -18,7 +18,7 @@ type HomeStore = {
     setUsersOnline: (count: number) => void;
     setMatchesInProgress: (count: number) => void;
     setCreatedAccounts: (count: number) => void;
-    setFriends: (friends: Array<UserOnlineItem>) => void;
+    setFriends: (friends: FriendsOnline) => void;
     setFriendsPage: (page: number) => void;
     setQueueList: (queueList: QueueList) => void;
     fetchQueueList: (gameType: gameType| 'any') => Promise<void>;
@@ -42,7 +42,7 @@ const useHomeStore = create<HomeStore>((set, get) => ({
     setUsersOnline: (count: number) => set({usersOnline: count}),
     setMatchesInProgress: (count: number) => set({matchesInProgress: count}),
     setCreatedAccounts: (count: number) => set({createdAccounts: count}),
-    setFriends: (friends: Array<UserOnlineItem>) => set({friends}),
+    setFriends: (friends: FriendsOnline) => set({friends}),
  
     async fetchQueueList(gameType) {
         try {

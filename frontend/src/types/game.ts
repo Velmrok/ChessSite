@@ -1,4 +1,4 @@
-import type { PublicUser, UserSummary } from "./user";
+import type { PublicUser, PlayerSummary } from "./user";
 
 export type GameSearchParams = {
     query: string; 
@@ -36,8 +36,8 @@ export type GameState = {
 
 export type GameSummary = {
         id: string;
-        whitePlayer: UserSummary;
-        blackPlayer: UserSummary;
+        whitePlayer: PlayerSummary;
+        blackPlayer: PlayerSummary;
         winnerNickname: string | null;
         gameType: string;
         time: number;

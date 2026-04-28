@@ -6,11 +6,11 @@ import { SiPushbullet, SiStackblitz } from "react-icons/si";
 import { TfiCup } from "react-icons/tfi";
 import { Link } from "react-router-dom";
 import Avatar from "../global/Avatar";
-import type { Leaderboard } from "@/types/home";
+import type { LeaderboardResponse} from "@/types/home";
 
 
 type Props = {
-  leaderboard: Leaderboard | undefined;
+  leaderboard: LeaderboardResponse | undefined;
 };
 
 export default function LeaderBoard({ leaderboard }: Props) {

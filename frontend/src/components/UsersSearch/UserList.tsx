@@ -6,13 +6,13 @@ import SortArrows from "./SortArrows";
 import Rating from "../global/Rating";
 import DeleteAccountButton from "../global/DeleteAccountButton";
 import { useEffect, useState } from "react";
-import type { UserSearchItem } from "@/types/user";
+import type { UsersSearch } from "@/types/usersSearch";
 import { useTranslation } from "react-i18next";
 import Avatar from "../global/Avatar";
 
 const API_URL = import.meta.env.VITE_API_URL;
 type Props = {
-    users: UserSearchItem[];
+    users: UsersSearch;
 };
 
 export default function UserList({ users}: Props) {

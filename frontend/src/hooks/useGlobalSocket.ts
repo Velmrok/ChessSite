@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { socket } from '../services/socket/socketService';
+import {getConnection} from "@/services/signalR/connection";
 import useToastStore from '@/stores/useToastStore';
 import useUserStore from '@/stores/useUserStore';
 import { useNavigate } from 'react-router-dom';
@@ -16,8 +16,9 @@ export function useGlobalSocket() {
   const setIsConnected = useUserStore((state) => state.setIsConnected);
   const navigate = useNavigate();
   useEffect(() => {
+    const conn = getConnection();
 
-    socket.on("queue:leave:status", ({ status }: { status: string }) => {
+    conn.on("queue:leave:status", ({ status }: { status: string }) => {
       console.log("Left queue with status:", status);
       if (status === 'left') {
         setIsInQueue(false);
@@ -26,10 +27,10 @@ export function useGlobalSocket() {
         setToast({ msg: t('error.didntLeaveQueue'), type: 'error' });
       }
     });
-    socket.on('error', (message: string) => {
+    conn.on('error', (message: string) => {
       console.log("socketError: ", message);
     });
-    socket.on('queue:join:status', ({ status, gameId, joinedAt }: { status: string; gameId?: string; joinedAt?: string }) => {
+    conn.on('queue:join:status', ({ status, gameId, joinedAt }: { status: string; gameId?: string; joinedAt?: string }) => {
       console.log("Join queue status:", status, "Game ID:", gameId);
       if (gameId) {
         useUserStore.getState().setIsInQueue(false);
@@ -47,21 +48,21 @@ export function useGlobalSocket() {
       }
     });
 
-    socket.on('disconnect', () => {
+    conn.on('disconnect', () => {
       setIsConnected(false);
     });
 
-    socket.on('connect', () => {
+    conn.on('connect', () => {
       setIsConnected(true);
     });
 
 
 
     return () => {
-      socket.off("queue:leave:status");
-      socket.off('error');
-      socket.off('queue:join:status');
-      socket.emit('lobbyRoom:leave');
+      conn.off("queue:leave:status");
+      conn.off('error');
+      conn.off('queue:join:status');
+      
     }
   }, [setToast, t, setIsInQueue]);
 

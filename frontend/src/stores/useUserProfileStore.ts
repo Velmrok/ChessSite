@@ -1,11 +1,11 @@
-import type { PublicUser, UserProfile, UserSummary } from "@/types/user";
+import type { PublicUser, UserProfile, FriendsProfile} from "@/types/user";
 import { create } from "zustand";
 
 type UserProfileStore = {
 
   profile: UserProfile | null;
   games: Array<ProfileGame>;
-  friends: UserSummary[];
+  friends: FriendsProfile;
   gamesPage: number;
   friendsPage: number;
   totalFriendsPages: number;
@@ -13,7 +13,7 @@ type UserProfileStore = {
 
   setGames: (games : Array<ProfileGame>) => void;
   setGamesPage: (page: number) => void;
-  setFriends: (friends: Array<UserSummary>) => void;
+  setFriends: (friends: FriendsProfile) => void;
   setFriendsPage: (page: number) => void;
   setProfile: (profile: UserProfile | null) => void;
 };

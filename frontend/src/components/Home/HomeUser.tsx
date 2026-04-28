@@ -8,12 +8,11 @@ import LeaderBoard from "./Leaderboard";
 import { getLeaderboard} from "@/services/homeService";
 import {fetchFriendsOnline} from "@/services/userService";
 import Lobby from "./Lobby";
-import { useHomeSignalR } from "@/hooks/useHomeSignalR";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useApi } from "@/hooks/useApi";
-import type { Leaderboard } from "@/types/home";
-import { joinHomeGroup } from "@/services/socket/signalRHomeService";
+import type { LeaderboardResponse } from "@/types/home";
+
 
 export default function HomeUser() {
     const {t} = useTranslation("home");
@@ -22,7 +21,7 @@ export default function HomeUser() {
     const matchesInProgress = useHomeStore((state) => state.matchesInProgress);
     const createdAccounts = useHomeStore((state) => state.createdAccounts);
     const queueSize = useHomeStore((state) => state.queueSize);
-    const [leaderboard, setLeaderboard] = useState<Leaderboard | undefined>({ topRapidPlayers: [], topBlitzPlayers: [], topBulletPlayers: [] });
+    const [leaderboard, setLeaderboard] = useState<LeaderboardResponse | undefined>({ topRapidPlayers: [], topBlitzPlayers: [], topBulletPlayers: [] });
     const [qmViewMode, setQmViewMode] = useState<string>('queue');
     const navigate = useNavigate();
     const setFriends = useHomeStore(state => state.setFriends);

@@ -1,4 +1,5 @@
-import { HubConnectionBuilder, HubConnection, HubConnectionState } from '@microsoft/signalr';
+import type { SignalRError, SignalRRequest } from '@/types/signalR';
+import { HubConnectionBuilder, HubConnection, HubConnectionState, HttpTransportType } from '@microsoft/signalr';
 
 let connection: HubConnection | null = null;
 let heartBeatInterval: ReturnType<typeof setTimeout> | null = null;
@@ -13,8 +14,13 @@ export const connectSignalR = async (): Promise<void> => {
 
     if (!connection) {
         connection = new HubConnectionBuilder()
-            .withUrl('/api/mainhub', { withCredentials: true })
+            .withUrl('/api/mainhub', {
+                withCredentials: true,
+                skipNegotiation: true,
+                transport: HttpTransportType.WebSockets
+            })
             .withAutomaticReconnect()
+
             .build();
 
         connection.onclose(err => {
@@ -47,10 +53,23 @@ const waitForConnected = async () => {
 
   while (!connection || connection.state !== HubConnectionState.Connected) {
     await new Promise(res => setTimeout(res, 50));
-  }
+    }
 };
 
-export const invokeSignalR = async (methodName: string, ...args: any[]) => {
-  await waitForConnected();
-  return await connection!.invoke(methodName, ...args);
+export const invokeSignalR = async (methodName: string, request: SignalRRequest,
+    options?: {
+        onError?: (error: SignalRError) => void;
+    }) => {
+    await waitForConnected();
+
+  
+    const response = await connection!.invoke(methodName, request);
+    if (response.error) {
+        if (options?.onError) {
+            options.onError(response.error);
+        } else {
+            console.error("SignalR Error:", response.error);
+        }
+    }
+    return response.data;
 };

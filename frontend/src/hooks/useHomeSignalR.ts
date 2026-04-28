@@ -16,7 +16,10 @@ export function useHomeSignalR() {
   const setQueueSize = useHomeStore((state) => state.setQueueSize);
   useEffect(() => {
     if (isInitialized) return;
-    invokeSignalR('JoinHomeGroup');
+    invokeSignalR('JoinGroup',{
+      type: "Home",
+      correlationId: crypto.randomUUID(),
+    });
     const conn = getConnection();
 
     conn.on("StatsUpdated", (stats: HomeStats) => {
@@ -39,7 +42,10 @@ export function useHomeSignalR() {
     setIsInitialized(true);
 
     return () => {
-      invokeSignalR("LeaveHomeGroup");
+      invokeSignalR("LeaveGroup", {
+        type: "Home",
+        correlationId: crypto.randomUUID(),
+      });
       conn.off("StatsUpdated");
       conn.off("queueList:delete");
       conn.off("queue:enter");

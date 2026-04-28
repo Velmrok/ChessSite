@@ -34,7 +34,7 @@ export default function GameForm({ currentTime, setCurrentTime }: Props) {
             handleCancelGame();
 
         } else {
-            handleJoinGame(parseInt(currentTime.split('+')[0]), parseInt(currentTime.split('+')[1]));
+            handleJoinGame({ type: "Queue", correlationId: crypto.randomUUID(), payload: { timeControl: parseInt(currentTime.split('+')[0]), increment: parseInt(currentTime.split('+')[1]) } });
         }
     }
 

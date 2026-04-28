@@ -14,7 +14,7 @@ export default function useQueue() {
     const handleCancelGame = () => {
 
         setIsInQueue(false);
-        leaveQueue();
+        //leaveQueue();
         setToast({ msg: t('info.leftQueue'), type: "info" });
 
     }

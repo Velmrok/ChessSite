@@ -9,7 +9,7 @@ export type LeaderboardResponse = {
 
     topRapidPlayers: Array<UsersLeaderboardSummary>;
     topBlitzPlayers: Array<UsersLeaderboardSummary>;
-    topBulletPlayers: Array<UsersLeaderboardSummary>;
+    topBulletPlayers: Array<UsersLeaderboardSummary>; 
        
         
 }

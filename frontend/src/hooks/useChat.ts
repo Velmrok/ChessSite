@@ -9,11 +9,11 @@ export const useChat = ({gameId, previousMessages}: Props) => {
     const [messages, setMessages] = useState<Array<Message>>(previousMessages);
     useEffect(() => {
         const conn = getConnection();
-        invokeSignalR('JoinChat', gameId);
+        invokeSignalR('JoinGroup', { type: "Chat", correlationId: crypto.randomUUID(), payload: { gameId } });
         conn.on('MessageReceived', handleReceiveMessage);
         return () => {
             conn.off('MessageReceived', handleReceiveMessage);
-            invokeSignalR('LeaveChat', gameId);
+            invokeSignalR('LeaveGroup', { type: "Chat", correlationId: crypto.randomUUID(), payload: { gameId } });
         }
     }, []);
     const handleReceiveMessage = (msg: Message) => {

@@ -24,7 +24,7 @@ export default function Chat({ previousMessages }: Props) {
             e.preventDefault();
             const text = e.target.value.trim();
             if (text.length > 0) {
-                sendMessage(text, gameId);
+                sendMessage({ type: "Chat", correlationId: crypto.randomUUID(), payload: { gameId, text } });
                 e.target.value = '';
             }
         }

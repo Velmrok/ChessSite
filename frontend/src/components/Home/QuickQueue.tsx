@@ -37,7 +37,7 @@ export default function QuickQueue() {
     <div className="max-w-[540px] grid grid-cols-3 gap-2 md:gap-4 w-full">
       {["1+0", "2+0", "3+0", "3+2", "5+3", "10+0", "10+5", "15+10", "30+0"].map((t) => (
         <button
-          onClick={() => handleJoinGame(parseInt(t.split('+')[0]), parseInt(t.split('+')[1]))}
+          //onClick={() => handleJoinGame(parseInt(t.split('+')[0]), parseInt(t.split('+')[1]))}
           key={t}
           className="aspect-square w-full flex items-center justify-center transition-colors duration-300
         bg-black/50 hover:bg-black/70 shadow-md text-white font-MyFancyFont text-lg md:text-2xl rounded-xl ">

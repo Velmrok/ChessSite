@@ -1,14 +1,15 @@
+import type { SignalRRequest } from '@/types/signalR';
 import {invokeSignalR} from '../signalR/connection';
 
-export const leaveQueue = () => {
-    return invokeSignalR('LeaveQueue');
+export const leaveQueue = (request: SignalRRequest) => {
+    return invokeSignalR('LeaveGroup', request);
 }
-export const joinGame = ( time: number, increment: number) => {
-    const gameType = time<3 ? 'bullet' : time<10 ? 'blitz' : 'rapid';
-    return invokeSignalR('JoinQueue', gameType, time, increment);
+export const joinGame = ( request : SignalRRequest) => {
+
+    return invokeSignalR('JoinGroup', request);
 }
-export const rejoinQueue = () => {
-    return invokeSignalR('RejoinQueue');
+export const rejoinQueue = (request : SignalRRequest) => {
+    return invokeSignalR('RejoinQueue', request);
 }
 export const formatTimeFromMs = (ms: number | undefined): string => {
     if (ms === undefined || ms < 0) {

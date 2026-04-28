@@ -28,13 +28,13 @@ export function Buttons() {
     }
 
     const onSurrender = () => {
-        surrenderGame(gameId);
+        surrenderGame({ type: "Game", correlationId: crypto.randomUUID(), payload: { gameId } });
     }
     const onOfferDraw = () => {
-        offerDraw(gameId);
+        offerDraw({ type: "Game", correlationId: crypto.randomUUID(), payload: { gameId } });
     }
     const onAcceptDraw = () => {
-        offerDraw(gameId);
+        offerDraw({ type: "Game", correlationId: crypto.randomUUID(), payload: { gameId } });
     }
     return (
         <>

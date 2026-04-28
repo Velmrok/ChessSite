@@ -84,7 +84,7 @@ const isLive = game?.status === "active";
 
         chessGame.move(move);
         
-        makeMove(game!.id,chessGame.history()[chessGame.history().length -1]);
+        //makeMove(game!.id,chessGame.history()[chessGame.history().length -1]);
         return true;
       } catch {
       

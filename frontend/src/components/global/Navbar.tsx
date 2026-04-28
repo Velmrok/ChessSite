@@ -41,7 +41,7 @@ const UserMenu = ({ onLogout }: { onLogout: () => void }) => {
                         <div>{t("inQueue")}</div>
                         <div >({formatTimeFromMs(queueTime!)})</div></div>
                     <button className="hover:text-amber-200 transition-transform duration-300 text-[13px] text-gray-400"
-                        onClick={() => leaveQueue()}>
+                        onClick={() => leaveQueue({ type: "Queue", correlationId: crypto.randomUUID() })}>
                         {t("leaveQueue")} </button>
                 </div>}
 

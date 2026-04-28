@@ -1,18 +1,19 @@
+import type { SignalRRequest } from '@/types/signalR';
 import {invokeSignalR} from '../signalR/connection';
 
-export const joinGameRoom = (gameId: string) => {
-    return invokeSignalR('JoinGameRoom', gameId);
+export const joinGameRoom = (request : SignalRRequest) => {
+    return invokeSignalR('JoinGameRoom', request);
 }
-export const sendMessage = (text: string, gameId: string) => {
-       return invokeSignalR('SendGameMessage', gameId, text);
+export const sendMessage = (request : SignalRRequest) => {
+       return invokeSignalR('SendGameMessage', request);
     };
-export const surrenderGame = (gameId: string) => {
-    return invokeSignalR('SurrenderGame', gameId);
+export const surrenderGame = (request : SignalRRequest) => {
+    return invokeSignalR('SurrenderGame', request);
   }
-  export const offerDraw = (gameId: string) => {
-    return invokeSignalR('OfferDraw', gameId);
+  export const offerDraw = (request : SignalRRequest) => {
+    return invokeSignalR('OfferDraw', request);
   }
 
-export const makeMove = (gameId: string, move: string) => {
-    return invokeSignalR('MakeMove', gameId, move);
+export const makeMove = (request : SignalRRequest) => {
+    return invokeSignalR('MakeMove', request);
 }

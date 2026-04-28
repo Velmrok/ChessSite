@@ -33,7 +33,7 @@ export default function useGame() {
     const fetch = async () => {
 
       try {
-        joinGameRoom(gameId);
+        joinGameRoom({type: "Game", correlationId: crypto.randomUUID(), payload: { gameId } });
         setGameJustEnded(false);
         await fetchGame(gameId);
 
@@ -78,7 +78,7 @@ export default function useGame() {
       conn.off('GameEnded');
       conn.off('MoveMade');
       conn.off('DrawOffered');
-      invokeSignalR('LeaveGameRoom', { gameId });
+      invokeSignalR('LeaveGameRoom', { type: "Game", correlationId: crypto.randomUUID(), payload: { gameId } });
     };
   }, [gameId]);
 

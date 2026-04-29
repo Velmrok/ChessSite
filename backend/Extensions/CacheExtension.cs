@@ -12,15 +12,20 @@ public static class CacheExtension
     if (isTest || string.IsNullOrWhiteSpace(redisConnectionString))
     {
         services.AddDistributedMemoryCache();
-        return services;
-    }
+            return services;
+        }
         services.AddStackExchangeRedisCache(options =>
         {
             options.Configuration = redisConnectionString;
             options.InstanceName = "ChessSite:";
         });
-        services.AddSingleton<IConnectionMultiplexer>(sp => 
+        
+        services.AddSingleton<IConnectionMultiplexer>(sp =>
             ConnectionMultiplexer.Connect(redisConnectionString));
+
+        services.AddHealthChecks()
+            .AddRedis("redis:6379", name: "redis");
+
         return services;
     }
 }

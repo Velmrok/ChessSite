@@ -80,6 +80,9 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapHealthChecks("/health");
+
 app.MapHub<backend.Hubs.MainHub>("/mainhub");
 app.Run();
 

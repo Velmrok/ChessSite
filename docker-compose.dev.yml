@@ -20,6 +20,11 @@ services:
       - backend-net
     secrets:
       - db_password
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
   backend:
     image: mcr.microsoft.com/dotnet/sdk:8.0
     container_name: chess_backend
@@ -31,7 +36,7 @@ services:
       - /app/bin
       - /app/obj
       - dotnet_packages:/root/.nuget/packages
-        - ./backend/wwwroot/uploads:/app/wwwroot/uploads
+      - ./backend/wwwroot/uploads:/app/wwwroot/uploads
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:5062
@@ -48,11 +53,18 @@ services:
       dotnet watch run --no-launch-profile
       "
     depends_on:
-      - db
-      - redis
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     networks:
       - backend-net
       - frontend-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5062/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
 
   frontend:
     image: node:20-alpine
@@ -71,7 +83,8 @@ services:
       npm run dev
       "
     depends_on:
-      - backend
+      backend : 
+        condition: service_healthy
     networks:
       - frontend-net
 
@@ -85,6 +98,11 @@ services:
     command: redis-server --appendonly yes
     networks:
       - backend-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
 
 volumes:
   redis_data:

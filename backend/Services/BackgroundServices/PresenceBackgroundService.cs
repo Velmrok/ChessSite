@@ -19,13 +19,33 @@ namespace backend.Services.BackgroundServices
 
         }
 
+        private record ScheduledTask(Func<Task> Action, TimeSpan Interval)
+        {
+            public DateTime LastRun { get; set; } = DateTime.UtcNow;
+        }
+
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            var tasks = new List<ScheduledTask>
+            {
+                new(CleanupOnlineStatuses,       TimeSpan.FromSeconds(30)),
+                new(FlushLastActiveStatuses,     TimeSpan.FromMinutes(2)),
+            };
+
             while (!stoppingToken.IsCancellationRequested)
             {
-                await CleanupOnlineStatuses();
+                var now = DateTime.UtcNow;
 
-                await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken);
+                foreach (var task in tasks)
+                {
+                    if (now - task.LastRun >= task.Interval)
+                    {
+                        await task.Action();
+                        task.LastRun = now;
+                    }
+                }
+
+                await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken); 
             }
         }
         private async Task CleanupOnlineStatuses()
@@ -34,6 +54,13 @@ namespace backend.Services.BackgroundServices
             var presenceService = scope.ServiceProvider.GetRequiredService<IPresenceService>();
 
             await presenceService.CleanUpAsync();
+        }
+        private async Task FlushLastActiveStatuses()
+        {
+            await using var scope = _scopeFactory.CreateAsyncScope();
+            var presenceService = scope.ServiceProvider.GetRequiredService<IPresenceService>();
+
+            await presenceService.FlushLastActiveAsync();
         }
     }
 }

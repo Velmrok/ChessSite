@@ -6,4 +6,5 @@ public interface IPresenceService
     Task SetOnlineAsync(Guid userId);
     Task<int> GetOnlineCountAsync();
     Task CleanUpAsync();
+    Task FlushLastActiveAsync();
 }

@@ -8,6 +8,9 @@ old_backend
 # dotenv files
 .env
 
+*.pem
+*.key
+
 # User-specific files
 *.rsuser
 *.suo

@@ -1,6 +1,6 @@
 import { signUpForEvent, leaveEvent, invokeSignalR } from "@/services/signalR/connection";
 import useHomeStore from "@/stores/useHomeStore";
-
+import { v4 as uuidv4 } from "uuid";
 import useUserStore from "@/stores/useUserStore";
 import type { HomeStats } from "@/types/home";
 import { useEffect, useState } from "react";
@@ -22,7 +22,7 @@ export function useHomeSignalR() {
 
     request(() => invokeSignalR('JoinGroup', {
       type: "Home",
-      correlationId: crypto.randomUUID(),
+      correlationId: uuidv4(),
     }));
 
     signUpForEvent("StatsUpdated", (stats: HomeStats) => {
@@ -45,10 +45,10 @@ export function useHomeSignalR() {
     setIsInitialized(true);
 
     return () => {
-      invokeSignalR("LeaveGroup", {
+      request(() => invokeSignalR("LeaveGroup", {
         type: "Home",
-        correlationId: crypto.randomUUID(),
-      });
+        correlationId: uuidv4(),
+      }));
       leaveEvent("StatsUpdated");
       leaveEvent("queueList:delete");
       leaveEvent("queue:enter");

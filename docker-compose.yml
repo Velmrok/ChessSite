@@ -71,8 +71,8 @@ services:
     ports:
       - "443:443"
     volumes:
-      - ./192.168.1.19.pem:/etc/ssl/cert.pem:ro
-      - ./192.168.1.19-key.pem:/etc/ssl/key.pem:ro
+      - ./chess.site.pem:/etc/ssl/cert.pem:ro
+      - ./chess.site-key.pem:/etc/ssl/key.pem:ro
     depends_on:
       backend:
         condition: service_healthy

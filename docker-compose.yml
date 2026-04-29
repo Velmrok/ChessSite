@@ -27,13 +27,14 @@ services:
       - backend-net
     secrets:
       - db_password
+    
 
   backend:
     build: ./backend
     container_name: chess_backend_production
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
-      - ASPNETCORE_URLS=http://+:5062
+      - HTTP_PORTS=5062
       - ConnectionStrings__Host=db
       - ConnectionStrings__Database=${POSTGRES_DB}
       - ConnectionStrings__Username=${POSTGRES_USER}
@@ -42,8 +43,10 @@ services:
       - Storage__BucketName=${CF_BUCKET_NAME}
       - Storage__PublicBaseUrl=${CF_PUBLIC_URL}
     depends_on:
-      - db
-      - redis
+      db :
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     restart: unless-stopped
     networks:
       - backend-net
@@ -52,6 +55,14 @@ services:
       - db_password
       - cf_access_key
       - cf_secret_key
+    volumes:
+      - data_protection_keys:/root/.aspnet/DataProtection-Keys
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5062/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    
    
   frontend:
     build: ./frontend
@@ -60,7 +71,8 @@ services:
     ports:
       - "80:80"
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
     restart: unless-stopped
     networks:
       - frontend-net
@@ -74,10 +86,16 @@ services:
     restart: unless-stopped
     networks:
       - backend-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
   redis_data_production:
   postgres_data_production:
+  data_protection_keys:
 networks:
   frontend-net:
   backend-net:

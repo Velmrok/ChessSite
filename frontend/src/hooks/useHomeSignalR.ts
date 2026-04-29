@@ -1,9 +1,10 @@
-import { getConnection, invokeSignalR } from "@/services/signalR/connection";
+import { signUpForEvent, leaveEvent, invokeSignalR } from "@/services/signalR/connection";
 import useHomeStore from "@/stores/useHomeStore";
 
 import useUserStore from "@/stores/useUserStore";
 import type { HomeStats } from "@/types/home";
 import { useEffect, useState } from "react";
+import { useApi } from "./useApi";
 
 
 export function useHomeSignalR() {
@@ -14,28 +15,30 @@ export function useHomeSignalR() {
   const setCreatedAccounts = useHomeStore((state) => state.setCreatedAccounts);
   const setDeletedQueuesById = useHomeStore((state) => state.setDeletedQueuesById);
   const setQueueSize = useHomeStore((state) => state.setQueueSize);
+
+  const {request} = useApi();
   useEffect(() => {
     if (isInitialized) return;
-    invokeSignalR('JoinGroup',{
+
+    request(() => invokeSignalR('JoinGroup', {
       type: "Home",
       correlationId: crypto.randomUUID(),
-    });
-    const conn = getConnection();
+    }));
 
-    conn.on("StatsUpdated", (stats: HomeStats) => {
+    signUpForEvent("StatsUpdated", (stats: HomeStats) => {
       setUsersOnline(stats.usersOnline);
       setMatchesInProgress(stats.matchesInProgress);
       setCreatedAccounts(stats.createdAccounts);
     });
     
-    conn.on("queueList:delete", (q: { queueId: string }) => {
+    signUpForEvent("queueList:delete", (q: { queueId: string }) => {
       const queueId = q.queueId;
       setDeletedQueuesById(queueId);
-    })
-    conn.on("queue:enter", () => {
+    });
+    signUpForEvent("queue:enter", () => {
       setIsInQueue(true);
     });
-    conn.on("queueSize", (size: number) => {
+    signUpForEvent("queueSize", (size: number) => {
       setQueueSize(size);
     });
 
@@ -46,10 +49,10 @@ export function useHomeSignalR() {
         type: "Home",
         correlationId: crypto.randomUUID(),
       });
-      conn.off("StatsUpdated");
-      conn.off("queueList:delete");
-      conn.off("queue:enter");
-      conn.off("queueSize");
+      leaveEvent("StatsUpdated");
+      leaveEvent("queueList:delete");
+      leaveEvent("queue:enter");
+      leaveEvent("queueSize");
       setIsInitialized(false);
     }
   }, [setUsersOnline, setMatchesInProgress, setCreatedAccounts, setDeletedQueuesById, setIsInQueue]);

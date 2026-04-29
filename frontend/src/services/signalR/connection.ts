@@ -1,4 +1,4 @@
-import type { SignalRError, SignalRRequest } from '@/types/signalR';
+import type { SignalRError, SignalRRequest, SignalRResponse } from '@/types/signalR';
 import { HubConnectionBuilder, HubConnection, HubConnectionState, HttpTransportType } from '@microsoft/signalr';
 
 let connection: HubConnection | null = null;
@@ -56,20 +56,24 @@ const waitForConnected = async () => {
     }
 };
 
-export const invokeSignalR = async (methodName: string, request: SignalRRequest,
-    options?: {
-        onError?: (error: SignalRError) => void;
-    }) => {
+export const invokeSignalR = async <TData = unknown>(
+    methodName: string,
+    request: SignalRRequest
+): Promise<TData> => {
     await waitForConnected();
-
-  
-    const response = await connection!.invoke(methodName, request);
+    const response: SignalRResponse<TData> = await connection!.invoke(methodName, request);
     if (response.error) {
-        if (options?.onError) {
-            options.onError(response.error);
-        } else {
-            console.error("SignalR Error:", response.error);
-        }
+        throw Object.assign(new Error(response.error.title), { 
+            signalRError: response.error 
+        });
     }
-    return response.data;
+    return response.data as TData;
+};
+export const signUpForEvent = <TData = unknown>(eventName: string, callback: (data: TData) => void) => {
+    const conn = getConnection();
+    conn.on(eventName, callback);
+};
+export const leaveEvent = (eventName: string, callback?: (...args: any[]) => void) => {
+    const conn = getConnection();
+    conn.off(eventName, callback || (() => {}));
 };

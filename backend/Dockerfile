@@ -16,8 +16,10 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
 RUN apt-get update && apt-get install -y curl
 
+USER app
 
-COPY --from=build /app/publish .
+
+COPY --from=build --chown=app:app /app/publish .
 
 EXPOSE 5062
 

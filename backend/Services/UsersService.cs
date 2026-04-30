@@ -142,6 +142,7 @@ public class UsersService : IUsersService
         var totalPages = (int)Math.Ceiling(await query.CountAsync() / (double)pagination.Limit);
 
         var friends = query
+            .OrderBy(f => f.Nickname)
             .Skip((pagination.PageNumber - 1) * pagination.Limit)
             .Take(pagination.Limit);
 
@@ -281,6 +282,7 @@ public class UsersService : IUsersService
             var totalPages = (int)Math.Ceiling(onlineFriends.Count / (double)pagination.Limit);
 
             var paged = onlineFriends
+                .OrderBy(f => f.Nickname)
                 .Skip((pagination.PageNumber - 1) * pagination.Limit)
                 .Take(pagination.Limit)
                 .ToList();

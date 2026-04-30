@@ -10,7 +10,7 @@ public static class DatabaseExtensions
         IConfiguration configuration,
         bool isTestEnvironment)
     {
-        if (true)
+        if (isTestEnvironment)
         {
             services.AddDbContext<AppDbContext>(options =>
             options.UseNpgsql(configuration.GetConnectionString("TestDatabase")));

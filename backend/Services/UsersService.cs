@@ -137,12 +137,12 @@ public class UsersService : IUsersService
         var onlineIds = await _presenceService.GetOnlineIdsAsync(allFriends.Select(f => f.FriendId));
 
         var query = allFriends
+        .OrderBy(f => f.Friend.Nickname)
             .Select(f => f.Friend.ToFriendProfileSummary(onlineIds.Contains(f.FriendId)));
 
         var totalPages = (int)Math.Ceiling(await query.CountAsync() / (double)pagination.Limit);
 
         var friends = query
-            .OrderBy(f => f.Nickname)
             .Skip((pagination.PageNumber - 1) * pagination.Limit)
             .Take(pagination.Limit);
 
@@ -276,13 +276,14 @@ public class UsersService : IUsersService
             var onlineSet = await _presenceService.GetOnlineIdsAsync(friendIds);
 
             var onlineFriends = friends
+             .OrderBy(f => f.Nickname)
                 .Where(f => onlineSet.Contains(f.Id))
                 .Select(f => f.ToFriendOnlineSummary())
                 .ToList();
             var totalPages = (int)Math.Ceiling(onlineFriends.Count / (double)pagination.Limit);
 
             var paged = onlineFriends
-                .OrderBy(f => f.Nickname)
+               
                 .Skip((pagination.PageNumber - 1) * pagination.Limit)
                 .Take(pagination.Limit)
                 .ToList();

@@ -62,7 +62,7 @@ namespace backend.Controllers
             return HandleError(await _usersService.UpdateUserBioAsync(currentUserNickname!, request), Ok);
         }
         [HttpPatch("me/profile/picture")]
-        public async Task<IActionResult> UploadUserAvatar([FromForm] UpdateUserProfilePictureRequest request)
+        public async Task<IActionResult> UploadUserProfilePicture([FromForm] UpdateUserProfilePictureRequest request)
         {
             var currentUserNickname = User.FindFirst("nickname")?.Value;
             return HandleError(await _usersService.UpdateUserProfilePictureAsync(currentUserNickname!, request), Ok);

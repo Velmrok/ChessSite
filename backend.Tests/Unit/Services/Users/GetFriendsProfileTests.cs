@@ -6,7 +6,7 @@ using NSubstitute;
 
 namespace backend.Tests.Unit.Services.Users;
 
-public class GetFriendsTests : UsersServiceTestBase
+public class GetFriendsProfileTests : UsersServiceTestBase
 {
     
     [Fact]
@@ -21,15 +21,15 @@ public class GetFriendsTests : UsersServiceTestBase
 
         var query = new PaginationQuery(1, 10);
 
-        var result = await _usersService.GetFriendsAsync(user.Nickname, query);
+        var result = await _usersService.GetFriendsProfileAsync(user.Nickname, query);
         result.IsError.Should().BeFalse();
-        FriendsResponse response = result.Value;
+        FriendsProfileResponse response = result.Value;
         response.Friends.Should().HaveCount(1);
         response.Friends[0].Nickname.Should().Be("bob");
 
-        var result2 = await _usersService.GetFriendsAsync(friend.Nickname, query);
+        var result2 = await _usersService.GetFriendsProfileAsync(friend.Nickname, query);
         result2.IsError.Should().BeFalse();
-        FriendsResponse response2 = result2.Value;
+        FriendsProfileResponse response2 = result2.Value;
         response2.Friends.Should().HaveCount(1);
         response2.Friends[0].Nickname.Should().Be("alice");
     }
@@ -44,14 +44,14 @@ public class GetFriendsTests : UsersServiceTestBase
 
         var query = new PaginationQuery(1, 10);
 
-        var result = await _usersService.GetFriendsAsync(user.Nickname, query);
+        var result = await _usersService.GetFriendsProfileAsync(user.Nickname, query);
         result.IsError.Should().BeFalse();
-        FriendsResponse response = result.Value;
+        FriendsProfileResponse response = result.Value;
         response.Friends.Should().HaveCount(0);
 
-        var result2 = await _usersService.GetFriendsAsync(friend.Nickname, query);
+        var result2 = await _usersService.GetFriendsProfileAsync(friend.Nickname, query);
         result2.IsError.Should().BeFalse();
-        FriendsResponse response2 = result2.Value;
+        FriendsProfileResponse response2 = result2.Value;
         response2.Friends.Should().HaveCount(0);
     }
     [Fact]
@@ -59,7 +59,7 @@ public class GetFriendsTests : UsersServiceTestBase
     {
         var query = new PaginationQuery(1, 10);
 
-        var result = await _usersService.GetFriendsAsync("nonexistent", query);
+        var result = await _usersService.GetFriendsProfileAsync("nonexistent", query);
         result.IsError.Should().BeTrue();
 
         
@@ -71,9 +71,9 @@ public class GetFriendsTests : UsersServiceTestBase
         var user = MakeUser("alice");
         await SeedAsync(user);
         var query = new PaginationQuery(1, 10);
-        var result = await _usersService.GetFriendsAsync(user.Nickname, query);
+        var result = await _usersService.GetFriendsProfileAsync(user.Nickname, query);
         result.IsError.Should().BeFalse();
-        FriendsResponse response = result.Value;
+        FriendsProfileResponse response = result.Value;
         response.Friends.Should().HaveCount(0);
     }
     [Fact]
@@ -88,9 +88,9 @@ public class GetFriendsTests : UsersServiceTestBase
             await SeedAsync(MakeFriendship(user, friend));
         }
         var query = new PaginationQuery(2, 5);
-        var result = await _usersService.GetFriendsAsync(user.Nickname, query);
+        var result = await _usersService.GetFriendsProfileAsync(user.Nickname, query);
         result.IsError.Should().BeFalse();
-        FriendsResponse response = result.Value;
+        FriendsProfileResponse response = result.Value;
         response.Friends.Should().HaveCount(5);
         response.TotalPages.Should().Be(3);
         
@@ -104,9 +104,9 @@ public class GetFriendsTests : UsersServiceTestBase
         await SeedAsync(user, friend);
         await SeedAsync(MakeFriendship(user, friend));
         var query = new PaginationQuery(10, 5);
-        var result = await _usersService.GetFriendsAsync(user.Nickname, query);
+        var result = await _usersService.GetFriendsProfileAsync(user.Nickname, query);
         result.IsError.Should().BeFalse();
-        FriendsResponse response = result.Value;
+        FriendsProfileResponse response = result.Value;
         response.Friends.Should().HaveCount(0);
     }
     

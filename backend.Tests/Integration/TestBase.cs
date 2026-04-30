@@ -17,6 +17,7 @@ using NSubstitute.ClearExtensions;
 using StackExchange.Redis;
 using Xunit.Abstractions;
 using Microsoft.Extensions.Logging;
+using backend.Services.Interfaces;
 
 namespace backend.Tests.Integration;
 public class TestBase : IClassFixture<WebApplicationFactory<Program>>
@@ -25,7 +26,7 @@ public class TestBase : IClassFixture<WebApplicationFactory<Program>>
 
     protected readonly AppDbContext _dbContext;
     protected readonly IDistributedCache _cache;
-
+    protected readonly IPresenceService _presenceService;
     private readonly IPasswordHasher<User> _passwordHasher;
     public TestBase(WebApplicationFactory<Program> factory)
     {
@@ -75,6 +76,15 @@ public class TestBase : IClassFixture<WebApplicationFactory<Program>>
                {
                    services.Remove(descriptor);
                }
+
+                var presenceDescriptors = services.Where(
+                  d => d.ServiceType == typeof(IPresenceService)).ToList();
+
+               foreach (var descriptor in presenceDescriptors)
+               {
+                   services.Remove(descriptor);
+               }
+
                var connection = new SqliteConnection("DataSource=:memory:");
                connection.Open();
 
@@ -103,7 +113,9 @@ public class TestBase : IClassFixture<WebApplicationFactory<Program>>
 
                     return mockMultiplexer;
                 });
-
+               var presenceMock = Substitute.For<IPresenceService>();
+               services.AddSingleton(presenceMock);
+                
 
            });
         });
@@ -111,6 +123,7 @@ public class TestBase : IClassFixture<WebApplicationFactory<Program>>
          var scope = customizedFactory.Services.CreateScope();
         _dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         _cache = scope.ServiceProvider.GetRequiredService<IDistributedCache>();
+        _presenceService = scope.ServiceProvider.GetRequiredService<IPresenceService>();
 
 
 

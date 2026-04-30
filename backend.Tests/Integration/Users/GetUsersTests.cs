@@ -8,6 +8,7 @@ using backend.Tests.Integration;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Caching.Distributed;
+using NSubstitute;
 using Xunit.Abstractions;
 
 public class GetUsersTests : TestBase
@@ -24,7 +25,7 @@ public class GetUsersTests : TestBase
         var response = await _client.GetAsync("/users");
 
         response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
-        var jsonData = await response.Content.ReadFromJsonAsync<UsersResponse>();
+        var jsonData = await response.Content.ReadFromJsonAsync<UsersSearchResponse>();
         jsonData.Should().NotBeNull();
         var users = jsonData.Users;
         users.Should().NotBeNull();
@@ -38,7 +39,7 @@ public class GetUsersTests : TestBase
         var response = await _client.GetAsync("/users");
 
         response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
-        var jsonData = await response.Content.ReadFromJsonAsync<UsersResponse>();
+        var jsonData = await response.Content.ReadFromJsonAsync<UsersSearchResponse>();
 
         jsonData.Should().NotBeNull();
         var users = jsonData.Users;
@@ -122,14 +123,12 @@ public class GetUsersTests : TestBase
         await LoginAsUserAsync();
         var onlineUser = await MakeUserAsync("onlineuser@example.com", "onlineuser", "OnlineUser", "123456");
 
-        await _cache.SetStringAsync($"user:online:{onlineUser.Id}", "1", new DistributedCacheEntryOptions
-        {
-            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
-         });
+       _presenceService.IsOnlineAsync(onlineUser.Id).Returns(true);
+       _presenceService.GetOnlineIdsAsync(Arg.Any<IEnumerable<Guid>>()).Returns([onlineUser.Id]);
 
         var response = await _client.GetAsync("/users?JustOnline=true");
         response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
-        var jsonData = await response.Content.ReadFromJsonAsync<UsersResponse>();
+        var jsonData = await response.Content.ReadFromJsonAsync<UsersSearchResponse>();
 
         jsonData.Should().NotBeNull();
         var users = jsonData.Users;

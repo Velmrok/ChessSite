@@ -40,7 +40,7 @@ public class UsersControllerTests
 
         _usersServiceMock.GetAllUsersAsync(query).Returns(new UsersResult
         (
-            new UsersResponse([],0),
+            new UsersSearchResponse([],0),
             false
         ));
 
@@ -56,7 +56,7 @@ public class UsersControllerTests
 
         _usersServiceMock.GetAllUsersAsync(query).Returns(new UsersResult
         (
-            new UsersResponse([],0),
+            new UsersSearchResponse([],0),
             false
         ));
 
@@ -90,17 +90,17 @@ public class UsersControllerTests
            
     }
     [Fact]
-    public async Task GetFriends_ShouldReturnOk()
+    public async Task GetFriendsProfile_ShouldReturnOk()
     {
         var nickname = "testuser";
         var query = new PaginationQuery { PageNumber = 1, Limit = 10 };
 
-        _usersServiceMock.GetFriendsAsync(nickname, query).Returns(new FriendsResponse
+        _usersServiceMock.GetFriendsProfileAsync(nickname, query).Returns(new FriendsProfileResponse
         (
             [],1
         ));
 
-        var result = await _controller.GetFriends(nickname, query);
+        var result = await _controller.GetFriendsProfile(nickname, query);
 
         var okResult = Assert.IsType<OkObjectResult>(result);
         Assert.Equal(200, okResult.StatusCode);
@@ -109,11 +109,11 @@ public class UsersControllerTests
     public async Task AddFriend_ShouldReturnOk()
     {
         var nickname = "testuser";
-        var request = new AddFriendRequest { Nickname = "frienduser" };
+      
 
-        _usersServiceMock.AddFriendAsync(request, nickname).Returns(new Success());
+        _usersServiceMock.AddFriendAsync("friendUser", nickname).Returns(new Success());
 
-        var result = await _controller.AddFriend(request);
+        var result = await _controller.AddFriend(nickname);
 
         var okResult = Assert.IsType<NoContentResult>(result);
         Assert.Equal(204, okResult.StatusCode);
@@ -125,7 +125,7 @@ public class UsersControllerTests
         var request = new UpdateUserBioRequest ( Bio : "This is my new bio." );
         _usersServiceMock.UpdateUserBioAsync(nickname, request)
         .Returns(new UpdateUserBioResponse ( Bio : request.Bio ));
-        var result = await _controller.UpdateUserBio(nickname, request);
+        var result = await _controller.UpdateUserBio(request);
         var okResult = Assert.IsType<OkObjectResult>(result);
         Assert.Equal(200, okResult.StatusCode);
     }

@@ -21,21 +21,21 @@ public class AddFriendTests : TestBase
         var user1 = await MakeUserAsync("user1@example.com", "user1", "User1", "123456");
         
         
-        var response = await _client.PostAsync($"/users/friend", JsonContent.Create(new { user1.Nickname }));
+        var response = await _client.PostAsync($"/users/{user1.Nickname}/friend",null);
         response.StatusCode.Should().Be(System.Net.HttpStatusCode.NoContent);
     }
     [Fact]
     public async Task ShouldReturnNotFound_WhenFriendDoesNotExist()
     {
         await LoginAsUserAsync();
-        var response = await _client.PostAsync($"/users/friend", JsonContent.Create(new { Nickname = "nonexistentuser" }));
+        var response = await _client.PostAsync($"/users/nonexistentuser/friend", null);
         response.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
     }
     [Fact]
     public async Task ShouldReturnValidationError_WhenAddingSelf()
     {
         await LoginAsUserAsync();
-        var response = await _client.PostAsync($"/users/friend", JsonContent.Create(new { Nickname = "TestNick" }));
+        var response = await _client.PostAsync($"/users/TestNick/friend", JsonContent.Create(new { Nickname = "TestNick" }));
         response.StatusCode.Should().Be(System.Net.HttpStatusCode.BadRequest);
     }
     [Fact]
@@ -45,9 +45,9 @@ public class AddFriendTests : TestBase
         var user1 = await MakeUserAsync("user1@example.com", "user1", "User1", "123456");
 
         
-        var response1 = await _client.PostAsync($"/users/friend", JsonContent.Create(new { Nickname = user1.Nickname }));
+        var response1 = await _client.PostAsync($"/users/{user1.Nickname}/friend", null);
         response1.StatusCode.Should().Be(System.Net.HttpStatusCode.NoContent);
-        var response2 = await _client.PostAsync($"/users/friend", JsonContent.Create(new { Nickname = user1.Nickname }));
+        var response2 = await _client.PostAsync($"/users/{user1.Nickname}/friend", null);
         response2.StatusCode.Should().Be(System.Net.HttpStatusCode.Conflict);
     }
 }

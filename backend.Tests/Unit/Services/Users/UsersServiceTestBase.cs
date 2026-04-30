@@ -17,6 +17,7 @@ public abstract class UsersServiceTestBase : TestBase
 {
     protected readonly UsersService _usersService;
     protected readonly IPresenceService _presenceService;
+    protected readonly IStorageService _storageService;
 
     public UsersServiceTestBase() 
     {
@@ -26,7 +27,9 @@ public abstract class UsersServiceTestBase : TestBase
 
         var cache = provider.GetRequiredService<IDistributedCache>();
         _presenceService = Substitute.For<IPresenceService>();
-        _usersService = new UsersService(_dbContext, cache, _presenceService);
+        _storageService = Substitute.For<IStorageService>();
+
+        _usersService = new UsersService(_dbContext, cache, _presenceService, _storageService);
     }
     protected User MakeUser(string name, int rapid = 1000, int blitz = 1000, int bullet = 1000,
         DateTime? createdAt = null, DateTime? lastActive = null) => new()

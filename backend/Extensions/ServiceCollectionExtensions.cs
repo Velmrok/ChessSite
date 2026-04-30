@@ -21,7 +21,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IGamesService, GamesService>();
         services.AddScoped<IHomeService, HomeService>();
 
-        services.AddSingleton<IPresenceService, PresenceService>();
+        services.AddScoped<IPresenceService, PresenceService>();
         services.AddSingleton<IJwtGenerator, JwtGenerator>();
 
 

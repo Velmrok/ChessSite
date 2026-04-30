@@ -1,6 +1,7 @@
 
 
 using System.Net.Http.Json;
+using backend.DTO.Users;
 using backend.Tests.Integration;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -34,7 +35,7 @@ public class GetFriendsTests : TestBase
         var user = await MakeUserAsync("testuser3@example.com", "testuser3", "TestUser3", "1234563");
         var result = await _client.GetAsync($"/users/{user.Nickname}/friends");
         result.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
-        var res = await result.Content.ReadFromJsonAsync<FriendsResponse>();
+        var res = await result.Content.ReadFromJsonAsync<FriendsProfileResponse>();
         res.Should().NotBeNull();
         res.Friends.Should().BeEmpty();
         res.TotalPages.Should().Be(0);

@@ -39,9 +39,9 @@ namespace backend.Controllers
            
         }
         [HttpGet("{nickname}/friends")]
-        public async Task<IActionResult> GetFriends(string nickname, [FromQuery] PaginationQuery pagination)
+        public async Task<IActionResult> GetFriendsProfile(string nickname, [FromQuery] PaginationQuery pagination)
         {
-            return HandleError(await _usersService.GetFriendsAsync(nickname, pagination), Ok);
+            return HandleError(await _usersService.GetFriendsProfileAsync(nickname, pagination), Ok);
         }
         [HttpPost("{nickname}/friend")]
         public async Task<IActionResult> AddFriend(string nickname)

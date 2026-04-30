@@ -121,7 +121,7 @@ public class UsersService : IUsersService
         var response = user.ToUserProfileResponse(isOnline);
         return response;
     }
-    public async Task<ErrorOr<FriendsProfileResponse>> GetFriendsAsync(string nickname, PaginationQuery pagination)
+    public async Task<ErrorOr<FriendsProfileResponse>> GetFriendsProfileAsync(string nickname, PaginationQuery pagination)
     {
 
         var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Nickname == nickname);

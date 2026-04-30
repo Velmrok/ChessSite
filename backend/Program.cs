@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.HttpOverrides;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddGlobalErrorHandling();
-builder.Services.AddDatabase(builder.Configuration);
+builder.Services.AddDatabase(builder.Configuration, builder.Environment.IsEnvironment("Test"));
 
 
 builder.Services.AddControllers();

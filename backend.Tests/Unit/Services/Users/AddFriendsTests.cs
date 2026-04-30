@@ -15,8 +15,8 @@ public class AddFriendsTests : UsersServiceTestBase
         var user = MakeUser("alice");
         var friend = MakeUser("bob");
         await SeedAsync(user, friend);
-        AddFriendRequest request = new() { Nickname = friend.Nickname };
-        var result = await _usersService.AddFriendAsync(request, user.Nickname);
+
+        var result = await _usersService.AddFriendAsync(friend.Nickname, user.Nickname);
         result.IsError.Should().BeFalse();
 
         var friendship = await _dbContext.Friendships.FirstOrDefaultAsync(f => f.UserId == user.Id && f.FriendId == friend.Id);
@@ -31,8 +31,7 @@ public class AddFriendsTests : UsersServiceTestBase
     {
         var user = MakeUser("alice");
         await SeedAsync(user);
-        AddFriendRequest request = new() { Nickname = "nonexistent" };
-        var result = await _usersService.AddFriendAsync(request, user.Nickname);
+        var result = await _usersService.AddFriendAsync("nonexistent", user.Nickname);
         result.IsError.Should().BeTrue();
         result.FirstError.Code.Should().Be("userNotFound");
     }
@@ -41,8 +40,8 @@ public class AddFriendsTests : UsersServiceTestBase
     {
         var friend = MakeUser("bob");
         await SeedAsync(friend);
-        AddFriendRequest request = new() { Nickname = friend.Nickname };
-        var result = await _usersService.AddFriendAsync(request, "nonexistent");
+      
+        var result = await _usersService.AddFriendAsync(friend.Nickname, "nonexistent");
         result.IsError.Should().BeTrue();
         result.FirstError.Code.Should().Be("userNotFound");
     }
@@ -53,8 +52,8 @@ public class AddFriendsTests : UsersServiceTestBase
         var friend = MakeUser("bob");
         await SeedAsync(user, friend);
         await SeedAsync(MakeFriendship(user, friend), MakeFriendship(friend, user));
-        AddFriendRequest request = new() { Nickname = friend.Nickname };
-        var result = await _usersService.AddFriendAsync(request, user.Nickname);
+      
+        var result = await _usersService.AddFriendAsync(friend.Nickname, user.Nickname);
         result.IsError.Should().BeTrue();
         result.FirstError.Code.Should().Be("alreadyFriends");
     }
@@ -63,8 +62,8 @@ public class AddFriendsTests : UsersServiceTestBase
     {
         var user = MakeUser("alice");
         await SeedAsync(user);
-        AddFriendRequest request = new() { Nickname = user.Nickname };
-        var result = await _usersService.AddFriendAsync(request, user.Nickname);
+  
+        var result = await _usersService.AddFriendAsync(user.Nickname, user.Nickname);
         result.IsError.Should().BeTrue();
         result.FirstError.Code.Should().Be("sameUser");
     }

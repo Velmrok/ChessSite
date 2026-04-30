@@ -41,6 +41,7 @@ public abstract class UsersServiceTestBase : TestBase
         Rating = new RatingStats(rapid, blitz, bullet),
         CreatedAt = createdAt ?? DateTime.UtcNow,
         LastActive = lastActive ?? DateTime.UtcNow,
+        ProfilePictureUrl = string.Empty
     };
 
     protected Friendship MakeFriendship(User user, User friend) => new()
@@ -54,6 +55,11 @@ public abstract class UsersServiceTestBase : TestBase
 
 
     protected async Task SeedAsync<T>(params T[] entities) where T : class
+    {
+        _dbContext.Set<T>().AddRange(entities);
+        await _dbContext.SaveChangesAsync();
+    }
+    protected async Task SeedAsync<T>(IEnumerable<T> entities) where T : class
 {
     _dbContext.Set<T>().AddRange(entities);
     await _dbContext.SaveChangesAsync();

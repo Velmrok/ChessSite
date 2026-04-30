@@ -41,6 +41,7 @@ public class TestBase : IClassFixture<WebApplicationFactory<Program>>
                 {
                     logging.ClearProviders();
                 });
+            builder.UseEnvironment("Test");
             builder.ConfigureAppConfiguration((context, configBuilder) =>
             {
                 configBuilder.Sources.Clear();
@@ -160,7 +161,7 @@ public class TestBase : IClassFixture<WebApplicationFactory<Program>>
         var response = await _client.PostAsJsonAsync("/auth/register", registerRequest);
         response.EnsureSuccessStatusCode();
     }
-    protected async Task LoginAsUserAsync(
+    protected async Task<Guid> LoginAsUserAsync(
         string email = "test@test.com",
         string login = "testuser",
         string nickname = "TestNick",
@@ -178,6 +179,6 @@ public class TestBase : IClassFixture<WebApplicationFactory<Program>>
         var response = await _client.PostAsJsonAsync("/auth/login", loginRequest);
         
         response.EnsureSuccessStatusCode();
-        
+        return _dbContext.Users.First(u => u.Login == login).Id;
     }
 }

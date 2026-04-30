@@ -24,7 +24,7 @@ public class LocalStorageService(IWebHostEnvironment env) : IStorageService
     {
         var path = Path.Combine(_env.WebRootPath, "uploads", objectKey);
         if (File.Exists(path)) File.Delete(path);
-        return new Success();
+        return await Task.FromResult(new Success());
     }
     public string GetAvatarUrl(string key)
     {

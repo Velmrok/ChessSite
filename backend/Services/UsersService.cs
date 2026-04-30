@@ -204,12 +204,16 @@ public class UsersService : IUsersService
             return Error.NotFound("userNotFound", "One or both users were not found.");
         }
 
+        if (user.Id == friend.Id)
+        {
+            return Error.Validation("sameUser", "You cannot remove yourself from friends.");
+        }
         var friendship = await _dbContext.Friendships
             .FirstOrDefaultAsync(f => f.UserId == user.Id && f.FriendId == friend.Id);
 
         if (friendship == null)
         {
-            return Error.NotFound("friendshipNotFound", "These users are not friends.");
+            return Error.Conflict("friendshipNotFound", "These users are not friends.");
         }
 
         var reverseFriendship = await _dbContext.Friendships

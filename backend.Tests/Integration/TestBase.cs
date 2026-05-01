@@ -18,6 +18,7 @@ using StackExchange.Redis;
 using Xunit.Abstractions;
 using Microsoft.Extensions.Logging;
 using backend.Services.Interfaces;
+using backend.DTO.Common;
 
 namespace backend.Tests.Integration;
 public class TestBase : IClassFixture<WebApplicationFactory<Program>>
@@ -135,14 +136,15 @@ public class TestBase : IClassFixture<WebApplicationFactory<Program>>
         });
     }
 
-    protected async Task<User> MakeUserAsync(string email, string login, string nickname, string password)
+    protected async Task<User> MakeUserAsync(string nickname, string? email = null, string? login = null,  string? password = null,RatingStats? rating = null, string bio = "")
     {
         var user = new User
         {
-            Email = email,
-            Login = login,
+            Email = email ?? nickname + "@test.com",
+            Login = login ?? nickname,
             Nickname = nickname,
-            PasswordHash = _passwordHasher.HashPassword(null!, password)
+            PasswordHash = _passwordHasher.HashPassword(null!, password ?? "123456"),
+            Rating = rating ?? new RatingStats(1000, 1000, 1000),
         };
         _dbContext.Users.Add(user);
         await _dbContext.SaveChangesAsync();
@@ -168,7 +170,7 @@ public class TestBase : IClassFixture<WebApplicationFactory<Program>>
         string password = "123456")
     {
 
-        await MakeUserAsync(email, login, nickname, password);
+        await MakeUserAsync( nickname,email, login, password);
 
         var loginRequest = new LoginRequest
         {
@@ -180,5 +182,18 @@ public class TestBase : IClassFixture<WebApplicationFactory<Program>>
         
         response.EnsureSuccessStatusCode();
         return _dbContext.Users.First(u => u.Login == login).Id;
+    }
+    protected async Task<Friendship> MakeFriendshipAsync(User user, User friend)
+    {
+        var friendship = new Friendship
+        {
+            UserId = user.Id,
+            FriendId = friend.Id,
+            User = user,
+            Friend = friend
+        };
+        _dbContext.Friendships.Add(friendship);
+        await _dbContext.SaveChangesAsync();
+        return friendship;
     }
 }

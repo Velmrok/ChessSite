@@ -4,10 +4,12 @@ using backend.DTO.Games;
 using backend.Enums;
 using backend.Models;
 using backend.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 namespace backend.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("/games")]
 public class GamesController : MyControllerBase

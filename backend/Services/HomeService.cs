@@ -17,7 +17,7 @@ public class HomeService : IHomeService
 
     private readonly IPresenceService _presenceService;
     private readonly AppDbContext _dbContext;
-    public HomeService(IPresenceService presenceService, AppDbContext dbContext)
+    public HomeService(AppDbContext dbContext,IPresenceService presenceService)
     {
         _presenceService = presenceService; 
         _dbContext = dbContext;

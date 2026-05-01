@@ -32,7 +32,7 @@ public abstract class UsersServiceTestBase : TestBase
         _usersService = new UsersService(_dbContext, cache, _presenceService, _storageService);
     }
     protected User MakeUser(string name, int rapid = 1000, int blitz = 1000, int bullet = 1000,
-        DateTime? createdAt = null, DateTime? lastActive = null) => new()
+        DateTime? createdAt = null, DateTime? lastActive = null,string bio = "") => new()
     {
         Nickname = name,
         Login = name,
@@ -41,6 +41,7 @@ public abstract class UsersServiceTestBase : TestBase
         Rating = new RatingStats(rapid, blitz, bullet),
         CreatedAt = createdAt ?? DateTime.UtcNow,
         LastActive = lastActive ?? DateTime.UtcNow,
+        ProfileBio = bio,
         ProfilePictureUrl = string.Empty
     };
 

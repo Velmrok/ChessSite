@@ -27,7 +27,7 @@ coveragereport
 dist
 # Mono auto generated files
 mono_crash.*
-
+*/wwwroot
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/

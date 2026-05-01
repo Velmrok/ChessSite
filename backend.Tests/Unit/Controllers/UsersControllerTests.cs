@@ -129,5 +129,64 @@ public class UsersControllerTests
         var okResult = Assert.IsType<OkObjectResult>(result);
         Assert.Equal(200, okResult.StatusCode);
     }
+    [Fact]
+    public async Task RemoveFriend_ShouldReturnOk()
+    {
+        var nickname = "testuser";
+
+        _usersServiceMock.RemoveFriendAsync("friendUser", nickname).Returns(new Success());
+
+        var result = await _controller.RemoveFriend(nickname);
+
+        var okResult = Assert.IsType<NoContentResult>(result);
+        Assert.Equal(204, okResult.StatusCode);
+    }
+    [Fact]
+    public async Task GetUserProfile_ShouldReturnOk()
+    {
+        var nickname = "testuser";
+
+        _usersServiceMock.GetUserProfileAsync(nickname).Returns(new UserProfileResponse
+        (
+            Nickname: nickname,
+            Bio: "This is my bio.",
+            ProfilePictureUrl: "http://example.com/profile.jpg",
+            IsOnline: true,
+            UserInfo: new UserInfo
+            (
+                Rating: new DTO.Common.RatingStats(Rapid: 1200, Blitz: 1300, Bullet: 1100),
+                CreatedAt: DateTime.UtcNow.AddYears(-1).ToString("O"),
+                GamesPlayed: 100,
+                Wins: new DTO.Common.RatingStats(Rapid: 60, Blitz: 70, Bullet: 50),
+                Losses: new DTO.Common.RatingStats(Rapid: 30, Blitz: 20, Bullet: 40),
+                Draws: new DTO.Common.RatingStats(Rapid: 10, Blitz: 10, Bullet: 10),
+                TotalWins: 180,
+                TotalLosses: 90,
+                TotalDraws: 30
+               
+            )
+        ));
+
+        var result = await _controller.GetUserProfile(nickname);
+
+        var okResult = Assert.IsType<OkObjectResult>(result);
+        Assert.Equal(200, okResult.StatusCode);
+    }
+    [Fact]
+    public async Task GetOnlineFriends_ShouldReturnOk()
+    {
+        var nickname = "testuser";
+        var query = new PaginationQuery { PageNumber = 1, Limit = 10 };
+
+        _usersServiceMock.GetOnlineFriendsAsync(nickname, query).Returns(new OnlineFriendsResponse
+        (
+            [],1
+        ));
+
+        var result = await _controller.GetOnlineFriends(query);
+
+        var okResult = Assert.IsType<OkObjectResult>(result);
+        Assert.Equal(200, okResult.StatusCode);
+    }
 }
 

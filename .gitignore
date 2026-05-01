@@ -8,6 +8,8 @@ old_backend
 # dotenv files
 .env
 
+.claude/
+
 *.pem
 *.key
 

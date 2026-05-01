@@ -7,7 +7,7 @@ namespace backend.Services.Mappers
 {
     public static class GameMappers
     {
-        public static GameSummary MapToGamesResponse(this Game game, string? winnerNickname, bool isWhitePlayerOnline, bool isBlackPlayerOnline)
+        public static GameSummary MapToGamesResponse(this Game game, string? winnerNickname)
         {
 
             return new GameSummary

@@ -34,7 +34,7 @@ namespace backend.Services
             var games = await _dbContext.Games
                 .Where(g => g.WhitePlayer.Nickname.Contains(query.Query ?? "") || g.BlackPlayer.Nickname.Contains(query.Query ?? ""))
                 .Where(g => query.GameType == null || g.Type == query.GameType)
-                .Where(g => query.Status == null || g.Status == query.Status)
+                .Where(g => query.GameStatus == null || g.Status == query.GameStatus)
                 .SortBy(SortSelectors[query.SortBy ?? GamesSortBy.FinishedAt], query.SortDescending)
                 .Include(g => g.WhitePlayer)
                 .Include(g => g.BlackPlayer)

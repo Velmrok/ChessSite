@@ -16,7 +16,7 @@ namespace backend.DTO.Games
     GameType? GameType = null,
     GamesSortBy? SortBy = null,
     bool SortDescending = false,
-    GameStatus? Status = null
+    GameStatus? GameStatus = null
 
 
     );

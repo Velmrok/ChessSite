@@ -70,26 +70,34 @@ public class PresenceService : IPresenceService
         if (!keys.Any()) return;
 
         var updates = new List<(Guid userId, DateTime lastActive)>();
-
+        
         foreach (var key in keys)
         {
+            
             var value = await _db.StringGetDeleteAsync(key);
             if (!value.HasValue) continue;
-
+            
             var userId = Guid.Parse(key.ToString().Split(':')[2]);
-            var lastActive = DateTime.Parse(value.ToString());
+            var lastActive = DateTimeOffset.Parse(value.ToString()).UtcDateTime;
+            
             updates.Add((userId, lastActive));
         }
 
         var ids = updates.Select(u => u.userId).ToList();
         var times = updates.Select(u => u.lastActive).ToArray();
 
-        await _dbContext.Database.ExecuteSqlRawAsync(@"
-        UPDATE ""Users"" u
-        SET ""LastActive"" = data.last_active
-        FROM unnest(@ids, @times) AS data(user_id, last_active)
-        WHERE u.""Id"" = data.user_id
-    ", new NpgsqlParameter("ids", ids), new NpgsqlParameter("times", times));
+        var lookup = ids.Zip(times).ToDictionary(x => x.First, x => x.Second);
+
+        var updatesZipped = ids.Zip(times, (id, time) => new { id, time });
+        
+        foreach (var update in updatesZipped)
+        {
+            await _dbContext.Users
+                .Where(u => u.Id == update.id)
+                .ExecuteUpdateAsync(s => s.SetProperty(u => u.LastActive, update.time));
+            
+        }
+        ;
     }
 
 }

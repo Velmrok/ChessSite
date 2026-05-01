@@ -7,9 +7,9 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Mvc.Testing;
 
 
-public class GetFriendsTests : TestBase
+public class GetProfileFriendsTests : TestBase
 {
-    public GetFriendsTests(WebApplicationFactory<Program> factory) : base(factory)
+    public GetProfileFriendsTests(WebApplicationFactory<Program> factory) : base(factory)
     {
     }
 

@@ -14,29 +14,28 @@ namespace backend.Services;
 
 public class HomeService : IHomeService
 {
-    private readonly AppDbContext   _dbcontext;
+
     private readonly IPresenceService _presenceService;
     private readonly AppDbContext _dbContext;
-    public HomeService(AppDbContext context, IPresenceService presenceService, AppDbContext dbContext)
+    public HomeService(IPresenceService presenceService, AppDbContext dbContext)
     {
-        _dbcontext = context;    
         _presenceService = presenceService; 
         _dbContext = dbContext;
     }
 
     public async Task<ErrorOr<LeaderBoardResponse>> GetLeaderboardAsync()
     {
-        var topRapid = await _dbcontext.Users
+        var topRapid = await _dbContext.Users
             .OrderByDescending(u => u.Rating.Rapid)
             .Take(9)
             .ToListAsync();
 
-        var topBlitz = await _dbcontext.Users
+        var topBlitz = await _dbContext.Users
             .OrderByDescending(u => u.Rating.Blitz)
             .Take(9)
             .ToListAsync();
 
-        var topBullet = await _dbcontext.Users
+        var topBullet = await _dbContext.Users
             .OrderByDescending(u => u.Rating.Bullet)
             .Take(9)
             .ToListAsync();

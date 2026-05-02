@@ -2,6 +2,7 @@
 
 
 using backend.Data;
+using backend.DTO.Auth;
 using backend.DTO.Queue;
 using backend.Services.Interfaces;
 using backend.Services.Mappers;
@@ -43,6 +44,7 @@ public class QueueService : IQueueService
 
         await _db.HashSetAsync($"{QueueSetKey}:{userId}",
         [
+            new ("joinedAt", DateTime.UtcNow.ToString("o")),
             new("time", payload.Time),
             new("increment", payload.Increment),
             new("rating", user.GetRatingByTime(payload.Time))
@@ -65,5 +67,23 @@ public class QueueService : IQueueService
     public async Task<int> GetQueueLengthAsync()
     {
         return (int) await _db.SetLengthAsync(QueueSetKey);
+    }
+    public QueueData GetUserQueueData(string userId)
+    {
+        var data = _db.HashGetAll($"{QueueSetKey}:{userId}");
+        if (data.Length == 0)
+            return new QueueData(false);
+
+        var time = data.FirstOrDefault(e => e.Name == "time").Value;
+        var increment = data.FirstOrDefault(e => e.Name == "increment").Value;
+        var rating = data.FirstOrDefault(e => e.Name == "rating").Value;
+        var joinedAt = data.FirstOrDefault(e => e.Name == "joinedAt").Value;
+
+        return new QueueData(
+            IsInQueue: true,
+            Time: (int?)time,
+            Increment: (int?)increment,
+            JoinedQueueAt: DateTime.Parse(joinedAt.ToString())
+        );
     }
 }

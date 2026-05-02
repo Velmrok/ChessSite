@@ -29,7 +29,7 @@ const UserMenu = ({ onLogout }: { onLogout: () => void }) => {
     const user = useUserStore((state) => state.user);
     const { t } = useTranslation("navbar");
 
-    const isInQueue = useUserStore(state => state.user?.isInQueue);
+    const isInQueue = useUserStore(state => state.queueData?.isInQueue);
     const queueTime = useUserStore(state => state.queueTime);
 
     return (

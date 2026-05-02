@@ -10,12 +10,12 @@ import type { SignalRError } from "@/types/signalR";
 export default function useQueue() {
     const setToast = useToastStore((state) => state.setToast);
     const {t} = useTranslation('toast')
-    const setIsInQueue = useUserStore((state) => state.setIsInQueue);
+
 
     const {request} = useApi();
     const setQueueTime = useUserStore(state => state.setQueueTime);
-    const setQueueJoinedAt = useUserStore(state => state.setQueueJoinedAt);
-    const joinedQueueAt = useUserStore(state => state.joinedQueueAt);
+    const setQueueData = useUserStore(state => state.setQueueData);
+    const queueData = useUserStore(state => state.queueData);
 
     const handleJoinQueue = async (time: number, increment: number) => {
         const response = await request( () =>
@@ -32,10 +32,10 @@ export default function useQueue() {
        
         if (response) {
       
-        setIsInQueue(true);
+        
         
         setQueueTime(0);
-        setQueueJoinedAt(new Date());
+        setQueueData({ ...queueData, joinedQueueAt: new Date().toString(), time, increment, isInQueue: true });
         setToast({ msg: t('info.addedToQueue'), type: "info" });
       
     }
@@ -53,7 +53,7 @@ export default function useQueue() {
             }
         })
         if (response) {
-            setIsInQueue(false);
+            setQueueData({isInQueue: false});
             setToast({ msg: t('info.leftQueue'), type: "info" });
         }
 

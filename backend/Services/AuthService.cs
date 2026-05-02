@@ -20,10 +20,11 @@ public class AuthService : IAuthService
     private readonly ICacheInvalidationService _cacheInvalidation;
     private readonly IStorageService _storageService;
     private readonly IPresenceService _presenceService;
+    private readonly IQueueService _queueService;
 
     public AuthService(AppDbContext dbContext, IJwtGenerator jwtGenerator,
      IPasswordHasher<User> passwordHasher, ICacheInvalidationService cacheInvalidation,
-     IRefreshTokenService refreshTokenService, IStorageService storageService , IPresenceService presenceService)
+     IRefreshTokenService refreshTokenService, IStorageService storageService , IPresenceService presenceService, IQueueService queueService)
     {
         _dbContext = dbContext;
         _jwtGenerator = jwtGenerator;
@@ -32,6 +33,7 @@ public class AuthService : IAuthService
         _cacheInvalidation = cacheInvalidation;
         _storageService = storageService;
         _presenceService = presenceService;
+        _queueService = queueService;
     }
     public async Task<ErrorOr<AuthResult>> RegisterAsync(RegisterRequest request)
     {   
@@ -84,7 +86,9 @@ public class AuthService : IAuthService
 
         await _dbContext.SaveChangesAsync();
         await _cacheInvalidation.InvalidateUsersCache();
-        return new AuthResult(accessToken, refreshToken, newUser.ToGetMeResponse([]));
+
+        var queueData = _queueService.GetUserQueueData(newUser.Id.ToString());
+        return new AuthResult(accessToken, refreshToken, newUser.ToGetMeResponse([], queueData));
 
     }
     public async Task<ErrorOr<AuthResult>> LoginAsync(LoginRequest request)
@@ -117,8 +121,9 @@ public class AuthService : IAuthService
             .Where(f => f.UserId == user.Id)
             .Select(f => f.Friend.Nickname)
             .ToListAsync();
+        var queueData = _queueService.GetUserQueueData(user.Id.ToString());
         await _presenceService.SetOnlineAsync(user.Id);
-        return new AuthResult(accessToken, refreshToken, user.ToGetMeResponse(friendNicknames));
+        return new AuthResult(accessToken, refreshToken, user.ToGetMeResponse(friendNicknames, queueData));
     }
     public async Task<ErrorOr<AuthResult>> RefreshAsync(string refreshToken)
     {
@@ -147,8 +152,9 @@ public class AuthService : IAuthService
             .Where(f => f.UserId == user.Id)
             .Select(f => f.Friend.Nickname)
             .ToListAsync();
+        var queueData = _queueService.GetUserQueueData(user.Id.ToString());
         await _presenceService.SetOnlineAsync(user.Id);
-        return new AuthResult(newAccessToken, newRefreshToken, user.ToGetMeResponse(friendNicknames));
+        return new AuthResult(newAccessToken, newRefreshToken, user.ToGetMeResponse(friendNicknames, queueData));
     }
     public async Task<ErrorOr<Success>> LogoutAsync(string refreshToken)
     {
@@ -180,7 +186,8 @@ public class AuthService : IAuthService
             .Where(f => f.UserId == userEntity.Id)
             .Select(f => f.Friend.Nickname)
             .ToListAsync();
+        var queueData = _queueService.GetUserQueueData(userEntity.Id.ToString());
         await _presenceService.SetOnlineAsync(userEntity.Id);
-        return userEntity.ToGetMeResponse(friendNicknames);
+        return userEntity.ToGetMeResponse(friendNicknames, queueData);
     }
 }

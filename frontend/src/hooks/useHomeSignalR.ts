@@ -10,11 +10,10 @@ import type { SignalRResponse } from "@/types/signalR";
 
 export function useHomeSignalR() {
  
-  const setIsInQueue = useUserStore((state) => state.setIsInQueue);
+  
   const setUsersOnline = useHomeStore((state) => state.setUsersOnline);
   const setMatchesInProgress = useHomeStore((state) => state.setMatchesInProgress);
   const setCreatedAccounts = useHomeStore((state) => state.setCreatedAccounts);
-  const setDeletedQueuesById = useHomeStore((state) => state.setDeletedQueuesById);
   const setQueueSize = useHomeStore((state) => state.setQueueSize);
   const isConnected = useUserStore(state => state.isConnected);
   const {request} = useApi();

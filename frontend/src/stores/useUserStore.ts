@@ -1,19 +1,19 @@
 
-import type { User } from '@/types/user';
+import type { GetMeResponse, QueueData } from '@/types/auth';
 import {create} from 'zustand';
 type UserStore = {
-    user: User | null;
+    user: Omit<GetMeResponse, 'queueData'> | null;
+    queueData?: QueueData   ;
     queueTime?: number;
     isConnected: boolean;
-    joinedQueueAt?: Date;
     setQueueTime: (queueTime: number) => void;
-    setUser: (user: User | null) => void;
+    setQueueData: (queueData: QueueData) => void;
+    setUser: (user: Omit<GetMeResponse, 'queueData'> | null) => void;
     clearUser: () => void;
     deleteFriend: (nickname: string) => void;
     addFriend: (nickname: string) => void;
     setIsConnected: (isConnected: boolean) => void;
-    setIsInQueue: (isInQueue: boolean) => void;
-    setQueueJoinedAt: (joinedAt: Date) => void;
+
 
 
 };
@@ -21,14 +21,14 @@ const useUserStore = create<UserStore>((set, get) => ({
     user: null,
     queueTime: undefined,
     isConnected: false,
-    joinedQueueAt: undefined,
+    queueData: undefined,
     setQueueTime: (queueTime: number) =>{
          set({queueTime})
          
          
     },
-    setQueueJoinedAt: (joinedAt: Date) => set({joinedQueueAt: joinedAt}),
-    setUser: (user: User | null) => set({user}),
+    setQueueData: (queueData: QueueData) => set({ queueData }),
+    setUser: (user: Omit<GetMeResponse, 'queueData'> | null) => set({user}),
     clearUser: () => set({user: null}),
     deleteFriend: (nickname: string) => set((state) => {
         if (!state.user) return state;
@@ -48,12 +48,9 @@ const useUserStore = create<UserStore>((set, get) => ({
             }
         };
     }),
-    setIsInQueue: (isInQueue: boolean) => set((state) => {
-        if (!state.user) return state;
-        return { ...state, user: { ...state.user, isInQueue } };
-    }),
-    setIsConnected: (isConnected: boolean) => set({isConnected}),
     
-   
+    setIsConnected: (isConnected: boolean) => set({ isConnected }),
+
+
 }));
 export default useUserStore;

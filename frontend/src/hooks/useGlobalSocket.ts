@@ -10,16 +10,16 @@ import { useTranslation } from 'react-i18next';
 export function useGlobalSignalR() {
  
   const queueIntervalRef = useRef<number| null>(null);
-  const isInQueue = useUserStore(state => state.user?.isInQueue);
+  const isInQueue = useUserStore(state => state.queueData?.isInQueue);
   const setQueueTime = useUserStore(state => state.setQueueTime);
-  const joinedQueueAt = useUserStore(state => state.joinedQueueAt);
+  const joinedQueueAt = useUserStore(state => state.queueData?.joinedQueueAt);
 
 
   useEffect(() => {
     if (isInQueue) {
       queueIntervalRef.current = setInterval(() => {
   
-        setQueueTime(Date.now() - joinedQueueAt!.getTime());
+        setQueueTime(Date.now() - new Date(joinedQueueAt ?? '').getTime());
       }, 1000);
     }
 

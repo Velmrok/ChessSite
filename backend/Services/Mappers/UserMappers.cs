@@ -8,16 +8,16 @@ using System.Linq;
 namespace backend.Services.Mappers;
 public static class UserMappers
 {
-    public static GetMeResponse ToGetMeResponse(this User user, List<string> friendNicknames)
+    public static GetMeResponse ToGetMeResponse(this User user, List<string> friendNicknames, QueueData queueData)
     {
         return new GetMeResponse(
             Nickname: user.Nickname,
-            ProfileBio: user.ProfileBio,
             ProfilePictureUrl: user.ProfilePictureUrl,
             CreatedAt: user.CreatedAt,
             LastActive: user.LastActive,
             Rating: user.Rating,
-            FriendNicknames: friendNicknames
+            FriendNicknames: friendNicknames,
+            QueueData: queueData
         );
     }
     public static UserSearchSummary ToUserResponse(this User user, bool isOnline)

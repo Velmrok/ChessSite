@@ -72,7 +72,7 @@ export default function Navbar() {
     const handleLogout = async () => {
         try {
             await logoutUser();;
-            useUserStore.getState().setUser(null);
+            setUser(null);
             navigate('/login');
         } catch (error: any) {
             if (error.status === 401) setUser(null);

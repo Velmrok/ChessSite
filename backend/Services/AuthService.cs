@@ -1,4 +1,3 @@
-
 using backend.Data;
 using backend.DTO.Auth;
 using backend.Models;
@@ -10,7 +9,7 @@ using backend.Services.Mappers;
 using backend.Services.Results;
 
 namespace backend.Services;
- 
+
 public class AuthService : IAuthService
 {
     private readonly AppDbContext _dbContext;
@@ -22,9 +21,15 @@ public class AuthService : IAuthService
     private readonly IPresenceService _presenceService;
     private readonly IQueueService _queueService;
 
-    public AuthService(AppDbContext dbContext, IJwtGenerator jwtGenerator,
-     IPasswordHasher<User> passwordHasher, ICacheInvalidationService cacheInvalidation,
-     IRefreshTokenService refreshTokenService, IStorageService storageService , IPresenceService presenceService, IQueueService queueService)
+    public AuthService(
+        AppDbContext dbContext,
+        IJwtGenerator jwtGenerator,
+        IPasswordHasher<User> passwordHasher,
+        ICacheInvalidationService cacheInvalidation,
+        IRefreshTokenService refreshTokenService,
+        IStorageService storageService,
+        IPresenceService presenceService,
+        IQueueService queueService)
     {
         _dbContext = dbContext;
         _jwtGenerator = jwtGenerator;
@@ -35,29 +40,20 @@ public class AuthService : IAuthService
         _presenceService = presenceService;
         _queueService = queueService;
     }
+
     public async Task<ErrorOr<AuthResult>> RegisterAsync(RegisterRequest request)
-    {   
-        if (string.IsNullOrWhiteSpace(request.Email) || string.IsNullOrWhiteSpace(request.Login) ||
-            string.IsNullOrWhiteSpace(request.Nickname) || string.IsNullOrWhiteSpace(request.Password))
+    {
+        var user = new User
         {
-            return Error.Validation("invalidInput", "All fields are required.");
-        }
-        request.Email = request.Email.Trim();
-        request.Login = request.Login.Trim();
-        request.Nickname = request.Nickname.Trim();
+            Nickname = request.Nickname.Trim(),
+            Login = request.Login.Trim(),
+            Email = request.Email.Trim(),
+            PasswordHash = _passwordHasher.HashPassword(null!, request.Password),
+            ProfileBio = "",
+            ProfilePictureUrl = _storageService.GetAvatarUrl("default.webp"),
+        };
 
-        var passwordHash = _passwordHasher.HashPassword(null!, request.Password);
-            var newUser = new User
-            {
-                Nickname = request.Nickname,
-                Login = request.Login,
-                Email = request.Email,
-                PasswordHash = passwordHash,
-                ProfileBio = "",
-                ProfilePictureUrl = _storageService.GetAvatarUrl("default.webp"),
-            };
-        await _dbContext.Users.AddAsync(newUser);
-
+        _dbContext.Users.Add(user);
 
         try
         {
@@ -65,129 +61,133 @@ public class AuthService : IAuthService
         }
         catch (DbUpdateException)
         {
-            var conflictingUser = await _dbContext.Users
-                .Where(u => u.Nickname == request.Nickname ||
-                            u.Email == request.Email ||
-                            u.Login == request.Login)
-                .Select(u => new { u.Nickname, u.Email, u.Login })
-                .FirstOrDefaultAsync();
-
-            if (conflictingUser == null)
-                return Error.Failure("registrationFailed", "Registration failed due to a database error.");
-
-            if (conflictingUser.Nickname == request.Nickname) return Error.Conflict("nicknameTaken", "Nickname is already taken.");
-            if (conflictingUser.Email == request.Email) return Error.Conflict("emailTaken", "Email is already taken.");
-            return Error.Conflict("loginTaken", "Login is already taken.");
+            return await MapConflictErrorAsync(request);
         }
-        var accessToken = _jwtGenerator.GenerateToken(newUser);
-        var refreshToken = await _refreshTokenService.CreateRefreshTokenAsync(newUser);
 
-        await _presenceService.SetOnlineAsync(newUser.Id);
-
+        var (accessToken, refreshToken) = await GenerateTokensAsync(user);
+        await _presenceService.SetOnlineAsync(user.Id);
         await _dbContext.SaveChangesAsync();
         await _cacheInvalidation.InvalidateUsersCache();
 
-        var queueData = _queueService.GetUserQueueData(newUser.Id.ToString());
-        return new AuthResult(accessToken, refreshToken, newUser.ToGetMeResponse([], queueData));
-
+        return BuildAuthResult(user, accessToken, refreshToken, []);
     }
+
     public async Task<ErrorOr<AuthResult>> LoginAsync(LoginRequest request)
     {
-        if (string.IsNullOrWhiteSpace(request.Login) || string.IsNullOrWhiteSpace(request.Password))
-        {
-            return Error.Unauthorized("invalidLoginOrPassword", "Invalid login or password.");
-        }
-        request.Login = request.Login.Trim();
-        request.Password = request.Password.Trim();
-        var user = await _dbContext.Users.FirstOrDefaultAsync(u =>
-            u.Login == request.Login || u.Email == request.Login);
+        var login = request.Login.Trim();
 
-        if (user == null)
-        {
-            return Error.Unauthorized("invalidLoginOrPassword", "Invalid login or password.");
-        }
+        var user = await _dbContext.Users
+            .FirstOrDefaultAsync(u => u.Login == login || u.Email == login);
 
-        var verificationResult = _passwordHasher.VerifyHashedPassword(null!, user.PasswordHash, request.Password);
-        if (verificationResult == PasswordVerificationResult.Failed)
-        {
+        if (user is null)
             return Error.Unauthorized("invalidLoginOrPassword", "Invalid login or password.");
-        }
 
-        var accessToken = _jwtGenerator.GenerateToken(user);
-        var refreshToken = await _refreshTokenService.CreateRefreshTokenAsync(user);
+        var result = _passwordHasher.VerifyHashedPassword(null!, user.PasswordHash, request.Password);
+        if (result == PasswordVerificationResult.Failed)
+            return Error.Unauthorized("invalidLoginOrPassword", "Invalid login or password.");
+
+        var (accessToken, refreshToken) = await GenerateTokensAsync(user);
         await _dbContext.SaveChangesAsync();
-        
-        var friendNicknames = await _dbContext.Friendships
-            .Where(f => f.UserId == user.Id)
-            .Select(f => f.Friend.Nickname)
-            .ToListAsync();
-        var queueData = _queueService.GetUserQueueData(user.Id.ToString());
+
+        var friendNicknames = await GetFriendNicknamesAsync(user.Id);
         await _presenceService.SetOnlineAsync(user.Id);
-        return new AuthResult(accessToken, refreshToken, user.ToGetMeResponse(friendNicknames, queueData));
+
+        return BuildAuthResult(user, accessToken, refreshToken, friendNicknames);
     }
+
     public async Task<ErrorOr<AuthResult>> RefreshAsync(string refreshToken)
     {
         if (string.IsNullOrEmpty(refreshToken))
-        {
             return Error.Unauthorized("invalidRefreshToken", "Refresh token is missing.");
-        }
 
-        var refreshTokenEntity = await _dbContext.RefreshTokens.Include(rt => rt.User)
+        var tokenEntity = await _dbContext.RefreshTokens
+            .Include(rt => rt.User)
             .FirstOrDefaultAsync(rt => rt.Token == refreshToken);
 
-        if (refreshTokenEntity == null || refreshTokenEntity.ExpiresAt < DateTime.UtcNow || refreshTokenEntity.IsRevoked)
-        {
+        if (tokenEntity is null || tokenEntity.ExpiresAt < DateTime.UtcNow || tokenEntity.IsRevoked)
             return Error.Unauthorized("invalidRefreshToken", "Refresh token is invalid or has expired.");
-        }
 
-        var user = refreshTokenEntity.User;
-        var newAccessToken = _jwtGenerator.GenerateToken(user);
+        var user = tokenEntity.User;
 
-        var newRefreshToken = await _refreshTokenService.CreateRefreshTokenAsync(user);
         await _refreshTokenService.RevokeRefreshTokenAsync(refreshToken);
-
+        var (newAccessToken, newRefreshToken) = await GenerateTokensAsync(user);
         await _dbContext.SaveChangesAsync();
 
-        var friendNicknames = await _dbContext.Friendships
-            .Where(f => f.UserId == user.Id)
-            .Select(f => f.Friend.Nickname)
-            .ToListAsync();
-        var queueData = _queueService.GetUserQueueData(user.Id.ToString());
+        var friendNicknames = await GetFriendNicknamesAsync(user.Id);
         await _presenceService.SetOnlineAsync(user.Id);
-        return new AuthResult(newAccessToken, newRefreshToken, user.ToGetMeResponse(friendNicknames, queueData));
+
+        return BuildAuthResult(user, newAccessToken, newRefreshToken, friendNicknames);
     }
+
     public async Task<ErrorOr<Success>> LogoutAsync(string refreshToken)
     {
-       if (string.IsNullOrEmpty(refreshToken))
-        {
+        if (string.IsNullOrEmpty(refreshToken))
             return Error.Unauthorized("invalidRefreshToken", "Refresh token is missing.");
-        }
+
         await _refreshTokenService.RevokeRefreshTokenAsync(refreshToken);
         await _dbContext.SaveChangesAsync();
-        
+
         return new Success();
     }
 
     public async Task<ErrorOr<GetMeResponse>> GetMeAsync(string sub)
     {
-        if (string.IsNullOrEmpty(sub))
-        {
-            return Error.Unauthorized("invalidAccessToken", "Access token is invalid.");
-        }
         if (!Guid.TryParse(sub, out var userId))
-        {
             return Error.Unauthorized("invalidAccessToken", "Access token is invalid.");
-        }
-        var userEntity = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
-        if (userEntity == null)
+
+        var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
+        if (user is null)
             return Error.NotFound("userNotFound", "User account no longer exists.");
 
-        var friendNicknames = await _dbContext.Friendships
-            .Where(f => f.UserId == userEntity.Id)
+        var friendNicknames = await GetFriendNicknamesAsync(user.Id);
+        await _presenceService.SetOnlineAsync(user.Id);
+
+        var queueData = _queueService.GetUserQueueData(user.Id.ToString());
+        return user.ToGetMeResponse(friendNicknames, queueData);
+    }
+
+    // ── Private helpers ──────────────────────────────────────────
+
+    private async Task<(string accessToken, string refreshToken)> GenerateTokensAsync(User user)
+    {
+        var accessToken = _jwtGenerator.GenerateToken(user);
+        var refreshToken = await _refreshTokenService.CreateRefreshTokenAsync(user);
+        return (accessToken, refreshToken);
+    }
+
+    private async Task<List<string>> GetFriendNicknamesAsync(Guid userId)
+    {
+        return await _dbContext.Friendships
+            .Where(f => f.UserId == userId)
             .Select(f => f.Friend.Nickname)
             .ToListAsync();
-        var queueData = _queueService.GetUserQueueData(userEntity.Id.ToString());
-        await _presenceService.SetOnlineAsync(userEntity.Id);
-        return userEntity.ToGetMeResponse(friendNicknames, queueData);
+    }
+
+    private AuthResult BuildAuthResult(
+        User user, string accessToken, string refreshToken, List<string> friendNicknames)
+    {
+        var queueData = _queueService.GetUserQueueData(user.Id.ToString());
+        return new AuthResult(accessToken, refreshToken, user.ToGetMeResponse(friendNicknames, queueData));
+    }
+
+    private async Task<Error> MapConflictErrorAsync(RegisterRequest request)
+    {
+        _dbContext.ChangeTracker.Clear();
+
+        var conflict = await _dbContext.Users
+            .Where(u => u.Nickname == request.Nickname ||
+                        u.Email == request.Email ||
+                        u.Login == request.Login)
+            .Select(u => new { u.Nickname, u.Email, u.Login })
+            .FirstOrDefaultAsync();
+
+        if (conflict is null)
+            return Error.Failure("registrationFailed", "Registration failed due to a database error.");
+
+        if (conflict.Nickname == request.Nickname)
+            return Error.Conflict("nicknameTaken", "Nickname is already taken.");
+        if (conflict.Email == request.Email)
+            return Error.Conflict("emailTaken", "Email is already taken.");
+        return Error.Conflict("loginTaken", "Login is already taken.");
     }
 }

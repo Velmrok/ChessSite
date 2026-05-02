@@ -18,10 +18,11 @@ namespace backend.Tests.Unit.Services.Auth
             var refreshTokenService = new RefreshTokenService(_dbContext);
             var storageServiceMock = Substitute.For<IStorageService>();
             var presenceServiceMock = Substitute.For<IPresenceService>();
+            var queueServiceMock = Substitute.For<IQueueService>();
             jwtMock.GenerateToken(Arg.Any<User>()).Returns("mocked-jwt-token");
 
             _authService = new AuthService(_dbContext, jwtMock, new PasswordHasher<User>(), cacheInvalidationServiceMock,
-             refreshTokenService, storageServiceMock, presenceServiceMock);
+             refreshTokenService, storageServiceMock, presenceServiceMock, queueServiceMock);
              
             _passwordHasher = new PasswordHasher<User>();
 

@@ -38,12 +38,12 @@ public class AuthControllerTests
     RefreshToken: "fake-refresh-token",
     User: new GetMeResponse(
         Nickname: "test",
-        ProfileBio: "",
         ProfilePictureUrl: "",
         CreatedAt: DateTime.UtcNow,
         LastActive: DateTime.UtcNow,
         Rating: new RatingStats(Rapid: 1000, Blitz: 1000, Bullet: 1000),
-        FriendNicknames: []
+        FriendNicknames: [],
+        QueueData: new QueueData(IsInQueue: false)
     )
 );
 
@@ -190,12 +190,12 @@ public class AuthControllerTests
     {
         var expectedResponse = new GetMeResponse(
             Nickname: "test",
-            ProfileBio: "",
             ProfilePictureUrl: "",
             CreatedAt: DateTime.UtcNow,
             LastActive: DateTime.UtcNow,
             Rating: new RatingStats(Rapid: 1000, Blitz: 1000, Bullet: 1000),
-            FriendNicknames: []
+            FriendNicknames: [],
+            QueueData: new QueueData(IsInQueue: false)
         );
         _authServiceMock.GetMeAsync(Arg.Any<string>()).Returns(expectedResponse);
         var result = await _controller.GetMe();

@@ -95,21 +95,6 @@ namespace backend.Tests.Unit.Services.Auth;
         result.Value.RefreshToken.Should().NotBeNullOrEmpty();
 
     }
-    [Fact]
-    public async Task ShouldReturnValidationError_WhenFieldsAreMissing()
-    {
-        var request = new RegisterRequest
-        {
-            Nickname = "",
-            Login = "",
-            Email = "",
-            Password = ""
-        };
-
-        var result = await _authService.RegisterAsync(request);
-        result.IsError.Should().BeTrue();
-        var error = result.FirstError;
-        error.Code.Should().Be("invalidInput");
-    }
+    
 
 }

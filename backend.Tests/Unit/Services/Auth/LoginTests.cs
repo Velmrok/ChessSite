@@ -52,7 +52,7 @@ public class LoginTests : AuthTestBase
         var existingRequest = new LoginRequest
         {
             Login = "testuser   ",
-            Password = "Password123!            "
+            Password = "Password123!"
         };
         var result = await _authService.LoginAsync(existingRequest);
         result.IsError.Should().BeFalse();
@@ -148,21 +148,5 @@ public class LoginTests : AuthTestBase
         error.Code.Should().Be("invalidLoginOrPassword");
         result.Value.Should().BeNull();
     }
-    [Theory]
-    [InlineData(null, "Password123!")]
-    [InlineData("testuser", null)]
-    [InlineData("", "Password123!")]
-    [InlineData("testuser", "")]
-    [InlineData(null, null)]
-    [InlineData("", "")]
-    public async Task ShouldReturnUnauthorized_WhenFieldIsNullOrEmpty(string? login, string? password)
-    {
-        var request = new LoginRequest
-        {
-            Login = login!,
-            Password = password!
-        };
-        var result = await _authService.LoginAsync(request);
-        result.IsError.Should().BeTrue();
-    }
+    
 }

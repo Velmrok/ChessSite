@@ -20,6 +20,7 @@ export default function LoginForm() {
 
     const [error,setError] = useState("");
     const { request } = useApi();
+    const setQueueData = useUserStore((state) => state.setQueueData);
 
     const handleSubmit = async (e: React.FormEvent, form: LoginFormType) => {
         e.preventDefault();
@@ -33,6 +34,7 @@ export default function LoginForm() {
         if (user) {
 
             setUser(user);
+            setQueueData(user.queueData);
             setToast({ msg: toastT('success.login'), type: "success" });
             navigate("/");
         }

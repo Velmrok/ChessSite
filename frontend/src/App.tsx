@@ -15,6 +15,7 @@ import UsersSearchPage from './pages/UsersSearchPage'
 import GamesSearchPage from './pages/GamesSearchPage'
 import { useEffect } from 'react'
 import { connectSignalR } from './services/signalR/connection'
+import { useGlobalSignalR } from './hooks/useGlobalSocket'
 
 function App() {
   
@@ -25,6 +26,7 @@ function App() {
     connectSignalR();
     
   }, []);
+  useGlobalSignalR();
 
   
 

@@ -6,10 +6,10 @@ public record SignalRResponse<T>(
      string Type,
      string CorrelationId,
      T? Data,
-     SignalRError? Error
+     SignalRError? Error = null
 );
-public record SignalRResponse(
-    string Type,
-    string CorrelationId,
-    SignalRError? Error
-);
+// public record SignalRResponse(
+//     string Type,
+//     string CorrelationId,
+//     SignalRError? Error
+// );

@@ -34,6 +34,15 @@ namespace backend.Services.Mappers
                 Moves: game.Moves.Split(' ').ToList()
             );
         }
+        public static int GetRatingByTime(this User user, int time)
+        {
+            return time switch
+            {
+                <= 3 => user.Rating.Bullet,
+                <= 5 => user.Rating.Blitz,
+                _ => user.Rating.Rapid
+            };
+        }
         public static int GetRatingByType(this RatingStats ratingStats, GameType type)
         {
             return type switch
@@ -44,6 +53,7 @@ namespace backend.Services.Mappers
                 _ => throw new ArgumentException("Invalid game type")
             };
         }
+    
 
 
     }

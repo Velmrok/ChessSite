@@ -1,5 +1,5 @@
 import useQueue from "@/hooks/useQueue";
-import { formatTimeFromMs } from "@/services/socket/socketGlobalService";
+import { formatTimeFromMs } from "@/services/socket/signalRGlobalService";
 import useUserStore from "@/stores/useUserStore";
 import { useTranslation } from "react-i18next";
 import { MdAccessTime } from "react-icons/md";

@@ -3,7 +3,7 @@ import ReactCountryFlag from "react-country-flag";
 import useUserStore from "@/stores/useUserStore";
 import useToastStore from "@/stores/useToastStore";
 import { logoutUser } from "@/services/authService";
-import { formatTimeFromMs, leaveQueue } from "@/services/socket/socketGlobalService";
+import { formatTimeFromMs, leaveQueue } from "@/services/socket/signalRGlobalService";
 import { CiMenuBurger } from "react-icons/ci";
 import { useState } from "react";
 import SmallScreenMenu from "./SmallScreenMenu";

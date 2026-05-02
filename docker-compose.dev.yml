@@ -93,8 +93,6 @@ services:
     container_name: chess_redis
     ports:
       - "6379:6379"
-    volumes:
-      - redis_data:/data
     command: redis-server --appendonly yes
     networks:
       - backend-net
@@ -105,7 +103,6 @@ services:
       retries: 5
 
 volumes:
-  redis_data:
   postgres_data:
   dotnet_packages:
   frontend_node_modules:

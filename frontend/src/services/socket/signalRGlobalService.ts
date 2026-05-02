@@ -2,11 +2,11 @@ import type { SignalRRequest } from '@/types/signalR';
 import {invokeSignalR} from '../signalR/connection';
 
 export const leaveQueue = (request: SignalRRequest) => {
-    return invokeSignalR('LeaveGroup', request);
+    return invokeSignalR('LeaveQueue', request);
 }
-export const joinGame = ( request : SignalRRequest) => {
+export const joinQueue = ( request : SignalRRequest) => {
 
-    return invokeSignalR('JoinGroup', request);
+    return invokeSignalR('JoinQueue', request);
 }
 export const rejoinQueue = (request : SignalRRequest) => {
     return invokeSignalR('RejoinQueue', request);

@@ -19,7 +19,8 @@
         "friendAddError": "Failed to change friend status.",
         "friendDeleted": "Failed to delete friend.",
         "friendAdded": "Failed to add friend.",
-        "forbidden": "You don't have permission for this action."
+        "forbidden": "You don't have permission for this action.",
+        "leaveQueueFailed": "Failed to leave the queue."
       },
       "success": {
         "generic": "Operation completed successfully.",

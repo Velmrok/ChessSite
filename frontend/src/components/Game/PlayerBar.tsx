@@ -1,4 +1,4 @@
-import { formatTimeFromMs } from "@/services/socket/socketGlobalService";
+import { formatTimeFromMs } from "@/services/socket/signalRGlobalService";
 import { Link } from "react-router-dom";
 import Avatar from "../global/Avatar";
 

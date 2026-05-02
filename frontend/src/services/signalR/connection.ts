@@ -59,7 +59,7 @@ const waitForConnected = async () => {
 export const invokeSignalR = async <TData = unknown>(
     methodName: string,
     request: SignalRRequest
-): Promise<TData> => {
+): Promise<SignalRResponse<TData>> => {
     await waitForConnected();
     const response: SignalRResponse<TData> = await connection!.invoke(methodName, request);
     if (response.error) {
@@ -67,11 +67,23 @@ export const invokeSignalR = async <TData = unknown>(
             signalRError: response.error 
         });
     }
-    return response.data as TData;
+    return response as SignalRResponse<TData>;
 };
-export const signUpForEvent = <TData = unknown>(eventName: string, callback: (data: TData) => void) => {
+export const signUpForEvent = <TData = unknown>(eventName: string, callback: (response: SignalRResponse<TData>) => void,onError?: (error: SignalRError) => void) => {
     const conn = getConnection();
-    conn.on(eventName, callback);
+    conn.on(eventName, (Response: SignalRResponse<TData>) => {
+        if (Response == null) {
+            console.error(`Received null response for event ${eventName}`);
+            return;
+        }
+        if (Response.error ) {
+            console.error(`Error in event ${eventName}:`, Response.error);
+            if (onError)
+                onError(Response.error);
+            return;
+        }
+        callback(Response);
+    });
 };
 export const leaveEvent = (eventName: string, callback?: (...args: any[]) => void) => {
     const conn = getConnection();

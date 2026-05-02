@@ -41,7 +41,7 @@ export function useAuth() {
     }, []);
     useEffect(() => {
         reconnectSignalR();
-    }, [user])
+    }, [user?.nickname])
 
 
 

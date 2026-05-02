@@ -29,7 +29,7 @@ export default function useQueue() {
         }),{
             onError: (message:string) => {setToast({msg: t(`error.${message}`), type: 'error'})}
         })
-        console.log('Join queue response:', response);
+       
         if (response) {
       
         setIsInQueue(true);

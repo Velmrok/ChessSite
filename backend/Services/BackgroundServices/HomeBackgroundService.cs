@@ -1,4 +1,6 @@
 using backend.Data;
+using backend.DTO.Common;
+using backend.DTO.Home;
 using backend.Hubs;
 using backend.Services.Interfaces;
 using Microsoft.AspNetCore.SignalR;
@@ -12,6 +14,7 @@ public class HomeBackgroundService : BackgroundService
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly ILogger<HomeBackgroundService> _logger;
 
+    
     public HomeBackgroundService(
         IHubContext<MainHub> hubContext,
         IServiceScopeFactory scopeFactory, 
@@ -19,7 +22,7 @@ public class HomeBackgroundService : BackgroundService
     {
         _hubContext = hubContext;
         _scopeFactory = scopeFactory;
- 
+       ;
         _logger = logger;
     }
 
@@ -45,18 +48,25 @@ public class HomeBackgroundService : BackgroundService
         await using var scope = _scopeFactory.CreateAsyncScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         var presenceService = scope.ServiceProvider.GetRequiredService<IPresenceService>();
+        var queueService = scope.ServiceProvider.GetRequiredService<IQueueService>();
 
         var usersOnline = await presenceService.GetOnlineCountAsync();
-        var activeGames = -1; // TODO
-        var totalUsers = -1; // TODO
+        var usersInQueue = await queueService.GetQueueLengthAsync();
+        var matchesInProgress = -1; // TODO
+        var createdAccounts = -1; // TODO
 
         await _hubContext.Clients
             .Group("Home")
-            .SendAsync("StatsUpdated", new
-            {
-                usersOnline,
-                matchesInProgress = activeGames,
-                createdAccounts = totalUsers
-            });
+            .SendAsync("StatsUpdated", new SignalRResponse<HomeInfoResponse>(
+                Type : "StatsUpdated",
+                CorrelationId: Guid.NewGuid().ToString(),
+                Data: new HomeInfoResponse(
+                    usersOnline,
+                    usersInQueue,
+                    matchesInProgress,
+                    createdAccounts
+                )
+            ));
+            
     }
 }

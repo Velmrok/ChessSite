@@ -15,6 +15,7 @@ export type LeaderboardResponse = {
 }
 export type HomeStats = {
     usersOnline: number;
+    usersInQueue: number;
     matchesInProgress: number;
     createdAccounts: number;
 }

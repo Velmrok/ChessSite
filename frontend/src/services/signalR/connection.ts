@@ -1,8 +1,11 @@
+import useUserStore from '@/stores/useUserStore';
 import type { SignalRError, SignalRRequest, SignalRResponse } from '@/types/signalR';
 import { HubConnectionBuilder, HubConnection, HubConnectionState, HttpTransportType } from '@microsoft/signalr';
+import { use } from 'react';
 
 let connection: HubConnection | null = null;
 let heartBeatInterval: ReturnType<typeof setTimeout> | null = null;
+const setIsConnected = useUserStore.getState().setIsConnected;
 export const getConnection = (): HubConnection => {
     if (!connection) throw new Error('SignalR not connected');
     return connection;
@@ -10,7 +13,10 @@ export const getConnection = (): HubConnection => {
 
 export const connectSignalR = async (): Promise<void> => {
     console.log('Attempting to connect to SignalR...');
-    if (connection?.state === HubConnectionState.Connected || connection?.state === HubConnectionState.Connecting) return;
+    if (connection?.state === HubConnectionState.Connected || connection?.state === HubConnectionState.Connecting) {
+        setIsConnected(true);
+        return;
+    }
 
     if (!connection) {
         connection = new HubConnectionBuilder()
@@ -22,9 +28,11 @@ export const connectSignalR = async (): Promise<void> => {
             .withAutomaticReconnect()
 
             .build();
+            setIsConnected(true);
 
         connection.onclose(err => {
             console.error("SignalR closed:", err);
+            setIsConnected(false);
         });
     }
 
@@ -40,6 +48,7 @@ export const reconnectSignalR = async () => {
     if (connection) {
         try {
             await connection.stop();
+            setIsConnected(false);
         } catch (err) {
             console.error("Error stopping SignalR connection:", err);
         }

@@ -61,4 +61,9 @@ public class QueueService : IQueueService
         await _db.SetRemoveAsync(QueueSetKey, $"{userId}");
         return new Success();
     }
+
+    public async Task<int> GetQueueLengthAsync()
+    {
+        return (int) await _db.SetLengthAsync(QueueSetKey);
+    }
 }

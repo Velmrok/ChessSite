@@ -36,6 +36,17 @@ export const connectSignalR = async (): Promise<void> => {
         setTimeout(() => connectSignalR(), 2000);
     }
 };
+export const reconnectSignalR = async () => {
+    if (connection) {
+        try {
+            await connection.stop();
+        } catch (err) {
+            console.error("Error stopping SignalR connection:", err);
+        }
+        connection = null;
+    }
+    await connectSignalR();
+}
 export const startHeartBeat = () => {
     if (heartBeatInterval) return; 
     heartBeatInterval = setInterval(() => {

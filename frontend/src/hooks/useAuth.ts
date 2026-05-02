@@ -1,9 +1,9 @@
 import useUserStore from "@/stores/useUserStore";
 import { useApi } from "./useApi";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 
 import { getMe, refresh } from "@/services/authService";
-import { startHeartBeat } from "@/services/signalR/connection";
+import { reconnectSignalR, startHeartBeat } from "@/services/signalR/connection";
 
 
 export function useAuth() {
@@ -16,23 +16,17 @@ export function useAuth() {
         const checkAuth = async () => {
             let shouldRefresh = false;
 
-            const me = await request(getMe, {
+            let me = await request(getMe, {
                 onError: (_, status) => {
                     if (status === 401) shouldRefresh = true;
                 }
             });
-
+            if (shouldRefresh) me = await request(refresh);
             if (me) {
                 setUser(me);
                 startHeartBeat();
-            } else if (shouldRefresh) {
-                const refreshResult = await request(refresh);
-                if (refreshResult) {
-                    
-                    startHeartBeat();
-                    setUser(refreshResult);
-                }
             }
+
 
             setLoading(false);
         };
@@ -45,6 +39,9 @@ export function useAuth() {
         }
        
     }, []);
+    useEffect(() => {
+        reconnectSignalR();
+    }, [user])
 
 
 

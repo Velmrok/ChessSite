@@ -65,6 +65,7 @@ export default function Navbar() {
     const user = useUserStore((state) => state.user);
     const { t: toastT } = useTranslation("toast");
     const setUser = useUserStore((state) => state.setUser);
+    const setQueueData = useUserStore((state) => state.setQueueData);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const setToast = useToastStore((state) => state.setToast);
     const navigate = useNavigate();
@@ -73,6 +74,7 @@ export default function Navbar() {
         try {
             await logoutUser();;
             setUser(null);
+            setQueueData({ isInQueue: false, joinedQueueAt: undefined });
             navigate('/login');
         } catch (error: any) {
             if (error.status === 401) setUser(null);

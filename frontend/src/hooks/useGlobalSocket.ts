@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useQueueStore } from '@/stores/useQueueStore';
+import { leaveEvent } from '@/services/signalR/connection';
 
 
 
@@ -22,6 +23,10 @@ export function useGlobalSignalR() {
     return () => {
       if (queueIntervalRef.current) {
         clearInterval(queueIntervalRef.current);
+      }
+      if (isInQueue) {
+        
+        leaveEvent("GameFound");
       }
     };
   }, [isInQueue]);

@@ -31,7 +31,7 @@ export function useHomeSignalR() {
         console.error("Received StatsUpdated event with null data");
         return;
       }
-      console.log("Received StatsUpdated event:", stats);
+     
       setUsersOnline(stats.usersOnline);
       setMatchesInProgress(stats.activeGames);
       setCreatedAccounts(stats.totalUsers);

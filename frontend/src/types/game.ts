@@ -1,4 +1,4 @@
-import type { PublicUser, PlayerSummary } from "./user";
+import type { PublicUser, PlayerSummary } from "./user"; 
 
 export type GameSearchParams = {
     query: string; 
@@ -53,3 +53,6 @@ export type TimeControl =
     "5+0" | "5+3" | "5+5" |
     "10+0" | "10+2" | "15+0" |
     "15+5" | "30+0" | "30+15";
+export type MatchFoundResponse = {
+    gameUrl: string;
+}

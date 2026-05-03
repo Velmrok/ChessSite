@@ -22,7 +22,6 @@ public class HomeBackgroundService : BackgroundService
     {
         _hubContext = hubContext;
         _scopeFactory = scopeFactory;
-        ;
         _logger = logger;
     }
 

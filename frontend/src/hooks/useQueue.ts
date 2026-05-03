@@ -4,6 +4,11 @@ import { useTranslation } from "react-i18next";
 import {v4 as uuidv4} from "uuid";
 import { useApi } from "./useApi";
 import { useQueueStore } from "@/stores/useQueueStore";
+import { signUpForEvent } from "@/services/signalR/connection";
+import type { MatchFoundResponse } from "@/types/game";
+import { useNavigate } from "react-router-dom";
+import type { SignalRResponse } from "@/types/signalR";
+
 
 export default function useQueue() {
     const setToast = useToastStore((state) => state.setToast);
@@ -14,7 +19,7 @@ export default function useQueue() {
     const setQueueTime = useQueueStore(state => state.setQueueTime);
     const setQueueData = useQueueStore(state => state.setQueueData);
     const queueData = useQueueStore(state => state.queueData);
-   
+    const navigate = useNavigate();
 
     const handleJoinQueue = async (time: number, increment: number) => {
         const response = await request( () =>
@@ -31,7 +36,16 @@ export default function useQueue() {
        
         if (response) {
       
-        
+        signUpForEvent<MatchFoundResponse>("GameFound", (response: SignalRResponse<MatchFoundResponse>) => {
+            console.log("Received GameFound event:", response);
+            if (!response.data) {
+                console.error("Received GameFound event with null data");
+                return;
+            }
+            navigate(response.data.gameUrl);
+            setQueueData({isInQueue: false});
+
+        });
         
         setQueueTime(0);
         setQueueData({ ...queueData, joinedQueueAt: new Date().toString(), time, increment, isInQueue: true });

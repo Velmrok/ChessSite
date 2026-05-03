@@ -4,6 +4,7 @@
 using backend.Data;
 using backend.DTO.Auth;
 using backend.DTO.Queue;
+using backend.Enums;
 using backend.Services.Interfaces;
 using backend.Services.Mappers;
 using ErrorOr;
@@ -18,6 +19,7 @@ public class QueueService : IQueueService
     private readonly IDatabase _db;
     private readonly AppDbContext _dbContext;
     private const string QueueSetKey = "chess:queue";
+  
 
     public QueueService(IConnectionMultiplexer redis, AppDbContext dbContext)
     {
@@ -50,6 +52,10 @@ public class QueueService : IQueueService
             new("rating", user.GetRatingByTime(payload.Time))
         ]);
         await _db.SetAddAsync(QueueSetKey, $"{userId}");
+        
+        await _db.SetAddAsync($"{QueueSetKey}:{payload.Time}:{payload.Increment}", $"{userId}");
+
+        await _db.StringSetAsync($"{userId}:Key", $"{QueueSetKey}:{payload.Time}:{payload.Increment}");
 
         return new Success();
     }
@@ -61,6 +67,12 @@ public class QueueService : IQueueService
 
         await _db.KeyDeleteAsync($"{QueueSetKey}:{userId}");
         await _db.SetRemoveAsync(QueueSetKey, $"{userId}");
+        var queueKey = await _db.StringGetAsync($"{userId}:Key");
+
+        if(!queueKey.IsNull)
+            await _db.SetRemoveAsync(queueKey.ToString(), $"{userId}");
+        await _db.KeyDeleteAsync($"{userId}:Key");
+        
         return new Success();
     }
 
@@ -86,4 +98,6 @@ public class QueueService : IQueueService
             JoinedQueueAt: DateTime.Parse(joinedAt.ToString())
         );
     }
+
+    
 }

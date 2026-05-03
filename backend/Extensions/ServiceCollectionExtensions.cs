@@ -4,6 +4,7 @@ using backend.Services.BackgroundServices;
 using backend.Services.Helpers.Auth;
 using backend.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.SignalR;
 
 
 
@@ -24,10 +25,12 @@ public static class ServiceCollectionExtensions
 
         services.AddScoped<IPresenceService, PresenceService>();
         services.AddSingleton<IJwtGenerator, JwtGenerator>();
+        services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
 
 
         services.AddHostedService<HomeBackgroundService>();
         services.AddHostedService<PresenceBackgroundService>();
+        services.AddHostedService<QueueBackgroundService>();
 
 
 

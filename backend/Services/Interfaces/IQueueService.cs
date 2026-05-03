@@ -1,6 +1,7 @@
 
 using backend.DTO.Auth;
 using backend.DTO.Queue;
+using backend.Enums;
 using ErrorOr;
 
 namespace backend.Services.Interfaces
@@ -11,5 +12,6 @@ namespace backend.Services.Interfaces
         Task<ErrorOr<Success>> LeaveQueueAsync(string? userId);
         Task<int> GetQueueLengthAsync();
         QueueData GetUserQueueData(string userId);
+        
     }
 }

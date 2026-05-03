@@ -16,7 +16,7 @@ export type LeaderboardResponse = {
 export type HomeStats = {
     usersOnline: number;
     usersInQueue: number;
-    matchesInProgress: number;
-    createdAccounts: number;
+    activeGames: number;
+    totalUsers: number;
 }
 export type QmViewMode = 'queue' | 'leaderboard' | 'friends';

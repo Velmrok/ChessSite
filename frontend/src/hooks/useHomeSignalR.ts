@@ -33,8 +33,8 @@ export function useHomeSignalR() {
       }
       console.log("Received StatsUpdated event:", stats);
       setUsersOnline(stats.usersOnline);
-      setMatchesInProgress(stats.matchesInProgress);
-      setCreatedAccounts(stats.createdAccounts);
+      setMatchesInProgress(stats.activeGames);
+      setCreatedAccounts(stats.totalUsers);
       setQueueSize(stats.usersInQueue);
     });
     

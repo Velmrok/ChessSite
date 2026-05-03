@@ -17,9 +17,9 @@ public class HomeService : IHomeService
 
     private readonly IPresenceService _presenceService;
     private readonly AppDbContext _dbContext;
-    public HomeService(AppDbContext dbContext,IPresenceService presenceService)
+    public HomeService(AppDbContext dbContext, IPresenceService presenceService)
     {
-        _presenceService = presenceService; 
+        _presenceService = presenceService;
         _dbContext = dbContext;
     }
 
@@ -64,7 +64,7 @@ public class HomeService : IHomeService
     {
         if (!Guid.TryParse(id, out var guid))
             return Error.Unauthorized("invalidToken", "Token is invalid.");
-            
+
         var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == guid);
 
         if (user == null)

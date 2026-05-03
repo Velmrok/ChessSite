@@ -22,11 +22,11 @@ public class GamesController : MyControllerBase
         _gamesService = gamesService;
         _dbContext = dbContext;
     }
-    
+
     [HttpGet]
     public async Task<IActionResult> GetGames([FromQuery] GetGamesQuery query)
     {
         return HandleError(await _gamesService.GetAllGamesAsync(query), Ok);
     }
-   
+
 }

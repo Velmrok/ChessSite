@@ -9,8 +9,8 @@ public record GetMeResponse(
     string ProfilePictureUrl,
     DateTime CreatedAt,
     DateTime LastActive,
-    RatingStats Rating ,
-    List<string> FriendNicknames ,
+    RatingStats Rating,
+    List<string> FriendNicknames,
     QueueData QueueData
 );
 public record QueueData(

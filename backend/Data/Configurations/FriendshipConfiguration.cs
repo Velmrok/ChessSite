@@ -20,6 +20,6 @@ public class FriendshipConfiguration : IEntityTypeConfiguration<Friendship>
                 .IsRequired()
                .OnDelete(DeleteBehavior.Restrict);
 
-        
+
     }
 }

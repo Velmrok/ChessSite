@@ -12,7 +12,7 @@ namespace backend.Controllers;
 [Route("/home")]
 public class HomeController : MyControllerBase
 {
-  
+
     private readonly IHomeService _homeService;
     public HomeController(IHomeService homeService)
     {
@@ -23,6 +23,6 @@ public class HomeController : MyControllerBase
     {
         return HandleError(await _homeService.GetLeaderboardAsync(), Ok);
     }
-    
+
 }
 

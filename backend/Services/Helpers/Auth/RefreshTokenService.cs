@@ -53,7 +53,7 @@ public class RefreshTokenService : IRefreshTokenService
         if (refreshTokenEntity != null)
         {
             refreshTokenEntity.IsRevoked = true;
-           
+
         }
     }
 }

@@ -27,8 +27,8 @@ public class OwnerOrAdminHandler : AuthorizationHandler<OwnerOrAdminRequirement>
 
         var routeNickname = httpContext.GetRouteValue("nickname")?.ToString();
 
-        if (userNickname is not null 
-            && routeNickname is not null 
+        if (userNickname is not null
+            && routeNickname is not null
             && userNickname == routeNickname)
         {
             context.Succeed(requirement);

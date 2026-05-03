@@ -8,6 +8,6 @@ namespace backend.Services.Interfaces
         Task<string> CreateRefreshTokenAsync(User user);
         Task<bool> DoesRefreshTokenExistAsync(string refreshToken);
         Task RevokeRefreshTokenAsync(string refreshToken);
-       
+
     }
 }

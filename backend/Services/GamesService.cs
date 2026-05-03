@@ -21,7 +21,7 @@ namespace backend.Services
             _presenceService = presenceService;
         }
 
-        private Dictionary<GamesSortBy,Expression<Func<Game, object>>> SortSelectors = new()
+        private Dictionary<GamesSortBy, Expression<Func<Game, object>>> SortSelectors = new()
         {
             { GamesSortBy.FinishedAt, g => g.FinishedAt ?? DateTime.MaxValue },
             { GamesSortBy.Time, g => g.Time },
@@ -32,12 +32,12 @@ namespace backend.Services
         public async Task<ErrorOr<GamesResponse>> GetAllGamesAsync(GetGamesQuery query)
         {
             var search = query.Query ?? "";
-            var gamesQuerry =  _dbContext.Games
+            var gamesQuerry = _dbContext.Games
                 .Where(g => g.WhitePlayer.Nickname.Contains(search) || g.BlackPlayer.Nickname.Contains(search))
                 .Where(g => query.GameType == null || g.Type == query.GameType)
                 .Where(g => query.GameStatus == null || g.Status == query.GameStatus);
-                
-                
+
+
 
             var totalCount = await gamesQuerry.CountAsync();
             var totalPages = (int)Math.Ceiling(totalCount / (double)query.Limit);

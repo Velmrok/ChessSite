@@ -57,8 +57,8 @@ public class PresenceService : IPresenceService
         foreach (var member in await _db.SetMembersAsync(OnlineSetKey))
         {
             if (!await _db.KeyExistsAsync($"user:online:{member}"))
-        {
-            await _db.SetRemoveAsync(OnlineSetKey, member);
+            {
+                await _db.SetRemoveAsync(OnlineSetKey, member);
             }
         }
     }
@@ -70,16 +70,16 @@ public class PresenceService : IPresenceService
         if (!keys.Any()) return;
 
         var updates = new List<(Guid userId, DateTime lastActive)>();
-        
+
         foreach (var key in keys)
         {
-            
+
             var value = await _db.StringGetDeleteAsync(key);
             if (!value.HasValue) continue;
-            
+
             var userId = Guid.Parse(key.ToString().Split(':')[2]);
             var lastActive = DateTimeOffset.Parse(value.ToString()).UtcDateTime;
-            
+
             updates.Add((userId, lastActive));
         }
 
@@ -89,13 +89,13 @@ public class PresenceService : IPresenceService
         var lookup = ids.Zip(times).ToDictionary(x => x.First, x => x.Second);
 
         var updatesZipped = ids.Zip(times, (id, time) => new { id, time });
-        
+
         foreach (var update in updatesZipped)
         {
             await _dbContext.Users
                 .Where(u => u.Id == update.id)
                 .ExecuteUpdateAsync(s => s.SetProperty(u => u.LastActive, update.time));
-            
+
         }
         ;
     }

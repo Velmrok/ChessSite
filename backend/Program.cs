@@ -17,7 +17,7 @@ builder.Services.AddApplicationServices();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddJwtAuthentication(builder.Configuration);   
+builder.Services.AddJwtAuthentication(builder.Configuration);
 
 builder.Services.AddAuthorization(options =>
 {
@@ -64,7 +64,7 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-     app.UseStaticFiles();
+    app.UseStaticFiles();
 }
 app.UseRateLimiter();
 

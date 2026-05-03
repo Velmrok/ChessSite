@@ -1,4 +1,4 @@
-    // backend/Services/R2StorageService.cs
+// backend/Services/R2StorageService.cs
 using Amazon;
 using Amazon.Runtime;
 using Amazon.S3;
@@ -29,19 +29,19 @@ public class R2StorageService : IStorageService
         var config = new AmazonS3Config
         {
             ServiceURL = $"https://{_options.AccountId}.r2.cloudflarestorage.com",
-            
+
             ForcePathStyle = true,
-            
+
             AuthenticationRegion = "auto"
-          
+
         };
         var accessKey = File.ReadAllText("/run/secrets/cf_access_key").Trim();
         var secretKey = File.ReadAllText("/run/secrets/cf_secret_key").Trim();
 
         var credentials = new BasicAWSCredentials(
-            accessKey, 
+            accessKey,
             secretKey);
-            
+
         _s3 = new AmazonS3Client(credentials, config);
     }
     public string GetAvatarUrl(string key)
@@ -50,8 +50,8 @@ public class R2StorageService : IStorageService
     }
 
     public async Task<ErrorOr<string>> UploadAvatarAsync(
-        Stream imageStream, 
-        string userId, 
+        Stream imageStream,
+        string userId,
         string contentType)
     {
         var objectKey = $"{userId}.webp";
@@ -77,12 +77,12 @@ public class R2StorageService : IStorageService
 
             await _s3.PutObjectAsync(request);
             _logger.LogInformation(
-                "Avatar uploaded for user {UserId} to key {Key}", 
+                "Avatar uploaded for user {UserId} to key {Key}",
                 userId, objectKey);
         }
         catch (AmazonS3Exception ex)
         {
-            _logger.LogError(ex, 
+            _logger.LogError(ex,
                 "S3 error uploading avatar for user {UserId}", userId);
             return Error.Failure("uploadFailed", "Failed to upload avatar to storage.");
         }
@@ -99,7 +99,7 @@ public class R2StorageService : IStorageService
         catch (AmazonS3Exception ex)
         {
 
-            _logger.LogWarning(ex, 
+            _logger.LogWarning(ex,
                 "Failed to delete object {Key} from R2", objectKey);
             return Error.Failure("deleteFailed", "Failed to delete the old avatar from storage.");
         }
@@ -108,10 +108,10 @@ public class R2StorageService : IStorageService
     private static async Task<MemoryStream> ProcessImageAsync(Stream input)
     {
         var output = new MemoryStream();
-        
+
         using var image = await Image.LoadAsync(input);
-        
-    
+
+
         var squareSize = Math.Min(image.Width, image.Height);
         image.Mutate(ctx =>
         {
@@ -120,13 +120,13 @@ public class R2StorageService : IStorageService
                 (image.Height - squareSize) / 2,
                 squareSize,
                 squareSize));
-                
+
             ctx.Resize(256, 256, KnownResamplers.Lanczos3);
         });
 
         await image.SaveAsync(output, new WebpEncoder { Quality = 85 });
         output.Position = 0;
-        
+
         return output;
     }
 }

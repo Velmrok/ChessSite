@@ -14,15 +14,15 @@ public class HomeBackgroundService : BackgroundService
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly ILogger<HomeBackgroundService> _logger;
 
-    
+
     public HomeBackgroundService(
         IHubContext<MainHub> hubContext,
-        IServiceScopeFactory scopeFactory, 
+        IServiceScopeFactory scopeFactory,
         ILogger<HomeBackgroundService> logger)
     {
         _hubContext = hubContext;
         _scopeFactory = scopeFactory;
-       ;
+        ;
         _logger = logger;
     }
 
@@ -58,7 +58,7 @@ public class HomeBackgroundService : BackgroundService
         await _hubContext.Clients
             .Group("Home")
             .SendAsync("StatsUpdated", new SignalRResponse<HomeInfoResponse>(
-                Type : "StatsUpdated",
+                Type: "StatsUpdated",
                 CorrelationId: Guid.NewGuid().ToString(),
                 Data: new HomeInfoResponse(
                     usersOnline,
@@ -67,6 +67,6 @@ public class HomeBackgroundService : BackgroundService
                     createdAccounts
                 )
             ));
-            
+
     }
 }

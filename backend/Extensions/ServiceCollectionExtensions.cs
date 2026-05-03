@@ -28,15 +28,15 @@ public static class ServiceCollectionExtensions
 
         services.AddHostedService<HomeBackgroundService>();
         services.AddHostedService<PresenceBackgroundService>();
-       
-        
+
+
 
         return services;
     }
     public static IServiceCollection AddGlobalErrorHandling(this IServiceCollection services)
     {
         services.AddProblemDetails()
-;        
+;
         return services;
     }
 }

@@ -16,27 +16,27 @@ namespace backend.Controllers
     public class UsersController : MyControllerBase
     {
         private readonly IUsersService _usersService;
-        public UsersController(IUsersService usersService, IDistributedCache cache  )
+        public UsersController(IUsersService usersService, IDistributedCache cache)
         {
             _usersService = usersService;
-           
+
         }
         [HttpGet]
         public async Task<IActionResult> GetUsers([FromQuery] GetUsersQuery query)
         {
 
-           return  HandleError(await _usersService.GetAllUsersAsync(query), usersResult =>
-             {
-                 Response.Headers["X-Cache"] = usersResult.IsCached ? "HIT" : "MISS";
-                 return Ok(usersResult.Response);
-             });
+            return HandleError(await _usersService.GetAllUsersAsync(query), usersResult =>
+              {
+                  Response.Headers["X-Cache"] = usersResult.IsCached ? "HIT" : "MISS";
+                  return Ok(usersResult.Response);
+              });
 
         }
         [HttpGet("{nickname}/profile")]
         public async Task<IActionResult> GetUserProfile(string nickname)
         {
             return HandleError(await _usersService.GetUserProfileAsync(nickname), Ok);
-           
+
         }
         [HttpGet("{nickname}/friends")]
         public async Task<IActionResult> GetFriendsProfile(string nickname, [FromQuery] PaginationQuery pagination)
@@ -47,13 +47,13 @@ namespace backend.Controllers
         public async Task<IActionResult> AddFriend(string nickname)
         {
             var currentUserNickname = User.FindFirst("nickname")?.Value;
-            return HandleError(await _usersService.AddFriendAsync(nickname, currentUserNickname!), _=> NoContent());
+            return HandleError(await _usersService.AddFriendAsync(nickname, currentUserNickname!), _ => NoContent());
         }
         [HttpDelete("{nickname}/friend")]
         public async Task<IActionResult> RemoveFriend(string nickname)
         {
             var currentUserNickname = User.FindFirst("nickname")?.Value;
-            return HandleError(await _usersService.RemoveFriendAsync(nickname, currentUserNickname!), _=> NoContent());
+            return HandleError(await _usersService.RemoveFriendAsync(nickname, currentUserNickname!), _ => NoContent());
         }
         [HttpPatch("me/profile/bio")]
         public async Task<IActionResult> UpdateUserBio([FromBody] UpdateUserBioRequest request)

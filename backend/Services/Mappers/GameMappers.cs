@@ -15,15 +15,15 @@ namespace backend.Services.Mappers
                 Id: game.Id.ToString(),
                 WhitePlayer: new UserGameSummary
                 (
-                    Nickname : game.WhitePlayer.Nickname,
-                    ProfilePictureUrl : game.WhitePlayer.ProfilePictureUrl,
-                    Rating : game.WhitePlayer.Rating.GetRatingByType(game.Type)
+                    Nickname: game.WhitePlayer.Nickname,
+                    ProfilePictureUrl: game.WhitePlayer.ProfilePictureUrl,
+                    Rating: game.WhitePlayer.Rating.GetRatingByType(game.Type)
                 ),
                 BlackPlayer: new UserGameSummary
                 (
-                    Nickname : game.BlackPlayer.Nickname,
-                    ProfilePictureUrl : game.BlackPlayer.ProfilePictureUrl,
-                    Rating : game.BlackPlayer.Rating.GetRatingByType(game.Type)
+                    Nickname: game.BlackPlayer.Nickname,
+                    ProfilePictureUrl: game.BlackPlayer.ProfilePictureUrl,
+                    Rating: game.BlackPlayer.Rating.GetRatingByType(game.Type)
                 ),
                 WinnerNickname: winnerNickname,
                 Type: game.Type,
@@ -53,7 +53,7 @@ namespace backend.Services.Mappers
                 _ => throw new ArgumentException("Invalid game type")
             };
         }
-    
+
 
 
     }

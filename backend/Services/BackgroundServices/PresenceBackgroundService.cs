@@ -45,7 +45,7 @@ namespace backend.Services.BackgroundServices
                     }
                 }
 
-                await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken); 
+                await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);
             }
         }
         private async Task CleanupOnlineStatuses()

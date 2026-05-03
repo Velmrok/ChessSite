@@ -4,4 +4,4 @@ public enum GamesSortBy
     FinishedAt,
     Nickname,
     Time
-    }
+}

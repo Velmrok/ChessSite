@@ -6,6 +6,6 @@ namespace backend.Hubs;
 
 public partial class MainHub : Hub
 {
-   
-  
+
+
 }

@@ -1,5 +1,5 @@
 namespace backend.DTO.Common
 {
-   public record EmptyResponse();
-   public record EmptyPayload();
+    public record EmptyResponse();
+    public record EmptyPayload();
 }

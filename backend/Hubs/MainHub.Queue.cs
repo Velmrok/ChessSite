@@ -9,9 +9,9 @@ namespace backend.Hubs;
 
 public partial class MainHub : Hub
 {
-   
-   [Authorize]
-  public async Task<SignalRResponse<EmptyResponse>> JoinQueue(SignalRRequest<JoinQueuePayload> request)
+
+    [Authorize]
+    public async Task<SignalRResponse<EmptyResponse>> JoinQueue(SignalRRequest<JoinQueuePayload> request)
     {
         var payload = request.Payload;
         if (payload == null)
@@ -21,15 +21,15 @@ public partial class MainHub : Hub
                 default,
                 new SignalRError("invalidPayload", "Payload is required")
             );
-        
+
 
         var result = await _queueService.JoinQueueAsync(GetUserId(), payload);
-        return HandleError<Success,EmptyResponse,JoinQueuePayload>(result, request);
+        return HandleError<Success, EmptyResponse, JoinQueuePayload>(result, request);
     }
     [Authorize]
     public async Task<SignalRResponse<EmptyResponse>> LeaveQueue(SignalRRequest<EmptyPayload> request)
     {
         var result = await _queueService.LeaveQueueAsync(GetUserId());
-        return HandleError<Success,EmptyResponse,EmptyPayload>(result, request);
+        return HandleError<Success, EmptyResponse, EmptyPayload>(result, request);
     }
 }

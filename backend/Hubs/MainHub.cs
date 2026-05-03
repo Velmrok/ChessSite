@@ -13,7 +13,7 @@ public partial class MainHub : Hub
     private readonly IGamesService _gameService;
     private readonly IHomeService _homeService;
     private readonly IPresenceService _presenceService;
-        private readonly IQueueService _queueService;
+    private readonly IQueueService _queueService;
     public MainHub(
         IGamesService gameService,
         IHomeService homeService,
@@ -28,7 +28,7 @@ public partial class MainHub : Hub
 
     }
 
-    
+
     public override async Task OnConnectedAsync()
     {
         var userId = GetUserId();
@@ -64,7 +64,7 @@ public partial class MainHub : Hub
 
     protected string? GetNickname() =>
         Context.User?.FindFirst("nickname")?.Value;
-    
+
 
     public async Task<SignalRResponse<EmptyResponse>> LeaveGroup(SignalRRequest request)
     {
@@ -75,7 +75,7 @@ public partial class MainHub : Hub
             default
         );
     }
-     public async Task<SignalRResponse<EmptyResponse>> JoinGroup(SignalRRequest request)
+    public async Task<SignalRResponse<EmptyResponse>> JoinGroup(SignalRRequest request)
     {
         await Groups.AddToGroupAsync(Context.ConnectionId, request.Type);
         return new SignalRResponse<EmptyResponse>(

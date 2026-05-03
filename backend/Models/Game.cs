@@ -15,10 +15,10 @@ public class Game
     public User BlackPlayer { get; set; } = null!;
     public User? Winner { get; set; } = null;
 
-    
+
     public GameType Type { get; set; } = GameType.Rapid;
     public GameStatus Status { get; set; } = GameStatus.Active;
-    public DateTime? FinishedAt { get; set; }  = null;
+    public DateTime? FinishedAt { get; set; } = null;
     public string Moves { get; set; } = "";
     public int Time { get; set; } = 10;
     public int Increment { get; set; } = 0;

@@ -8,7 +8,7 @@ public class GameConfiguration : IEntityTypeConfiguration<Game>
 {
     public void Configure(EntityTypeBuilder<Game> builder)
     {
-       
+
         builder.HasOne(g => g.WhitePlayer)
             .WithMany()
             .HasForeignKey(g => g.WhitePlayerId)

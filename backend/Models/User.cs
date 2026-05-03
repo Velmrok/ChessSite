@@ -10,7 +10,7 @@ public class User
     public required string Login { get; set; }
     public required string Email { get; set; }
     public required string PasswordHash { get; set; }
-    public  string ProfileBio { get; set; } = "";
+    public string ProfileBio { get; set; } = "";
     public string ProfilePictureUrl { get; set; } = "/api/uploads/avatars/default.webp";
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime LastActive { get; set; } = DateTime.UtcNow;
@@ -21,10 +21,10 @@ public class User
     public int GamesPlayed { get; set; } = 0;
     public bool IsDeleted { get; set; } = false;
     public RoleType Role { get; set; } = RoleType.User;
-   
-   
 
 
 
-    
+
+
+
 }

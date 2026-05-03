@@ -36,12 +36,12 @@ public static class DatabaseExtensions
         using var scope = app.Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-        if(db.Database.ProviderName == "Microsoft.EntityFrameworkCore.InMemory")
+        if (db.Database.ProviderName == "Microsoft.EntityFrameworkCore.InMemory")
         {
-            return app; 
+            return app;
         }
         db.Database.Migrate();
-        
+
         return app;
     }
 }

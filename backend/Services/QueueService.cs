@@ -30,7 +30,7 @@ public class QueueService : IQueueService
     {
         if (userId == null)
             return Error.Failure("userNotAuthenticated");
-        if ( Guid.TryParse(userId, out var userGuid) == false)
+        if (Guid.TryParse(userId, out var userGuid) == false)
             return Error.Failure("invalidUserId");
 
         var exists = await _db.SetContainsAsync(QueueSetKey, $"{userId}");
@@ -66,7 +66,7 @@ public class QueueService : IQueueService
 
     public async Task<int> GetQueueLengthAsync()
     {
-        return (int) await _db.SetLengthAsync(QueueSetKey);
+        return (int)await _db.SetLengthAsync(QueueSetKey);
     }
     public QueueData GetUserQueueData(string userId)
     {

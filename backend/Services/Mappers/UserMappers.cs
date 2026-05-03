@@ -29,10 +29,10 @@ public static class UserMappers
             CreatedAt: user.CreatedAt,
             LastActive: user.LastActive,
             Role: user.Role,
-            Rating:user.Rating
+            Rating: user.Rating
         );
     }
-    public static UserProfileResponse ToUserProfileResponse(this User user,bool isOnline)
+    public static UserProfileResponse ToUserProfileResponse(this User user, bool isOnline)
     {
         return new UserProfileResponse(
             Nickname: user.Nickname,
@@ -52,8 +52,8 @@ public static class UserMappers
             )
         );
     }
-    
-   public static FriendProfileSummary ToFriendProfileSummary(this User user,bool isOnline)
+
+    public static FriendProfileSummary ToFriendProfileSummary(this User user, bool isOnline)
     {
         return new FriendProfileSummary(
             Nickname: user.Nickname,

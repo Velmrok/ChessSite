@@ -49,39 +49,39 @@ public class UsersService : IUsersService
     }
     public async Task<ErrorOr<UsersResult>> GetAllUsersAsync(GetUsersQuery query)
     {
-       
+
         var version = await _cache.GetStringAsync("users:version") ?? "0";
         var cacheKey = $"users_v{version}:users:{query.Page}:{query.Limit}:{query.Search}:" +
                   $"{query.SortBy}:{query.SortDescending}:{query.RatingType}:" +
                   $"{query.MinRating}:{query.MaxRating}:{query.JustOnline}";
 
-        
+
         var cached = await _cache.GetStringAsync(cacheKey);
         if (!string.IsNullOrEmpty(cached))
         {
             var cachedResponse = JsonSerializer.Deserialize<UsersSearchResponse>(cached)!;
-            return new UsersResult(cachedResponse, true); 
+            return new UsersResult(cachedResponse, true);
         }
 
         var users = _dbContext.Users.AsQueryable();
-        
+
 
         if (!string.IsNullOrEmpty(query.Search))
         {
             users = users.Where(u => u.Nickname.ToLower().Contains(query.Search.ToLower()));
         }
-        users = query.RatingType switch 
+        users = query.RatingType switch
         {
             RatingType.Blitz => users.Where(u => u.Rating.Blitz >= query.MinRating && u.Rating.Blitz <= query.MaxRating),
             RatingType.Bullet => users.Where(u => u.Rating.Bullet >= query.MinRating && u.Rating.Bullet <= query.MaxRating),
             _ => users.Where(u => u.Rating.Rapid >= query.MinRating && u.Rating.Rapid <= query.MaxRating),
         };
-        
-        
-       var onlineIds = await _presenceService.GetOnlineIdsAsync(users.Select(u => u.Id));
+
+
+        var onlineIds = await _presenceService.GetOnlineIdsAsync(users.Select(u => u.Id));
         if (query.JustOnline)
         {
-            
+
             users = users.Where(u => onlineIds.Contains(u.Id));
         }
 
@@ -97,7 +97,7 @@ public class UsersService : IUsersService
             .ToListAsync();
 
 
-        
+
 
         var response = new UsersSearchResponse(result, totalPages);
 
@@ -132,7 +132,7 @@ public class UsersService : IUsersService
         }
         var allFriends = _dbContext.Friendships
             .Where(f => f.User.Nickname == nickname);
-            
+
 
         var onlineIds = await _presenceService.GetOnlineIdsAsync(allFriends.Select(f => f.FriendId));
 
@@ -231,7 +231,7 @@ public class UsersService : IUsersService
     }
     public async Task<ErrorOr<UpdateUserBioResponse>> UpdateUserBioAsync(string nickname, UpdateUserBioRequest request)
     {
-        if(nickname is null)
+        if (nickname is null)
         {
             return Error.Unauthorized("invalidAccessToken", "Access token is invalid.");
         }
@@ -260,7 +260,7 @@ public class UsersService : IUsersService
         await _dbContext.SaveChangesAsync();
         return new UpdateUserProfilePictureResponse(user.ProfilePictureUrl);
     }
-    public async Task<ErrorOr<OnlineFriendsResponse>> GetOnlineFriendsAsync(string nickname,PaginationQuery pagination)
+    public async Task<ErrorOr<OnlineFriendsResponse>> GetOnlineFriendsAsync(string nickname, PaginationQuery pagination)
     {
         var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Nickname == nickname);
 
@@ -268,26 +268,26 @@ public class UsersService : IUsersService
         {
             return Error.NotFound("userNotFound", "User with the given nickname was not found.");
         }
-            var friends = await _dbContext.Friendships
-                .Where(f => f.UserId == user.Id)
-                .Select(f => f.Friend)
-                .ToListAsync();
-            var friendIds = friends.Select(f => f.Id).ToList();
-            var onlineSet = await _presenceService.GetOnlineIdsAsync(friendIds);
+        var friends = await _dbContext.Friendships
+            .Where(f => f.UserId == user.Id)
+            .Select(f => f.Friend)
+            .ToListAsync();
+        var friendIds = friends.Select(f => f.Id).ToList();
+        var onlineSet = await _presenceService.GetOnlineIdsAsync(friendIds);
 
-            var onlineFriends = friends
-             .OrderBy(f => f.Nickname)
-                .Where(f => onlineSet.Contains(f.Id))
-                .Select(f => f.ToFriendOnlineSummary())
-                .ToList();
-            var totalPages = (int)Math.Ceiling(onlineFriends.Count / (double)pagination.Limit);
+        var onlineFriends = friends
+         .OrderBy(f => f.Nickname)
+            .Where(f => onlineSet.Contains(f.Id))
+            .Select(f => f.ToFriendOnlineSummary())
+            .ToList();
+        var totalPages = (int)Math.Ceiling(onlineFriends.Count / (double)pagination.Limit);
 
-            var paged = onlineFriends
-               
-                .Skip((pagination.PageNumber - 1) * pagination.Limit)
-                .Take(pagination.Limit)
-                .ToList();
-            return new OnlineFriendsResponse(Friends:paged, TotalPages:totalPages);
-        
+        var paged = onlineFriends
+
+            .Skip((pagination.PageNumber - 1) * pagination.Limit)
+            .Take(pagination.Limit)
+            .ToList();
+        return new OnlineFriendsResponse(Friends: paged, TotalPages: totalPages);
+
     }
 }

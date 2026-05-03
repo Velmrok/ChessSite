@@ -4,7 +4,7 @@ namespace backend.Enums;
 public enum UsersSortBy
 {
     CreatedAt,
-    Nickname ,
+    Nickname,
     OnlineStatus,
     LastActive,
     Rating

@@ -10,6 +10,7 @@ import SmallScreenMenu from "./SmallScreenMenu";
 import { useTranslation } from "react-i18next";
 import i18n from "@/i18n/config";
 import Avatar from "./Avatar";
+import { useAuthActions } from "@/hooks/useAuthActions";
 
 
 
@@ -69,12 +70,12 @@ export default function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const setToast = useToastStore((state) => state.setToast);
     const navigate = useNavigate();
+    const {clearAuth} = useAuthActions();
 
     const handleLogout = async () => {
         try {
             await logoutUser();;
-            setUser(null);
-            setQueueData({ isInQueue: false, joinedQueueAt: undefined });
+            clearAuth();
             navigate('/login');
         } catch (error: any) {
             if (error.status === 401) setUser(null);

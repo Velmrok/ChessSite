@@ -1,7 +1,7 @@
 import useUserStore from '@/stores/useUserStore';
 import type { SignalRError, SignalRRequest, SignalRResponse } from '@/types/signalR';
 import { HubConnectionBuilder, HubConnection, HubConnectionState, HttpTransportType } from '@microsoft/signalr';
-import { use } from 'react';
+import { v4 as uuid } from 'uuid';
 
 let connection: HubConnection | null = null;
 let heartBeatInterval: ReturnType<typeof setTimeout> | null = null;
@@ -57,12 +57,18 @@ export const reconnectSignalR = async () => {
     await connectSignalR();
 }
 export const startHeartBeat = () => {
-    if (heartBeatInterval) return; 
+    if (heartBeatInterval) return;
     heartBeatInterval = setInterval(() => {
         if (connection?.state === HubConnectionState.Connected) {
-            connection.invoke('Heartbeat')
+            connection.invoke('Heartbeat', { type: "Heartbeat", correlationId: uuid(), data: {} })
         }
-    }, 20000); 
+    }, 20000);
+};
+export const stopHeartBeat = () => {
+    if (heartBeatInterval) {
+        clearInterval(heartBeatInterval);
+        heartBeatInterval = null;
+    }
 };
 
 

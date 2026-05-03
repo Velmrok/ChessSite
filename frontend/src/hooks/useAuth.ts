@@ -5,12 +5,12 @@ import { use, useEffect, useState } from "react";
 import { getMe, refresh } from "@/services/authService";
 import { reconnectSignalR, startHeartBeat } from "@/services/signalR/connection";
 import type { GetMeResponse } from "@/types/auth";
+import { useAuthActions } from "./useAuthActions";
 
 
 export function useAuth() {
     const user = useUserStore((state) => state.user);
-    const setUser = useUserStore((state) => state.setUser);
-    const setQueueData = useUserStore((state) => state.setQueueData);
+    const { applyAuth } = useAuthActions();
     const { request } = useApi();
     const [loading, setLoading] = useState(true);
 
@@ -24,11 +24,7 @@ export function useAuth() {
                 }
             });
             if (shouldRefresh) me = await request<GetMeResponse>(refresh);
-            if (me) {
-                setUser(me);
-                setQueueData(me.queueData);
-                startHeartBeat();
-            }
+            if (me) applyAuth(me);
 
 
             setLoading(false);
@@ -44,10 +40,11 @@ export function useAuth() {
     }, []);
     useEffect(() => {
         reconnectSignalR();
-    }, [user?.nickname])
+    }, [user?.nickname])    
+
+   
 
 
 
-
-    return { loading };
+    return { loading};
 }

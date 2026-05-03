@@ -9,6 +9,7 @@ import LoginInputs from "./LoginInputs";
 import useUserStore from "@/stores/useUserStore";
 import { useTranslation } from "react-i18next";
 import { useErrorTranslation } from "@/hooks/useErrorTranslation";
+import { useAuthActions } from "@/hooks/useAuthActions";
 
 export default function LoginForm() {
     const {t: authT} = useTranslation("auth");
@@ -17,7 +18,7 @@ export default function LoginForm() {
     const setUser = useUserStore((state) => state.setUser);
     const navigate = useNavigate();
     const setToast = useToastStore((state) => state.setToast);
-
+    const { applyAuth } = useAuthActions();
     const [error,setError] = useState("");
     const { request } = useApi();
     const setQueueData = useUserStore((state) => state.setQueueData);
@@ -33,8 +34,7 @@ export default function LoginForm() {
         });
         if (user) {
 
-            setUser(user);
-            setQueueData(user.queueData);
+            applyAuth(user);
             setToast({ msg: toastT('success.login'), type: "success" });
             navigate("/");
         }

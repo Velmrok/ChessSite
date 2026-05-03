@@ -8,12 +8,13 @@ import RegisterInputs from "./RegisterInputs";
 import useUserStore from "@/stores/useUserStore";
 import { useTranslation } from "react-i18next";
 import { useErrorTranslation } from "@/hooks/useErrorTranslation";
+import { useAuthActions } from "@/hooks/useAuthActions";
 
 export default function RegisterForm() {
     const {t: authT} = useTranslation("auth");
     const {t: toastT} = useTranslation("toast");
     const errorT = useErrorTranslation();
-    const setUser = useUserStore((state) => state.setUser);
+    const {applyAuth} = useAuthActions();
     const navigate = useNavigate();
     const setToast = useToastStore((state) => state.setToast);
 
@@ -31,7 +32,7 @@ export default function RegisterForm() {
         });
 
         if (user) {
-            setUser(user);
+            applyAuth(user);
             setToast({ msg: toastT('success.register'), type: "success" });
             navigate("/");
         }

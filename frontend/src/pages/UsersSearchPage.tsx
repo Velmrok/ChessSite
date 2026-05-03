@@ -74,7 +74,7 @@ export default function UsersSearchPage() {
                         </div>
                         <div className="w-full bg-cyan-900 min-h-screen p-2 md:p-6
                       rounded-lg shadow-lg flex flex-col items-center gap-6 mb-10">
-                            {isLoading ? <Loading /> : <UserList users={list} />}
+                            <UserList users={list} isLoading={isLoading} />
                         </div>
                     </div>
                 </div>

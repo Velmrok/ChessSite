@@ -9,13 +9,15 @@ import { useEffect, useState } from "react";
 import type { UsersSearch } from "@/types/usersSearch";
 import { useTranslation } from "react-i18next";
 import Avatar from "../global/Avatar";
+import Loading from "../global/Loading";
 
 const API_URL = import.meta.env.VITE_API_URL;
 type Props = {
     users: UsersSearch;
+    isLoading: boolean;
 };
 
-export default function UserList({ users}: Props) {
+export default function UserList({ users,isLoading}: Props) {
     const {t} = useTranslation("search");
     const setOrder = useSearchStore((state) => state.setOrder);
     const [deletedAccounts, setDeletedAccounts] = useState<string[]>([]);
@@ -68,7 +70,8 @@ export default function UserList({ users}: Props) {
                     <SortArrows  sortBy="LastActive"/>
                     </button>
             </div>
-            {users && users.map((user) => {
+            {isLoading ? <Loading /> :
+            users && users.map((user) => {
                 const isDeleted = deletedAccounts.includes(user.nickname);
                 return(
                 <div key={user.nickname}

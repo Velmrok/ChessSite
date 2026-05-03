@@ -12,6 +12,7 @@ import i18n from "@/i18n/config";
 import Avatar from "./Avatar";
 import { useAuthActions } from "@/hooks/useAuthActions";
 import useQueue from "@/hooks/useQueue";
+import { useQueueStore } from "@/stores/useQueueStore";
 
 
 
@@ -31,8 +32,8 @@ const UserMenu = ({ onLogout }: { onLogout: () => void }) => {
     const user = useUserStore((state) => state.user);
     const { t } = useTranslation("navbar");
 
-    const isInQueue = useUserStore(state => state.queueData?.isInQueue);
-    const queueTime = useUserStore(state => state.queueTime);
+    const isInQueue = useQueueStore(state => state.queueData?.isInQueue);
+    const queueTime = useQueueStore(state => state.queueTime);
     const { handleCancelQueue } = useQueue();
 
     return (

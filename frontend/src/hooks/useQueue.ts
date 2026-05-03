@@ -1,11 +1,9 @@
 import { joinQueue, leaveQueue } from "@/services/socket/signalRGlobalService";
 import useToastStore from "@/stores/useToastStore";
-import useUserStore from "@/stores/useUserStore";
-import { useState, useTransition } from "react";
 import { useTranslation } from "react-i18next";
 import {v4 as uuidv4} from "uuid";
 import { useApi } from "./useApi";
-import type { SignalRError } from "@/types/signalR";
+import { useQueueStore } from "@/stores/useQueueStore";
 
 export default function useQueue() {
     const setToast = useToastStore((state) => state.setToast);
@@ -13,9 +11,9 @@ export default function useQueue() {
 
 
     const {request} = useApi();
-    const setQueueTime = useUserStore(state => state.setQueueTime);
-    const setQueueData = useUserStore(state => state.setQueueData);
-    const queueData = useUserStore(state => state.queueData);
+    const setQueueTime = useQueueStore(state => state.setQueueTime);
+    const setQueueData = useQueueStore(state => state.setQueueData);
+    const queueData = useQueueStore(state => state.queueData);
    
 
     const handleJoinQueue = async (time: number, increment: number) => {

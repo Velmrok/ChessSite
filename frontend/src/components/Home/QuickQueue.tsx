@@ -8,8 +8,8 @@ import { useTranslation } from "react-i18next";
 
 export default function QuickQueue() {
   const { t } = useTranslation("home");
-  const isInQueue = useUserStore((state) => state.queueData?.isInQueue);
-  const queueTime = useUserStore((state) => state.queueTime);
+  const isInQueue = useQueueStore((state) => state.queueData?.isInQueue);
+  const queueTime = useQueueStore((state) => state.queueTime);
   const { handleJoinQueue, handleCancelQueue } = useQueue();
   const setSelectedTime = useQueueStore(state => state.setSelectedTime);
   const selectedTime = useQueueStore(state => state.selectedTime);

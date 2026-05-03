@@ -1,3 +1,4 @@
+import { useQueueStore } from "@/stores/useQueueStore";
 import useUserStore from "@/stores/useUserStore";
 import { Chessboard } from "react-chessboard";
 import { useTranslation } from "react-i18next";
@@ -9,7 +10,7 @@ export default function ChessBoard() {
         throw new Error("Should not happen: ChessBoard rendered without user logged in");
     }
     const { t } = useTranslation('game');
-    const isInQueue = useUserStore((state) => state.queueData?.isInQueue);
+    const isInQueue = useQueueStore((state) => state.queueData?.isInQueue);
   return (
     <div className="w-full min-w-[330px] py-3 relative">
       <Chessboard />

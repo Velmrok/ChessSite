@@ -1,6 +1,7 @@
 import useUserStore from "@/stores/useUserStore";
 import { Link } from "react-router-dom";
 import Avatar from "../global/Avatar";
+import { useQueueStore } from "@/stores/useQueueStore";
 
 type Props = {
     nickname: string,
@@ -13,7 +14,7 @@ type Props = {
 const API_URL = import.meta.env.VITE_API_URL;
 export default function PlayerBar({ nickname, avatarUrl, rating, time, withLink }: Props) {
 
-    const isInQueue = useUserStore((state) => state.queueData?.isInQueue);
+    const isInQueue = useQueueStore((state) => state.queueData?.isInQueue);
 
     const formatedTime = `${time.split("+")[0]}:00`;
 

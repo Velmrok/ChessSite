@@ -1,18 +1,14 @@
 import { useEffect, useRef } from 'react';
-import useToastStore from '@/stores/useToastStore';
-import useUserStore from '@/stores/useUserStore';
-import { useNavigate } from 'react-router-dom';
-import useGameStore from '@/stores/useGameStore';
-import { useTranslation } from 'react-i18next';
+import { useQueueStore } from '@/stores/useQueueStore';
 
 
 
 export function useGlobalSignalR() {
  
   const queueIntervalRef = useRef<number| null>(null);
-  const isInQueue = useUserStore(state => state.queueData?.isInQueue);
-  const setQueueTime = useUserStore(state => state.setQueueTime);
-  const joinedQueueAt = useUserStore(state => state.queueData?.joinedQueueAt);
+  const isInQueue = useQueueStore(state => state.queueData?.isInQueue);
+  const setQueueTime = useQueueStore(state => state.setQueueTime);
+  const joinedQueueAt = useQueueStore(state => state.queueData?.joinedQueueAt);
 
 
   useEffect(() => {

@@ -10,8 +10,8 @@ import { SiPushbullet, SiStackblitz } from "react-icons/si";
 
 export default function GameForm() {
     const { t } = useTranslation('game');
-    const isInQueue = useUserStore((state) => state.queueData?.isInQueue);
-    const queueTime = useUserStore((state) => state.queueTime);
+    const isInQueue = useQueueStore((state) => state.queueData?.isInQueue);
+    const queueTime = useQueueStore((state) => state.queueTime);
     const gameTypeIcon = {
         rapid: <MdAccessTime className="text-green-500 text-base md:text-xl inline" />,
         blitz: <SiStackblitz className="text-yellow-300 text-base md:text-xl inline" />,

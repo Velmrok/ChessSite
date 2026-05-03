@@ -1,4 +1,5 @@
 import { startHeartBeat, stopHeartBeat } from "@/services/signalR/connection";
+import { useQueueStore } from "@/stores/useQueueStore";
 import useUserStore from "@/stores/useUserStore";
 import type { GetMeResponse } from "@/types/auth";
 
@@ -6,7 +7,7 @@ import type { GetMeResponse } from "@/types/auth";
 export function useAuthActions() {
 
     const setUser = useUserStore((state) => state.setUser);
-    const setQueueData = useUserStore((state) => state.setQueueData);
+    const setQueueData = useQueueStore((state) => state.setQueueData);
     
 
 

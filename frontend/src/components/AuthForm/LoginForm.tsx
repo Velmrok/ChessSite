@@ -3,25 +3,24 @@ import { useNavigate } from "react-router-dom";
 import { loginUser } from "../../services/authService";
 import useToastStore from "@/stores/useToastStore";
 import { useApi } from "@/hooks/useApi";
-
 import type { LoginFormType } from "../../types/auth";
 import LoginInputs from "./LoginInputs";
-import useUserStore from "@/stores/useUserStore";
 import { useTranslation } from "react-i18next";
 import { useErrorTranslation } from "@/hooks/useErrorTranslation";
 import { useAuthActions } from "@/hooks/useAuthActions";
+
 
 export default function LoginForm() {
     const {t: authT} = useTranslation("auth");
     const errorT = useErrorTranslation();
     const {t: toastT} = useTranslation("toast");
-    const setUser = useUserStore((state) => state.setUser);
+
     const navigate = useNavigate();
     const setToast = useToastStore((state) => state.setToast);
     const { applyAuth } = useAuthActions();
     const [error,setError] = useState("");
     const { request } = useApi();
-    const setQueueData = useUserStore((state) => state.setQueueData);
+   
 
     const handleSubmit = async (e: React.FormEvent, form: LoginFormType) => {
         e.preventDefault();

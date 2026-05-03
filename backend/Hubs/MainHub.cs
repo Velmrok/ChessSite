@@ -2,6 +2,7 @@ using backend.DTO.Common;
 using backend.DTO.Queue;
 using backend.Services.Interfaces;
 using ErrorOr;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 
@@ -36,15 +37,25 @@ public partial class MainHub : Hub
 
         await base.OnConnectedAsync();
     }
-    public async Task<string> Heartbeat()
+    [Authorize]
+    public async Task<SignalRResponse<EmptyResponse>> Heartbeat(SignalRRequest<EmptyPayload> request)
     {
         string? userId = GetUserId();
         if (userId != null)
         {
             await _presenceService.SetOnlineAsync(Guid.Parse(userId));
-            return "ok";
+            return new SignalRResponse<EmptyResponse>(
+                Type: request.Type,
+                CorrelationId: request.CorrelationId,
+                Data: default
+            );
         }
-        return "not_ok";
+        return new SignalRResponse<EmptyResponse>(
+            Type: request.Type,
+            CorrelationId: request.CorrelationId,
+            Data: default,
+            Error: new SignalRError("unauthorized", "User is not authenticated")
+        );
     }
 
 

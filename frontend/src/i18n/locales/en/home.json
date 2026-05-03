@@ -7,7 +7,7 @@
     "quickQueue": "Quick game queue",
     "lookingForSomeone": "Looking for someone?",
     "inQueue": "Looking for a game...",
-    "findMatch": "Find match",
+    "findUser": "Search users",
     "find": "Find game",
     "queueSize": "in queue",
     "wantToFindGame": "Want to find a game in the database?",
@@ -24,7 +24,7 @@
     "noPlayersInQueue": "No players in queue",
     "startGame": "Start Game",
     "cancelQueue": "Cancel queue",
-    "findGame": "Find game",
+    "findGame": "Search games",
     "findSomeone": "Find other players",
     "play": "Play"
 }

@@ -68,20 +68,20 @@ export default function HomeUser() {
                     <div className="flex flex-col items-center gap-4">
                         <span>{t('wantToPlay')}</span>
                         <button onClick={()=>navigate('/find-game')}
-                         className="bg-cyan-500/60 px-8 py-2 rounded hover:bg-cyan-500 hover:scale-105 transition-all">{t('findMatch')}</button>
+                         className="bg-cyan-500/60 px-8 py-2 rounded hover:bg-cyan-500 hover:scale-105 transition-all">{t('play')}</button>
                     </div>
                     <div className="flex flex-col items-center gap-4">
                         <span>{t('lookingForSomeone')}</span>
                         <button onClick={()=>navigate('/search')}
                          className="bg-cyan-500/60 px-8 py-2 rounded hover:bg-cyan-500
-                         hover:scale-105 transition-all">{t('findMatch')}</button>
+                         hover:scale-105 transition-all">{t('findUser')}</button>
                          
                     </div>
                     <div className="flex flex-col items-center gap-4">
                         <span>{t('wantToFindGame')}</span>
                         <button onClick={()=>navigate('/games')}
                          className="bg-cyan-500/60 px-8 py-2 rounded hover:bg-cyan-500
-                         hover:scale-105 transition-all">{t('find')}</button>
+                         hover:scale-105 transition-all">{t('findGame')}</button>
                          
                     </div>
                     

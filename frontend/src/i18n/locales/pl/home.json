@@ -7,7 +7,7 @@
   "quickQueue": "Szybka kolejka",
   "lookingForSomeone": "Szukasz kogoś?",
   "inQueue": "Szukam gry...",
-  "findMatch": "Znajdź mecz",
+  "findUser": "Przeszukaj użytkowników",
   "find": "Znajdź grę",
   "queueSize": "w kolejce",
   "wantToFindGame": "Chcesz znaleźć grę w bazie danych?",
@@ -24,7 +24,7 @@
   "noPlayersInQueue": "Brak graczy w kolejce",
   "startGame": "Rozpocznij grę",
   "cancelQueue": "Anuluj kolejkę",
-  "findGame": "Znajdź grę",
+  "findGame": "Przeszukaj gry",
   "findSomeone": "Znajdź innych graczy",
   "play": "Graj"
 }

@@ -13,7 +13,7 @@ type Props = {
 const API_URL = import.meta.env.VITE_API_URL;
 export default function PlayerBar({ nickname, avatarUrl, rating, time, withLink }: Props) {
 
-    const isInQueue = useUserStore((state) => state.user?.isInQueue);
+    const isInQueue = useUserStore((state) => state.queueData?.isInQueue);
 
     const formatedTime = `${time.split("+")[0]}:00`;
 

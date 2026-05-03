@@ -1,6 +1,8 @@
 import useQueue from "@/hooks/useQueue";
 import { formatTimeFromMs } from "@/services/socket/signalRGlobalService";
+import { useQueueStore } from "@/stores/useQueueStore";
 import useUserStore from "@/stores/useUserStore";
+import type { TimeControl } from "@/types/game";
 import { useTranslation } from "react-i18next";
 
 
@@ -9,10 +11,18 @@ export default function QuickQueue() {
   const isInQueue = useUserStore((state) => state.queueData?.isInQueue);
   const queueTime = useUserStore((state) => state.queueTime);
   const { handleJoinQueue, handleCancelQueue } = useQueue();
-  
+  const setSelectedTime = useQueueStore(state => state.setSelectedTime);
+  const selectedTime = useQueueStore(state => state.selectedTime);
+
   const handleLeaveQueue = () => {
     if (isInQueue) {
       handleCancelQueue();
+    }
+  }
+  const handleClickJoinQueue = (time: number, increment: number) => {
+    if (!isInQueue) {
+      setSelectedTime(`${time}+${increment}` as TimeControl);
+      handleJoinQueue(time, increment);
     }
   }
   
@@ -26,6 +36,9 @@ export default function QuickQueue() {
         <div className="text-white text-2xl font-MyFancyFont animate-pulse">
           {t('inQueue')}
         </div>
+        <div className="text-white text-2xl font-MyFancyFont animate-pulse">
+          {selectedTime}
+        </div>
         <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-cyan-600 border-gray-200" />
 
 
@@ -36,9 +49,9 @@ export default function QuickQueue() {
 
   return (
     <div className="max-w-[540px] grid grid-cols-3 gap-2 md:gap-4 w-full">
-      {["1+0", "2+0", "3+0", "3+2", "5+3", "10+0", "10+5", "15+10", "30+0"].map((t) => (
+      {["1+0", "2+0", "3+0", "3+2", "5+3", "10+0", "10+2", "15+5", "30+0"].map((t) => (
         <button
-          onClick={() => handleJoinQueue(parseInt(t.split('+')[0]), parseInt(t.split('+')[1]))}
+          onClick={() => handleClickJoinQueue(parseInt(t.split('+')[0]), parseInt(t.split('+')[1]))}
           key={t}
           className="aspect-square w-full flex items-center justify-center transition-colors duration-300
         bg-black/50 hover:bg-black/70 shadow-md text-white font-MyFancyFont text-lg md:text-2xl rounded-xl ">

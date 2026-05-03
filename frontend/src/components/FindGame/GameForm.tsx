@@ -1,40 +1,40 @@
 import useQueue from "@/hooks/useQueue";
 import { formatTimeFromMs } from "@/services/socket/signalRGlobalService";
+import { useQueueStore } from "@/stores/useQueueStore";
 import useUserStore from "@/stores/useUserStore";
+import type { TimeControl } from "@/types/game";
 import { useTranslation } from "react-i18next";
 import { MdAccessTime } from "react-icons/md";
 import { SiPushbullet, SiStackblitz } from "react-icons/si";
 
 
-type Props = {
-    currentTime: string;
-    setCurrentTime: (time: string) => void;
-}
-export default function GameForm({ currentTime, setCurrentTime }: Props) {
+export default function GameForm() {
     const { t } = useTranslation('game');
-    const isInQueue = useUserStore((state) => state.user?.isInQueue);
+    const isInQueue = useUserStore((state) => state.queueData?.isInQueue);
     const queueTime = useUserStore((state) => state.queueTime);
     const gameTypeIcon = {
         rapid: <MdAccessTime className="text-green-500 text-base md:text-xl inline" />,
         blitz: <SiStackblitz className="text-yellow-300 text-base md:text-xl inline" />,
         bullet: <SiPushbullet className="text-red-500 text-base md:text-xl inline" />,
     }
+    const selectedTime = useQueueStore(state => state.selectedTime);
+    const setSelectedTime = useQueueStore(state => state.setSelectedTime);
     const isGameType = (s: string) =>
         s === "rapid" || s === "blitz" || s === "bullet";
-    const handleSetCurrentTime = (e: any, time: string) => {
+    const handleSetCurrentTime = (e: any, time: TimeControl) => {
         e.preventDefault();
         if (isInQueue) {
             return;
         }
-        setCurrentTime(time);
+        setSelectedTime(time);
     }
-    const { handleJoinGame, handleCancelGame } = useQueue();
+    const { handleJoinQueue, handleCancelQueue } = useQueue();
     const handleButtonClick = () => {
         if (isInQueue) {
-            handleCancelGame();
+            handleCancelQueue();
 
         } else {
-            handleJoinGame({ type: "Queue", correlationId: crypto.randomUUID(), payload: { timeControl: parseInt(currentTime.split('+')[0]), increment: parseInt(currentTime.split('+')[1]) } });
+            handleJoinQueue(parseInt(selectedTime.split('+')[0]), parseInt(selectedTime.split('+')[1]));
         }
     }
 
@@ -53,8 +53,8 @@ export default function GameForm({ currentTime, setCurrentTime }: Props) {
                         !isGameType(text) ? (
                             <button
                                 key={text}
-                                onClick={(e) => handleSetCurrentTime(e, text)}
-                                className={`${currentTime === text ? "outline-2 outline-amber-400" : "bg-cyan-700"} w-full flex items-center
+                                onClick={(e) => handleSetCurrentTime(e, text as TimeControl)}
+                                className={`${selectedTime === text ? "outline-2 outline-amber-400" : "bg-cyan-700"} w-full flex items-center
                          justify-center transition-colors duration-300 bg-cyan-700 hover:bg-cyan-500 
                          text-white font-MyFancyFont text-base md:text-lg rounded-sm `}>
                                 {text}

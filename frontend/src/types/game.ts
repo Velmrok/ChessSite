@@ -43,6 +43,13 @@ export type GameSummary = {
         time: number;
         increment: number;
         status: string;
-        finishedAt: string;
-        moves: Array<string>;
-    };
+    finishedAt: string;
+    moves: Array<string>;
+};
+export type TimeControl =
+    "1+0" | "1+1" | "1+2" |
+    "2+0" | "2+1" | "2+2" |
+    "3+0" | "3+1" | "3+2" |
+    "5+0" | "5+3" | "5+5" |
+    "10+0" | "10+2" | "15+0" |
+    "15+5" | "30+0" | "30+15";

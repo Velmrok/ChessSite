@@ -5,24 +5,13 @@ declare global {
 
 
 
-    type Message = {
-        id: string;
-        nickname: string;
-        text: string;
-        timestamp: string;
-
-    }
-    
+   
     type Move = {
         from: string;
         to: string;
         promotion?: string;
     };
-    type MoveInfo = {
-        move: string;
-        deltaTime: number;
-        absoluteTime: number;
-    }
+   
 
     type Toast = "success" | "error" | "info";
     type GameStatus = "waiting" | "live" | "finished";

@@ -15,27 +15,41 @@ export type GameType = 'bullet' | 'blitz' | 'rapid';
 export type GameStatus = 'active' | 'finished';
 
 export type GameState = {
-        id: string;
-        winnerNickname: string | null;
-        date: string;
-        status: GameStatus;
-        white: PublicUser;
-        black: PublicUser;
-        fen: string;
-        moves: Array<MoveInfo>;
-        gameType: gameType;
-        time: number;
-        increment: number;
-        currentTurn: 'white' | 'black';
-        currentWhiteTime: number;
-        currentBlackTime: number;
-        messages: Array<Message>;
-        isDrawOffered: string | null;
-        reason?: string;
+    id: string;
+    winnerNickname: string | null;
+    date: string;
+    gameStatus: GameStatus;
+    whitePlayer: PlayerSummary;
+    blackPlayer: PlayerSummary;
+    moves: Array<MoveInfo>;
+    gameType: gameType;
+    time: number;
+    increment: number;
+    currentTurn: 'white' | 'black';
+    currentWhiteTime: number;
+    currentBlackTime: number;
+    messages: Array<MessageInfo>;
+    drawOfferedBy: string | null;
+    endGameReason: string | null;
+}
+export type MoveInfo = {
+    san: string;
+    fen: string;
+    deltaTime: number;
+    absoluteTime: number;
+}
+export type MessageInfo = {
+    id: string;
+    senderNickname: string;
+    content: string;
+    timestamp: string;
+
 }
 
+
+
 export type GameSummary = {
-        id: string;
+    id: string;
         whitePlayer: PlayerSummary;
         blackPlayer: PlayerSummary;
         winnerNickname: string | null;
@@ -55,4 +69,17 @@ export type TimeControl =
     "15+5" | "30+0" | "30+15";
 export type MatchFoundResponse = {
     gameUrl: string;
+}
+export type GameEndedResponse = {
+    gameId: string;
+    winner: string;
+    reason: string;
+}
+export type MoveMadeResponse = {
+    gameId: string;
+    move: MoveInfo;
+}
+export type DrawOfferedResponse = {
+    gameId: string,
+    drawOfferedBy: string 
 }

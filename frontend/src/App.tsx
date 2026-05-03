@@ -49,7 +49,7 @@ function App() {
             <Route element={<OnlyLoggedInRoute />}>
               <Route path="/find-game" element={<FindGame />} />
               <Route path="/search" element={<UsersSearchPage />} />
-               <Route path="/game/:gameId" element={<GamePage />} />
+               <Route path="/games/:gameId" element={<GamePage />} />
                <Route path ="/games" element={<GamesSearchPage/>} />
                <Route path="/users/:nickname/profile" element={<UserProfilePage />} />
             

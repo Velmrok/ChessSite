@@ -28,5 +28,10 @@ public class GamesController : MyControllerBase
     {
         return HandleError(await _gamesService.GetAllGamesAsync(query), Ok);
     }
+    [HttpGet("{gameId}")]
+    public async Task<IActionResult> GetGame([FromRoute] string gameId)
+    {
+        return HandleError(await _gamesService.GetGameByIdAsync(gameId), Ok);
+    }
 
 }

@@ -1,3 +1,4 @@
+import type { GetMeResponse } from "@/types/auth";
 import type { GameState } from "@/types/game";
 import type { User } from "@/types/user";
 import { FaWindowClose } from "react-icons/fa";
@@ -5,7 +6,7 @@ import { FaWindowClose } from "react-icons/fa";
 type Props = {
     endData: () => { title: string; reasonText: string };
     game: GameState;
-    user: User;
+    user: Omit<GetMeResponse, "queueData"> ;
     setGameJustEndedState: (state: boolean) => void;
 }
 

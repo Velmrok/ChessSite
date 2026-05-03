@@ -17,7 +17,7 @@ export function useChessboardInteraction({ game, pushAnalysisMove }: Props) {
     const live = useChessboardLive();
     const analysis = useChessboardAnalysis({ pushAnalysisMove });
     const user = useUserStore((state) => state.user);
-    const isLive = game.status === "active";
+    const isLive = game.gameStatus === "active";
 
     const isInAnalysisTree = useGameStore((state) => state.isInAnalysisTree);
     const currentMoveIndex = useGameStore((state) => state.currentMoveIndex);
@@ -56,9 +56,9 @@ export function useChessboardInteraction({ game, pushAnalysisMove }: Props) {
     useEffect(() => {
         const lastMove = isLive ? live.lastMove : analysis.lastMove;
         const currentShownTurn = isLive ? live.chessRef.current.turn() : analysis.chessRef.current.turn();
-        const isUserAPlayer = user && (user.nickname === game.white.nickname || user.nickname === game.black.nickname);
-        const isUserTurn = isLive ? (user && ((currentShownTurn === "w" && user.nickname === game.white.nickname) ||
-            (currentShownTurn === "b" && user.nickname === game.black.nickname))) : true;
+        const isUserAPlayer = user && (user.nickname === game.whitePlayer.nickname || user.nickname === game.blackPlayer.nickname);
+        const isUserTurn = isLive ? (user && ((currentShownTurn === "w" && user.nickname === game.whitePlayer.nickname) ||
+            (currentShownTurn === "b" && user.nickname === game.blackPlayer.nickname))) : true;
         const hasUndoBeenMade = isLive ? game.moves.length > currentMoveIndex + 1 : false;
 
         const newStyles: Record<string, React.CSSProperties> = {};
@@ -75,8 +75,7 @@ export function useChessboardInteraction({ game, pushAnalysisMove }: Props) {
                 newStyles[kingPosition] = { backgroundColor: "rgba(255, 0, 0, 0.6)" };
             }
         }
-        console.log(`currentShownTurn: ${currentShownTurn} for user: ${user?.nickname} in game: ${game.white.nickname} vs ${game.black.nickname}`);
-        console.log(`isUserAPlayer: ${isUserAPlayer}, isUserTurn: ${isUserTurn}, hasUndoBeenMade: ${hasUndoBeenMade}`);
+
         if (!isUserAPlayer || !isUserTurn || hasUndoBeenMade) {
             setSquareStyles(newStyles);
             return;
@@ -94,8 +93,8 @@ export function useChessboardInteraction({ game, pushAnalysisMove }: Props) {
         clickedSquareStyles, 
         isLive, 
         user?.nickname, 
-        game.white.nickname, 
-        game.black.nickname, 
+        game.whitePlayer.nickname, 
+        game.blackPlayer.nickname, 
         game.moves.length, 
         currentMoveIndex,
         live.isCheck,

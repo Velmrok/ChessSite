@@ -1,8 +1,7 @@
-import { fetchGame as fg } from "@/services/gameService";
 import type { GameState } from "@/types/game";
 
 import {create} from "zustand";
-
+import type { MoveInfo } from "@/types/game";
 
 
 
@@ -14,7 +13,6 @@ type GameStoreType = {
     gameHasJustStarted: boolean;
     ratingType : 'bullet' | 'blitz' | 'rapid';
     setGame: (game: GameState) => void;
-    fetchGame: (gameId: string) => Promise<void>;
     setCurrentMoveIndex: (cb:(index: number)=> number) => void;
     setCurrentWhiteTime: (time: number) => void;
     setCurrentBlackTime: (time: number) => void;
@@ -30,6 +28,7 @@ type GameStoreType = {
     setAbsoluteCurrentMoveIndex: (index: number) => void;
     resetGame: () => void;
     setGameHasJustStarted: (value: boolean) => void;
+    setAnalysisMoves: (moves: Array<string>) => void;
 }
 
 
@@ -54,27 +53,7 @@ const useGameStore = create<GameStoreType>((set) => ({
     }),
     setGameHasJustStarted: (value: boolean) => set({gameHasJustStarted: value}),
     setGame: (game: GameState) => set({ game: { ...game } }),
-    async fetchGame(gameId: string) {
-        try {
-            const response = await fg(gameId);
-            set({
-                game: response,
-                currentMoveIndex: response.moves.length - 1,
-                currentWhiteTime: response.currentWhiteTime,
-                currentBlackTime: response.currentBlackTime,
-                analysisMoves: [],
-                currentAnalysisMoveIndex: -1,
-                isInAnalysisTree: false,
-                
-            });
-           
-
-        } catch (error) {
-            console.error("Error fetching game:", error);
-            throw error;
-        }
-    },
-    
+   
     setCurrentMoveIndex: (cb: (index: number) => number) => set((state) => ({currentMoveIndex: cb(state.currentMoveIndex)})),
         
     setCurrentWhiteTime: (time: number) => set({currentWhiteTime: time}),
@@ -140,6 +119,7 @@ setCurrentAnalysisMoveIndex: (cb: (index: number) => number) => set((state) => (
         isInAnalysisTree: false,
          analysisMoves: [],
           currentAnalysisMoveIndex: -1}),
+        setAnalysisMoves: (moves: Array<string>) => set({analysisMoves: moves}),
 
     
    

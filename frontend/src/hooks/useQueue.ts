@@ -8,6 +8,7 @@ import { signUpForEvent } from "@/services/signalR/connection";
 import type { MatchFoundResponse } from "@/types/game";
 import { useNavigate } from "react-router-dom";
 import type { SignalRResponse } from "@/types/signalR";
+import useGameStore from "@/stores/useGameStore";
 
 
 export default function useQueue() {
@@ -20,6 +21,7 @@ export default function useQueue() {
     const setQueueData = useQueueStore(state => state.setQueueData);
     const queueData = useQueueStore(state => state.queueData);
     const navigate = useNavigate();
+    const setGameHasJustStarted = useGameStore(state => state.setGameHasJustStarted);
 
     const handleJoinQueue = async (time: number, increment: number) => {
         const response = await request( () =>
@@ -44,6 +46,7 @@ export default function useQueue() {
             }
             navigate(response.data.gameUrl);
             setQueueData({isInQueue: false});
+            setGameHasJustStarted(true);
 
         });
         

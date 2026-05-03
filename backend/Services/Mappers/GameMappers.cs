@@ -53,8 +53,38 @@ namespace backend.Services.Mappers
                 _ => throw new ArgumentException("Invalid game type")
             };
         }
+        public static GameResponse MapToGameResponse(this Game game)
+        {
+            return new GameResponse
+            (
+                Id: game.Id.ToString(),
+                WhitePlayer: new UserGameSummary
+                (
+                    Nickname: game.WhitePlayer.Nickname,
+                    ProfilePictureUrl: game.WhitePlayer.ProfilePictureUrl,
+                    Rating: game.WhitePlayer.Rating.GetRatingByType(game.Type)
+                ),
+                BlackPlayer: new UserGameSummary
+                (
+                    Nickname: game.BlackPlayer.Nickname,
+                    ProfilePictureUrl: game.BlackPlayer.ProfilePictureUrl,
+                    Rating: game.BlackPlayer.Rating.GetRatingByType(game.Type)
+                ),
+                WinnerNickname: game.Winner?.Nickname,
+                Type: game.Type,
+                Status: game.Status,
+                Time: game.Time,
+                Increment: game.Increment,
+                Moves: game.Moves.Split(' ').Select(m => new MoveInfo(m, "", 0, 0)).ToList(),
+                GameType: game.Type,
+                CurrentBlackTime: 100,
+                CurrentWhiteTime: 100,
+                Messages: new List<MessageInfo>(),
+                DrawOfferedBy: null,
+                EndGameReason: null
+            );
         
-
+        }
 
 
     }

@@ -19,3 +19,4 @@ export type HomeStats = {
     matchesInProgress: number;
     createdAccounts: number;
 }
+export type QmViewMode = 'queue' | 'leaderboard' | 'friends';

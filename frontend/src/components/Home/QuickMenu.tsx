@@ -1,10 +1,9 @@
+import type { QmViewMode } from "@/types/home";
 import { useTranslation } from "react-i18next";
-
-
 
 type Props = {
     buttons: Array<() => void>;
-    qmViewMode: string;
+    qmViewMode: QmViewMode;
 }
 export default function QuickMenu({ buttons, qmViewMode }: Props) {
     const {t} = useTranslation("home");
@@ -26,7 +25,7 @@ export default function QuickMenu({ buttons, qmViewMode }: Props) {
             {btn(t('queue'), 0, qmViewMode === 'queue')}
             {btn(t('leaderBoard'), 1, qmViewMode === 'leaderboard')}
             {btn(t('friendsOnline'), 2, qmViewMode === 'friends')}
-            {btn(t('lobby'), 3, qmViewMode === 'lobby')}
+           
 
         </div>
     )

@@ -7,11 +7,10 @@ import FriendsOnline from "./FriendsOnline";
 import LeaderBoard from "./Leaderboard";
 import { getLeaderboard} from "@/services/homeService";
 import {fetchFriendsOnline} from "@/services/userService";
-import Lobby from "./Lobby";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useApi } from "@/hooks/useApi";
-import type { LeaderboardResponse } from "@/types/home";
+import type { LeaderboardResponse, QmViewMode } from "@/types/home";
 
 
 export default function HomeUser() {
@@ -22,7 +21,7 @@ export default function HomeUser() {
     const createdAccounts = useHomeStore((state) => state.createdAccounts);
     const queueSize = useHomeStore((state) => state.queueSize);
     const [leaderboard, setLeaderboard] = useState<LeaderboardResponse | undefined>({ topRapidPlayers: [], topBlitzPlayers: [], topBulletPlayers: [] });
-    const [qmViewMode, setQmViewMode] = useState<string>('queue');
+    const [qmViewMode, setQmViewMode] = useState<QmViewMode>('queue');
     const navigate = useNavigate();
     const setFriends = useHomeStore(state => state.setFriends);
     const {request} = useApi();
@@ -46,7 +45,7 @@ export default function HomeUser() {
 
    
 
-    const changeQMViewMode=(mode:string)=>{
+    const changeQMViewMode=(mode:QmViewMode)=>{
         return () => setQmViewMode(mode);
     }
 
@@ -93,14 +92,13 @@ export default function HomeUser() {
                 <QuickMenu buttons={[
                     changeQMViewMode('queue'),
                     changeQMViewMode('leaderboard'),
-                    changeQMViewMode('friends'),
-                    changeQMViewMode('lobby')]}
+                    changeQMViewMode('friends')]}
                     qmViewMode={qmViewMode}
                     />
                 {qmViewMode==='queue' && <QuickQueue />}
                 {qmViewMode==='friends' && <FriendsOnline  />}
                 {qmViewMode==='leaderboard' && <LeaderBoard leaderboard={leaderboard} />}
-                {qmViewMode==='lobby' && <Lobby />}
+                
                 </div>
             
             

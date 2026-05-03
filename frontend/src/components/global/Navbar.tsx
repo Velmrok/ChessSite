@@ -3,7 +3,7 @@ import ReactCountryFlag from "react-country-flag";
 import useUserStore from "@/stores/useUserStore";
 import useToastStore from "@/stores/useToastStore";
 import { logoutUser } from "@/services/authService";
-import { formatTimeFromMs, leaveQueue } from "@/services/socket/signalRGlobalService";
+import { formatTimeFromMs} from "@/services/socket/signalRGlobalService";
 import { CiMenuBurger } from "react-icons/ci";
 import { useState } from "react";
 import SmallScreenMenu from "./SmallScreenMenu";
@@ -11,6 +11,7 @@ import { useTranslation } from "react-i18next";
 import i18n from "@/i18n/config";
 import Avatar from "./Avatar";
 import { useAuthActions } from "@/hooks/useAuthActions";
+import useQueue from "@/hooks/useQueue";
 
 
 
@@ -32,6 +33,7 @@ const UserMenu = ({ onLogout }: { onLogout: () => void }) => {
 
     const isInQueue = useUserStore(state => state.queueData?.isInQueue);
     const queueTime = useUserStore(state => state.queueTime);
+    const { handleCancelQueue } = useQueue();
 
     return (
         <>
@@ -42,7 +44,7 @@ const UserMenu = ({ onLogout }: { onLogout: () => void }) => {
                         <div>{t("inQueue")}</div>
                         <div >({formatTimeFromMs(queueTime!)})</div></div>
                     <button className="hover:text-amber-200 transition-transform duration-300 text-[13px] text-gray-400"
-                        onClick={() => leaveQueue({ type: "Queue", correlationId: crypto.randomUUID() })}>
+                        onClick={() => handleCancelQueue()}>
                         {t("leaveQueue")} </button>
                 </div>}
 
@@ -66,7 +68,6 @@ export default function Navbar() {
     const user = useUserStore((state) => state.user);
     const { t: toastT } = useTranslation("toast");
     const setUser = useUserStore((state) => state.setUser);
-    const setQueueData = useUserStore((state) => state.setQueueData);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const setToast = useToastStore((state) => state.setToast);
     const navigate = useNavigate();

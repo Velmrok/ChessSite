@@ -31,23 +31,25 @@ namespace backend.Services
 
         public async Task<ErrorOr<GamesResponse>> GetAllGamesAsync(GetGamesQuery query)
         {
-            var games = await _dbContext.Games
-                .Where(g => g.WhitePlayer.Nickname.Contains(query.Query ?? "") || g.BlackPlayer.Nickname.Contains(query.Query ?? ""))
+            var search = query.Query ?? "";
+            var gamesQuerry =  _dbContext.Games
+                .Where(g => g.WhitePlayer.Nickname.Contains(search) || g.BlackPlayer.Nickname.Contains(search))
                 .Where(g => query.GameType == null || g.Type == query.GameType)
-                .Where(g => query.GameStatus == null || g.Status == query.GameStatus)
+                .Where(g => query.GameStatus == null || g.Status == query.GameStatus);
+                
+                
+
+            var totalCount = await gamesQuerry.CountAsync();
+            var totalPages = (int)Math.Ceiling(totalCount / (double)query.Limit);
+
+            var pagedGames = await gamesQuerry
                 .SortBy(SortSelectors[query.SortBy ?? GamesSortBy.FinishedAt], query.SortDescending)
                 .Include(g => g.WhitePlayer)
                 .Include(g => g.BlackPlayer)
                 .Include(g => g.Winner)
-                .ToListAsync();
-
-            var totalCount = games.Count;
-            var totalPages = (int)Math.Ceiling(totalCount / (double)query.Limit);
-
-            var pagedGames = games
                 .Skip((query.PageNumber - 1) * query.Limit)
                 .Take(query.Limit)
-                .ToList();
+                .ToListAsync();
 
             var response = new GamesResponse
             (

@@ -96,5 +96,13 @@ namespace backend.Services
 
             return game.MapToGameResponse();
         }
+
+        public async Task<bool> IsInGameAsync(Guid userId)
+        {
+    
+            return await _dbContext
+            .Games.AnyAsync(g => (g.WhitePlayerId == userId || g.BlackPlayerId == userId) && g
+            .Status == GameStatus.Active);
+        }
     }
 }

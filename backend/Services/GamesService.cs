@@ -11,20 +11,24 @@ using System.Linq.Expressions;
 using StackExchange.Redis;
 using System.Text.Json;
 using Chess;
+using Microsoft.AspNetCore.SignalR;
+using backend.Hubs;
 namespace backend.Services
 {
     public class GamesService : IGamesService
     {
+        private readonly IHubContext<MainHub> _hubContext;
         private readonly AppDbContext _dbContext;
         private readonly IPresenceService _presenceService;
         private readonly IDatabase _db;
         private const string _defaultFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
-        public GamesService(AppDbContext dbContext, IPresenceService presenceService, IConnectionMultiplexer redis)
+        public GamesService(AppDbContext dbContext, IPresenceService presenceService, IConnectionMultiplexer redis, IHubContext<MainHub> hubContext)
         {
             _dbContext = dbContext;
             _presenceService = presenceService;
             _db = redis.GetDatabase();
+            _hubContext = hubContext;
         }
 
         private Dictionary<GamesSortBy, Expression<Func<Game, object>>> SortSelectors = new()
@@ -195,6 +199,53 @@ namespace backend.Services
                 .OfType<MoveInfo>()
                 .ToList();
             return moves;
+        }
+        private async Task<ErrorOr<Success>> EndGame(string gameId, string winnerId, string reason)
+        {
+            var gameActiveData = await _db.HashGetAllAsync("games:" + gameId);
+            var gameActive = gameActiveData.FromHashEntries<GameActive>();
+            
+
+            var game = await _dbContext.Games.FirstOrDefaultAsync(g => g.Id.ToString() == gameId);
+            if (game == null)
+                return Error.NotFound("gameNotFound");
+            if(gameActive == null)
+                return Error.Failure("gameNotActive");
+
+            var moves = GetMovesByGameId(gameId);
+
+            game.Status = GameStatus.Finished;
+            game.FinishedAt = DateTime.UtcNow;
+            game.Moves = moves;
+            
+            string? winnerNickname = null;
+            if (winnerId != null)
+            {
+                var winner = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id.ToString() == winnerId);
+                if (winner != null)
+                {
+                    game.WinnerId = winner.Id;
+                    winnerNickname = winner.Nickname;
+                }
+                else
+                {
+                    return Error.NotFound("winnerNotFound");
+                }
+            }
+            await _dbContext.SaveChangesAsync();
+
+            await _db.SetRemoveAsync("activeGames", gameId);
+            await _db.KeyDeleteAsync("games:" + gameId);
+            await _db.KeyDeleteAsync($"games:{gameId}:moves");
+            await _db.KeyDeleteAsync($"games:{gameId}:messages");
+
+            await _hubContext.Clients.Group(gameId).SendAsync("GameEnded", new GameEndedResponse(
+                GameId: gameId,
+                Winner: winnerNickname,
+                Reason: reason
+            ));
+
+            return new Success();
         }
     }
 }

@@ -70,7 +70,7 @@ namespace backend.Services.Mappers
                     ProfilePictureUrl: game.BlackPlayer.ProfilePictureUrl,
                     Rating: game.BlackPlayer.Rating.GetRatingByType(game.Type)
                 ),
-                WinnerNickname: game.Winner?.Nickname
+                WinnerNickname: game.Winner?.Nickname,
                 Status: game.Status,
                 Time: game.Time,
                 Increment: game.Increment,
@@ -83,6 +83,60 @@ namespace backend.Services.Mappers
                 EndGameReason: null
             );
         
+        }
+        public static GameActive MapToGameActive(this Game game)
+        {
+            return new GameActive
+            {
+                Id = game.Id.ToString(),
+
+                WhitePlayerId = game.WhitePlayer.Id.ToString(),
+                WhitePlayerNickname = game.WhitePlayer.Nickname,
+                WhitePlayerProfilePictureUrl = game.WhitePlayer.ProfilePictureUrl,
+                WhitePlayerRating = game.WhitePlayer.Rating.GetRatingByType(game.Type),
+                CurrentWhiteTime = game.Time * 60 * 1000,
+
+                BlackPlayerId = game.BlackPlayer.Id.ToString(),
+                BlackPlayerNickname = game.BlackPlayer.Nickname,
+                BlackPlayerProfilePictureUrl = game.BlackPlayer.ProfilePictureUrl,
+                BlackPlayerRating = game.BlackPlayer.Rating.GetRatingByType(game.Type),
+                CurrentBlackTime = game.Time * 60 * 1000,
+
+                Time = game.Time,
+                Increment = game.Increment,
+                GameType = game.Type,
+                DrawOfferedBy = null
+            };
+        }
+        public static GameResponse MapToGameResponse(this GameActive gameActive,List<MoveInfo> moves, List<MessageInfo> messages)
+        {
+            return new GameResponse
+            (
+                Id: gameActive.Id,
+                WhitePlayer: new UserGameSummary
+                (
+                    Nickname: gameActive.WhitePlayerNickname,
+                    ProfilePictureUrl: gameActive.WhitePlayerProfilePictureUrl,
+                    Rating: gameActive.WhitePlayerRating
+                ),
+                BlackPlayer: new UserGameSummary
+                (
+                    Nickname: gameActive.BlackPlayerNickname,
+                    ProfilePictureUrl: gameActive.BlackPlayerProfilePictureUrl,
+                    Rating: gameActive.BlackPlayerRating
+                ),
+                WinnerNickname: null,
+                Status: GameStatus.Active,
+                Time: gameActive.Time,
+                Increment: gameActive.Increment,
+                Moves: moves,
+                GameType: gameActive.GameType,
+                CurrentBlackTime: gameActive.CurrentBlackTime,
+                CurrentWhiteTime: gameActive.CurrentWhiteTime,
+                Messages: messages,
+                DrawOfferedBy: gameActive.DrawOfferedBy,
+                EndGameReason: null
+            );
         }
 
 

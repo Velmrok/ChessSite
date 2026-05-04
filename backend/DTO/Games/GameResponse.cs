@@ -8,7 +8,6 @@ public record GameResponse(
     UserGameSummary WhitePlayer,
     UserGameSummary BlackPlayer,
     string? WinnerNickname,
-    GameType Type,
     GameStatus Status,
     int Time,
     int Increment,

@@ -70,8 +70,7 @@ namespace backend.Services.Mappers
                     ProfilePictureUrl: game.BlackPlayer.ProfilePictureUrl,
                     Rating: game.BlackPlayer.Rating.GetRatingByType(game.Type)
                 ),
-                WinnerNickname: game.Winner?.Nickname,
-                Type: game.Type,
+                WinnerNickname: game.Winner?.Nickname
                 Status: game.Status,
                 Time: game.Time,
                 Increment: game.Increment,

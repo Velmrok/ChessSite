@@ -6,7 +6,15 @@ import { v4 as uuid } from 'uuid';
 let connection: HubConnection | null = null;
 let isReconnecting = false;
 let heartBeatInterval: ReturnType<typeof setTimeout> | null = null;
-const eventListeners = new Map<string, (...args: any[]) => void>();
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const eventListeners = new Map<string, (response: any) => void>();
+
+function resubscribeEvents() {
+    if (!connection) return;
+    for (const [event, handler] of eventListeners) {
+        connection.on(event, handler);
+    }
+}
 const setIsConnected = useUserStore.getState().setIsConnected;
 export const getConnection = (): HubConnection => {
     if (!connection) throw new Error('SignalR not connected');
@@ -58,9 +66,7 @@ export const reconnectSignalR = async () => {
         connection = null;
     }
     await connectSignalR();
-    for (const [event, handler] of eventListeners) {
-        connection?.on(event, handler);
-    }
+    resubscribeEvents();
     isReconnecting = false;
 }
 export const startHeartBeat = () => {

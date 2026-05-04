@@ -1,3 +1,4 @@
+using backend.DTO.Common;
 using backend.DTO.Games;
 using ErrorOr;
 
@@ -8,5 +9,6 @@ public interface IGamesService
     Task<ErrorOr<GameResponse>> GetGameByIdAsync(string gameId);
     Task<ErrorOr<string>> CreateGameAsync(string user1Id, string user2Id, int time, int increment);
     Task<bool> IsInGameAsync(Guid userId);
-    Task<ErrorOr<MoveInfo>> MakeMoveAsync(string? userId, MakeMoveRequest request);
+    Task<ErrorOr<EmptyResponse>> MakeMoveAsync(string? userId, SignalRRequest<MakeMoveRequest> request);
+    Task<ErrorOr<EmptyResponse>> SurrenderGameAsync(string? userId, string gameId);
 }

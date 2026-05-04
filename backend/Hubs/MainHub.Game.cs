@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using backend.Services.Interfaces;
 using backend.DTO.Games;
 using backend.DTO.Common;
+using ErrorOr;
 
 namespace backend.Hubs;
 
@@ -11,22 +12,24 @@ public partial class MainHub : Hub
 
 
     [Authorize]
-    public async Task<SignalRResponse<MoveInfo>> MakeMove(SignalRRequest<MakeMoveRequest> request)
+    public async Task<SignalRResponse<EmptyResponse>> MakeMove(SignalRRequest<MakeMoveRequest> request)
     {
-        if (ValidatePayload<MakeMoveRequest,MoveInfo>(request) is { } error) return error;
+        if (ValidatePayload<MakeMoveRequest,EmptyResponse>(request) is { } error) return error;
 
         var userId = GetUserId();
         
-        var result = await _gamesService.MakeMoveAsync(userId, request.Payload!);
-        return HandleError(result, request, data =>
-        {
-            Clients.Group($"Game:{request.Payload!.GameId}")
-                .SendAsync("MoveMade", new SignalRResponse<MoveInfo>(
-                    Type: "MoveMade",
-                    CorrelationId: request.Payload.GameId,
-                    Data: data
-                ));
-            return data;
-        });
+        var result = await _gamesService.MakeMoveAsync(userId, request);
+        return HandleError(result, request);
+    } 
+    [Authorize]
+    public async Task<SignalRResponse<EmptyResponse>> SurrenderGame(SignalRRequest<SurrenderGameRequest> request)
+    {
+        if (ValidatePayload<SurrenderGameRequest,EmptyResponse>(request) is { } error) return error;
+
+        var userId = GetUserId();
+    
+        
+        var result = await _gamesService.SurrenderGameAsync(userId, request.Payload!.GameId);
+        return HandleError(result, request); 
     } 
 }

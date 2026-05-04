@@ -1,9 +1,10 @@
+import { useApi } from "@/hooks/useApi";
 import { offerDraw, surrenderGame } from "@/services/socket/socketGameService";
 import useGameStore from "@/stores/useGameStore";
 import useUserStore from "@/stores/useUserStore";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
-
+import { v4 as uuid } from "uuid";
 export function Buttons() {
     const gameId = useParams().gameId!;
     const user = useUserStore((state) => state.user);
@@ -11,6 +12,7 @@ export function Buttons() {
     const isLive = useGameStore((state) => state.game?.gameStatus === "Active");
     const game = useGameStore((state) => state.game);
 
+    const {request} = useApi();
     if (!game || !user) return null;
     const drawOfferedBy = game.drawOfferedBy;
     const getPGN = () => {
@@ -27,14 +29,14 @@ export function Buttons() {
         return grouped.map((mv, index) => `${index + 1}. ${mv}`).join(" ");
     }
 
-    const onSurrender = () => {
-        surrenderGame({ type: "Game", correlationId: crypto.randomUUID(), payload: { gameId } });
+    const onSurrender = async () => {
+        await request(() => surrenderGame({ type: "Game", correlationId: uuid(), payload: { gameId } })) ;
     }
-    const onOfferDraw = () => {
-        offerDraw({ type: "Game", correlationId: crypto.randomUUID(), payload: { gameId } });
+    const onOfferDraw = async () => {
+        await request(() => offerDraw({ type: "Game", correlationId: uuid(), payload: { gameId } }));
     }
-    const onAcceptDraw = () => {
-        offerDraw({ type: "Game", correlationId: crypto.randomUUID(), payload: { gameId } });
+    const onAcceptDraw = async () => {
+        await request(() => offerDraw({ type: "Game", correlationId: uuid(), payload: { gameId } }));
     }
     return (
         <>

@@ -18,14 +18,16 @@ public class QueueService : IQueueService
     private readonly IConnectionMultiplexer _redis;
     private readonly IDatabase _db;
     private readonly AppDbContext _dbContext;
+    private readonly IGamesService _gamesService;
     private const string QueueSetKey = "chess:queue";
   
 
-    public QueueService(IConnectionMultiplexer redis, AppDbContext dbContext)
+    public QueueService(IConnectionMultiplexer redis, AppDbContext dbContext, IGamesService gamesService)
     {
         _redis = redis;
         _db = redis.GetDatabase();
         _dbContext = dbContext;
+        _gamesService = gamesService;
     }
 
     public async Task<ErrorOr<Success>> JoinQueueAsync(string? userId, JoinQueuePayload payload)
@@ -35,9 +37,13 @@ public class QueueService : IQueueService
         if (Guid.TryParse(userId, out var userGuid) == false)
             return Error.Failure("invalidUserId");
 
-        var exists = await _db.SetContainsAsync(QueueSetKey, $"{userId}");
-        if (exists)
+        var isInQueue = await _db.SetContainsAsync(QueueSetKey, $"{userId}");
+        if (isInQueue)
             return Error.Failure("userAlreadyInQueue");
+
+        var isInGame = await _gamesService.IsInGameAsync(userGuid);
+        if (isInGame)            
+            return Error.Failure("userAlreadyInGame");
 
 
         var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == userGuid);

@@ -1,3 +1,5 @@
+import type { MoveInfo } from "@/types/game";
+
 type GroupedMoveInfo ={
     whiteMove: string;
     blackMove?: string;
@@ -8,7 +10,7 @@ export class Format {
  
     static groupMoves(moves: Array<MoveInfo | string>): Array<GroupedMoveInfo> {
         return moves.reduce((acc: Array<GroupedMoveInfo>, move, index) => {
-            const moveStr = typeof move === 'string' ? move : move.move;
+            const moveStr = typeof move === 'string' ? move : move.san;
             const deltaTime = typeof move === 'string' ? 0 : move.deltaTime;
 
             if (index % 2 === 0) {

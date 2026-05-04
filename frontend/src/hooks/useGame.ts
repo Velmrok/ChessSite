@@ -11,7 +11,7 @@ import {invokeSignalR, leaveEvent, signUpForEvent} from "@/services/signalR/conn
 import {v4 as uuid} from "uuid";
 import { useApi } from "./useApi";
 import { fetchGame } from "@/services/gameService";
-import type { DrawOfferedResponse, GameEndedResponse, GameState, MoveMadeResponse } from "@/types/game";
+import type { DrawOfferedResponse, GameEndedResponse, GameState, MoveInfo } from "@/types/game";
 import type { SignalRResponse } from "@/types/signalR";
 
 export default function useGame() {
@@ -21,6 +21,7 @@ export default function useGame() {
   const { t: toastT } = useTranslation('toast');
   const { t } = useTranslation('game');
   const game = useGameStore((state) => state.game);
+  const isWhiteTurn = useGameStore((state) => state.game);
   const currentMoveIndex = useGameStore((state) => state.currentMoveIndex);
   const setCurrentWhiteTime = useGameStore((state) => state.setCurrentWhiteTime);
   const setCurrentBlackTime = useGameStore((state) => state.setCurrentBlackTime);
@@ -41,7 +42,7 @@ export default function useGame() {
 
     const fetch = async () => {
 
-        joinGameRoom({type: "Game:"+gameId, correlationId: uuid()});
+        const joinGameGroupResponse = request(() => joinGameRoom({type: "Game:"+gameId, correlationId: uuid()}));
         setGameJustEnded(false);
         const response = await request<GameState>(()=>fetchGame(gameId));
         if (response) {
@@ -74,14 +75,15 @@ export default function useGame() {
       }
     }
     );
-    signUpForEvent('MoveMade', (response: SignalRResponse<MoveMadeResponse>) => {
+    signUpForEvent('MoveMade', (response: SignalRResponse<MoveInfo>) => {
       const data = response.data;
       if (!data) {
         console.error("Received MoveMade event with null data");
         return;
       }
-      if (data.gameId === gameId) {
-        pushMove(data.move);
+      
+      if (response.correlationId === gameId) {
+        pushMove(data);
       }
 
     });
@@ -104,7 +106,7 @@ export default function useGame() {
       leaveEvent('GameEnded');
       leaveEvent('MoveMade');
       leaveEvent('DrawOffered');
-      invokeSignalR('LeaveGameRoom', { type: "Game", correlationId: crypto.randomUUID(), payload: { gameId } });
+      invokeSignalR('LeaveGroup', { type: "Game:"+gameId, correlationId: crypto.randomUUID() });
     };
   }, [gameId]);
 
@@ -113,7 +115,7 @@ export default function useGame() {
     if (!game) return;
 
 
-    if (game.gameStatus == "active") return;
+    //if (game.gameStatus == "Active") return;
     if (currentMoveIndex < 0) {
       setCurrentWhiteTime(game.time * 60 * 1000);
       setCurrentBlackTime(game.time * 60 * 1000);

@@ -24,8 +24,8 @@ export function useChessboardAnalysis({ pushAnalysisMove }: Props) {
     const [allPossibleMoves, setAllPossibleMoves] = useState<Move[]>([]);
     
 const [lastMove, setLastMove] = useState<Move | undefined>(undefined);
-const isLive = game?.status === "active";
-const prevStatusRef = useRef(game?.status);
+const isLive = game?.gameStatus === "Active";
+const prevStatusRef = useRef(game?.gameStatus);
 
 useEffect(() => {
         if(!game) return; 
@@ -35,10 +35,10 @@ useEffect(() => {
       
     for (let i = 0; i <= currentMoveIndex; i++) {
         try{
-            c.move(game!.moves[i].move);
+            c.move(game!.moves[i].san);
             
         }catch{
-            console.error("Invalid game move at index", i, ":", game!.moves[i].move);
+            console.error("Invalid game move at index", i, ":", game!.moves[i].san);
         }
       
      
@@ -69,10 +69,10 @@ useEffect(() => {
         setFen(c.fen());
 
         const prevStatus = prevStatusRef.current;
-        prevStatusRef.current = game?.status;
+        prevStatusRef.current = game?.gameStatus;
 
        if (newLastMove && !isLive) {
-            if (prevStatus === 'active' && game?.status === 'finished') {
+            if (prevStatus === 'Active' && game?.gameStatus === 'Finished') {
             } else {
                 if (c.inCheck()) {
                     playCheck();
@@ -110,7 +110,7 @@ useEffect(() => {
       
         const san = chessGame.history()[chessGame.history().length -1];
         
-        if( ! (game&&game.moves[currentMoveIndex +1] && game.moves[currentMoveIndex +1].move === san)){
+        if( ! (game&&game.moves[currentMoveIndex +1] && game.moves[currentMoveIndex +1].san === san)){
         pushAnalysisMove(chessGame.history()[chessGame.history().length -1]);
         
         }else{

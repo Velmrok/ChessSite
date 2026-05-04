@@ -31,7 +31,7 @@ namespace backend.Services.Mappers
                 FinishedAt: game.FinishedAt,
                 Time: game.Time,
                 Increment: game.Increment,
-                Moves: game.Moves.Split(' ').ToList()
+                Moves: [.. game.Moves.Take(6).Select(m => m.San)]
             );
         }
         public static int GetRatingByTime(this User user, int time)
@@ -71,10 +71,11 @@ namespace backend.Services.Mappers
                     Rating: game.BlackPlayer.Rating.GetRatingByType(game.Type)
                 ),
                 WinnerNickname: game.Winner?.Nickname,
-                Status: game.Status,
+                GameStatus: game.Status,
                 Time: game.Time,
+                IsWhiteTurn: game.IsWhiteTurn,
                 Increment: game.Increment,
-                Moves: game.Moves.Split(' ').Select(m => new MoveInfo(m, "", 0, 0)).ToList(),
+                Moves: game.Moves,
                 GameType: game.Type,
                 CurrentBlackTime: 100,
                 CurrentWhiteTime: 100,
@@ -102,6 +103,8 @@ namespace backend.Services.Mappers
                 BlackPlayerRating = game.BlackPlayer.Rating.GetRatingByType(game.Type),
                 CurrentBlackTime = game.Time * 60 * 1000,
 
+                IsWhiteTurn = true,
+
                 Time = game.Time,
                 Increment = game.Increment,
                 GameType = game.Type,
@@ -126,13 +129,14 @@ namespace backend.Services.Mappers
                     Rating: gameActive.BlackPlayerRating
                 ),
                 WinnerNickname: null,
-                Status: GameStatus.Active,
+                GameStatus: GameStatus.Active,
                 Time: gameActive.Time,
                 Increment: gameActive.Increment,
                 Moves: moves,
                 GameType: gameActive.GameType,
                 CurrentBlackTime: gameActive.CurrentBlackTime,
                 CurrentWhiteTime: gameActive.CurrentWhiteTime,
+                IsWhiteTurn: gameActive.IsWhiteTurn,
                 Messages: messages,
                 DrawOfferedBy: gameActive.DrawOfferedBy,
                 EndGameReason: null

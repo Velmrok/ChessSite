@@ -17,7 +17,7 @@ export function useChessboardInteraction({ game, pushAnalysisMove }: Props) {
     const live = useChessboardLive();
     const analysis = useChessboardAnalysis({ pushAnalysisMove });
     const user = useUserStore((state) => state.user);
-    const isLive = game.gameStatus === "active";
+    const isLive = game.gameStatus === "Active";
 
     const isInAnalysisTree = useGameStore((state) => state.isInAnalysisTree);
     const currentMoveIndex = useGameStore((state) => state.currentMoveIndex);

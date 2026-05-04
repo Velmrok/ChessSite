@@ -24,12 +24,12 @@ public partial class MainHub : Hub
 
 
         var result = await _queueService.JoinQueueAsync(GetUserId(), payload);
-        return HandleError<Success, EmptyResponse, JoinQueuePayload>(result, request);
+        return HandleError(result, request);
     }
     [Authorize]
     public async Task<SignalRResponse<EmptyResponse>> LeaveQueue(SignalRRequest<EmptyPayload> request)
     {
         var result = await _queueService.LeaveQueueAsync(GetUserId());
-        return HandleError<Success, EmptyResponse, EmptyPayload>(result, request);
+        return HandleError(result, request);
     }
 }

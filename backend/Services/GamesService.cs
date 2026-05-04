@@ -10,6 +10,7 @@ using backend.Extensions;
 using System.Linq.Expressions;
 using StackExchange.Redis;
 using System.Text.Json;
+using Chess;
 namespace backend.Services
 {
     public class GamesService : IGamesService
@@ -17,6 +18,7 @@ namespace backend.Services
         private readonly AppDbContext _dbContext;
         private readonly IPresenceService _presenceService;
         private readonly IDatabase _db;
+        private const string _defaultFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
         public GamesService(AppDbContext dbContext, IPresenceService presenceService, IConnectionMultiplexer redis)
         {
@@ -104,11 +106,8 @@ namespace backend.Services
             {
                 var gameActiveData = await _db.HashGetAllAsync("games:" + gameId);
                 var gameActive = gameActiveData.FromHashEntries<GameActive>();
-                var movesData = await _db.ListRangeAsync($"games:{gameId}:moves");
-                var moves = (await _db.ListRangeAsync($"game:{gameId}:moves"))
-                    .Select(m => JsonSerializer.Deserialize<MoveInfo>(m))
-                    .OfType<MoveInfo>()
-                    .ToList();
+        
+                var moves = GetMovesByGameId(gameId);
                 List<MessageInfo> messages = [];
                 return gameActive.MapToGameResponse(moves, messages);
             }
@@ -130,6 +129,72 @@ namespace backend.Services
             return await _dbContext
             .Games.AnyAsync(g => (g.WhitePlayerId == userId || g.BlackPlayerId == userId) && g
             .Status == GameStatus.Active);
+        }
+        public async Task<ErrorOr<MoveInfo>> MakeMoveAsync(string? userId, MakeMoveRequest request)
+        {
+            var gameId = request.GameId;
+            var isActive = await _db.SetContainsAsync("activeGames", gameId);
+            if (!isActive)
+                return Error.NotFound("gameNotFound");
+
+            var gameActiveData = await _db.HashGetAllAsync("games:" + gameId);
+            var gameActive = gameActiveData.FromHashEntries<GameActive>();
+
+            if (gameActive.WhitePlayerId != userId && gameActive.BlackPlayerId != userId)
+                return Error.Failure("userNotInGame");
+
+            var currentTurnPlayerId = gameActive.IsWhiteTurn ? gameActive.WhitePlayerId : gameActive.BlackPlayerId;
+            if (currentTurnPlayerId != userId)
+                return Error.Failure("notUsersTurn");
+            
+            var moves = GetMovesByGameId(gameId);
+            
+            var currentFen = moves.Count == 0 ? _defaultFen : moves.Last().Fen;
+           
+            var board = ChessBoard.LoadFromFen(currentFen);
+
+            var move = request.San;
+
+            var isValidMove = board.IsValidMove(move);
+            if (!isValidMove)
+                return Error.Failure("invalidMove");
+            board.Move(move);
+            var newFen = board.ToFen();
+            var now = DateTime.UtcNow;
+
+            var currentTimestamp = moves.Count == 0 ? now : moves.Last().Timestamp;
+            var deltaTime = (int)(now - currentTimestamp).TotalMilliseconds;
+
+            if(gameActive.IsWhiteTurn)
+                gameActive.CurrentWhiteTime -= deltaTime;
+            else
+                gameActive.CurrentBlackTime -= deltaTime;
+            var absoluteTime = gameActive.IsWhiteTurn ? gameActive.CurrentWhiteTime : gameActive.CurrentBlackTime;
+
+            if (absoluteTime < 0)
+            {
+                // todo endgame
+                return Error.Failure("timeOut");
+            }
+
+            var moveInfo = new MoveInfo(move, newFen, deltaTime, absoluteTime, now);
+            await _db.ListRightPushAsync($"games:{gameId}:moves", JsonSerializer.Serialize(moveInfo));
+
+            gameActive.IsWhiteTurn = !gameActive.IsWhiteTurn;
+            await _db.HashSetAsync("games:" + gameId, gameActive.ToHashEntries());
+            
+            return moveInfo;
+        }
+
+        // --------- helpers ---------
+        private List<MoveInfo> GetMovesByGameId(string gameId)
+        {
+            var movesData = _db.ListRangeAsync($"games:{gameId}:moves").Result;
+            var moves = movesData
+                .Select(m => JsonSerializer.Deserialize<MoveInfo>(m))
+                .OfType<MoveInfo>()
+                .ToList();
+            return moves;
         }
     }
 }

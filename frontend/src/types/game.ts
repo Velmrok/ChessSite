@@ -12,7 +12,7 @@ export type GameSearchParams = {
 
 export type GameType = 'bullet' | 'blitz' | 'rapid';
 
-export type GameStatus = 'active' | 'finished';
+export type GameStatus = 'Active' | 'Finished';
 
 export type GameState = {
     id: string;
@@ -25,7 +25,7 @@ export type GameState = {
     gameType: gameType;
     time: number;
     increment: number;
-    currentTurn: 'white' | 'black';
+    isWhiteTurn: boolean;
     currentWhiteTime: number;
     currentBlackTime: number;
     messages: Array<MessageInfo>;
@@ -37,6 +37,7 @@ export type MoveInfo = {
     fen: string;
     deltaTime: number;
     absoluteTime: number;
+    timestamp: string;
 }
 export type MessageInfo = {
     id: string;
@@ -75,10 +76,7 @@ export type GameEndedResponse = {
     winner: string;
     reason: string;
 }
-export type MoveMadeResponse = {
-    gameId: string;
-    move: MoveInfo;
-}
+
 export type DrawOfferedResponse = {
     gameId: string,
     drawOfferedBy: string 

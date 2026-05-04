@@ -9,7 +9,7 @@ type Props = {
 
 export default function MovesHistory({ moves, time }: Props) {
     const currentMoveIndex = useGameStore((state) => state.currentMoveIndex);
-    const isLive = useGameStore((state) => state.game?.gameStatus === "active");
+    const isLive = useGameStore((state) => state.game?.gameStatus === "Active");
 
     const setAbsoluteCurrentMoveIndex = useGameStore((state) => state.setAbsoluteCurrentMoveIndex);
 

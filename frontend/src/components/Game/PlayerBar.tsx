@@ -10,7 +10,6 @@ type Props = {
     time: number,
     withLink: boolean
 }
-const API_URL = import.meta.env.VITE_API_URL;
 export default function PlayerBar({ nickname, avatarUrl, rating, time, withLink }: Props) {
 
     const formatedTime = formatTimeFromMs(time);

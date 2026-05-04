@@ -1,4 +1,5 @@
 using backend.DTO.Common;
+using backend.DTO.Games;
 using backend.Enums;
 
 
@@ -15,11 +16,11 @@ public class Game
     public User BlackPlayer { get; set; } = null!;
     public User? Winner { get; set; } = null;
 
-
+    public bool IsWhiteTurn { get; set; } = true;
+    public List<MoveInfo> Moves { get; set; } = new();
     public GameType Type { get; set; } = GameType.Rapid;
     public GameStatus Status { get; set; } = GameStatus.Active;
     public DateTime? FinishedAt { get; set; } = null;
-    public string Moves { get; set; } = "";
     public int Time { get; set; } = 10;
     public int Increment { get; set; } = 0;
 }

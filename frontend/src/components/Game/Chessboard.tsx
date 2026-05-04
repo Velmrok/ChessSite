@@ -5,6 +5,7 @@ import useUserStore from "@/stores/useUserStore";
 import EndGameWindow from "./EndGameWindow";
 import { useTranslation } from "react-i18next";
 import type { GameState } from "@/types/game";
+import useGameStore from "@/stores/useGameStore";
 
 type Props = {
   game: GameState;
@@ -27,6 +28,7 @@ export default function ChessBoard({ game, boardOrientation = "white", gameJustE
     isInAnalysisTree
   } = useChessboardInteraction({ game, pushAnalysisMove });
   const user = useUserStore((state) => state.user);
+
   const { t } = useTranslation("global");
   const isConnected = useUserStore((state) => state.isConnected);
   const [gameJustEndedState, setGameJustEndedState] = useState(gameJustEnded);
@@ -35,6 +37,7 @@ export default function ChessBoard({ game, boardOrientation = "white", gameJustE
     setGameJustEndedState(gameJustEnded);
   }, [gameJustEnded]);
 
+  
   const options = {
     position: isLive ? live.fen : analysis.fen,
     boardOrientation: boardOrientation,

@@ -4,9 +4,11 @@ import { useParams } from "react-router-dom";
 import { sendMessage } from '@/services/socket/socketGameService';
 import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
+import { v4 as uuid } from 'uuid';
+import type { MessageInfo } from "@/types/game";
 
 type Props = {
-    previousMessages: Array<Message>;
+    previousMessages: Array<MessageInfo>;
 }
 export default function Chat({ previousMessages }: Props) {
     const gameId = useParams().gameId!;
@@ -24,7 +26,7 @@ export default function Chat({ previousMessages }: Props) {
             e.preventDefault();
             const text = e.target.value.trim();
             if (text.length > 0) {
-                sendMessage({ type: "Chat", correlationId: crypto.randomUUID(), payload: { gameId, text } });
+                sendMessage({ type: "Chat", correlationId: uuid(), payload: { gameId, text } });
                 e.target.value = '';
             }
         }

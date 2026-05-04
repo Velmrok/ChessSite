@@ -3,6 +3,7 @@
 
 using backend.Data;
 using backend.DTO.Auth;
+using backend.DTO.Common;
 using backend.DTO.Queue;
 using backend.Enums;
 using backend.Services.Interfaces;
@@ -30,7 +31,7 @@ public class QueueService : IQueueService
         _gamesService = gamesService;
     }
 
-    public async Task<ErrorOr<Success>> JoinQueueAsync(string? userId, JoinQueuePayload payload)
+    public async Task<ErrorOr<EmptyResponse>> JoinQueueAsync(string? userId, JoinQueuePayload payload)
     {
         if (userId == null)
             return Error.Failure("userNotAuthenticated");
@@ -63,10 +64,10 @@ public class QueueService : IQueueService
 
         await _db.StringSetAsync($"{userId}:Key", $"{QueueSetKey}:{payload.Time}:{payload.Increment}");
 
-        return new Success();
+        return new EmptyResponse();
     }
 
-    public async Task<ErrorOr<Success>> LeaveQueueAsync(string? userId)
+    public async Task<ErrorOr<EmptyResponse>> LeaveQueueAsync(string? userId)
     {
         if (userId == null)
             return Error.Failure("userNotAuthenticated");
@@ -79,7 +80,7 @@ public class QueueService : IQueueService
             await _db.SetRemoveAsync(queueKey.ToString(), $"{userId}");
         await _db.KeyDeleteAsync($"{userId}:Key");
         
-        return new Success();
+        return new EmptyResponse();
     }
 
     public async Task<int> GetQueueLengthAsync()

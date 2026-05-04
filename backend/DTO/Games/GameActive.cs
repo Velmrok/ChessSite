@@ -18,10 +18,13 @@ public class GameActive
     public int BlackPlayerRating { get; set; }
     public int CurrentBlackTime { get; set; }
 
+    public bool IsWhiteTurn { get; set; }
+
     public int Time { get; set; }
     public int Increment { get; set; }
     public GameType GameType { get; set; }
     public string? DrawOfferedBy { get; set; }
+
 }
 
 

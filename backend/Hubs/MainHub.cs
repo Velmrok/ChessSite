@@ -14,17 +14,20 @@ public partial class MainHub : Hub
     private readonly IHomeService _homeService;
     private readonly IPresenceService _presenceService;
     private readonly IQueueService _queueService;
+    private readonly IGamesService _gamesService;
     public MainHub(
         IGamesService gameService,
         IHomeService homeService,
         IQueueService queueService,
-        IPresenceService presenceService
+        IPresenceService presenceService,
+        IGamesService gamesService
         )
     {
         _gameService = gameService;
         _homeService = homeService;
         _presenceService = presenceService;
         _queueService = queueService;
+        _gamesService = gamesService;
 
     }
 
@@ -77,6 +80,7 @@ public partial class MainHub : Hub
     }
     public async Task<SignalRResponse<EmptyResponse>> JoinGroup(SignalRRequest request)
     {
+        
         await Groups.AddToGroupAsync(Context.ConnectionId, request.Type);
         return new SignalRResponse<EmptyResponse>(
             request.Type,
@@ -84,10 +88,10 @@ public partial class MainHub : Hub
             default
         );
     }
-    protected SignalRResponse<TResponse> HandleError<T, TResponse, TPayload>(
-    ErrorOr<T> result,
+    protected SignalRResponse<TResponse> HandleError<TResponse, TPayload>(
+    ErrorOr<TResponse> result,
     SignalRRequest<TPayload> request,
-    Func<T, TResponse>? onSuccess = null)
+    Func<TResponse, TResponse>? onSuccess = null)
     {
         if (result.IsError)
         {
@@ -114,6 +118,18 @@ public partial class MainHub : Hub
             data,
             null
         );
+    }
+
+    protected SignalRResponse<TResponse>? ValidatePayload<TRequest,TResponse>(SignalRRequest<TRequest> request)
+    {
+        if (request.Payload == null)
+            return new SignalRResponse<TResponse>(
+                request.Type,
+                request.CorrelationId,
+                default,
+                new SignalRError("invalidPayload", "Payload is required")
+            );
+        return null;
     }
 
 }

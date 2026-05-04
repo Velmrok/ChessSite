@@ -66,7 +66,7 @@ const useGameStore = create<GameStoreType>((set) => ({
                 game: {
                     ...state.game,
                     currentTurn:
-                        state.game.currentTurn === "white" ? "black" : "white",
+                        state.game.isWhiteTurn ? false : true,
                 },
                 analysisMoves: [...state.analysisMoves, move],
                 currentAnalysisMoveIndex: state.analysisMoves.length,
@@ -84,16 +84,17 @@ setCurrentAnalysisMoveIndex: (cb: (index: number) => number) => set((state) => (
     setIsInAnalysisTree: (value: boolean) => set({isInAnalysisTree: value}),
     pushMove: (move: MoveInfo) => set((state) => {
         if (!state.game) return {}; 
-        const isWhiteTurn = state.game.currentTurn === "white";
+        const isWhiteTurn = state.game.isWhiteTurn;
         const newWhiteTime = isWhiteTurn ? move.absoluteTime : state.currentWhiteTime;
         const newBlackTime = !isWhiteTurn ? move.absoluteTime : state.currentBlackTime;
-        const nextTurn = isWhiteTurn ? "black" : "white";
+      
         const newMoves = [...state.game.moves, move];
         return {
             game: {
                 ...state.game,
                 moves: newMoves,
-                currentTurn: nextTurn
+                isWhiteTurn : !isWhiteTurn,
+               
             },
             currentWhiteTime: newWhiteTime,
             currentBlackTime: newBlackTime,

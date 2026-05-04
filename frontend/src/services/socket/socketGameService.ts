@@ -2,7 +2,7 @@ import type { SignalRRequest } from '@/types/signalR';
 import {invokeSignalR} from '../signalR/connection';
 
 export const joinGameRoom = (request : SignalRRequest) => {
-    return invokeSignalR('JoinGameRoom', request);
+    return invokeSignalR('JoinGroup', request);
 }
 export const sendMessage = (request : SignalRRequest) => {
        return invokeSignalR('SendGameMessage', request);
@@ -15,5 +15,6 @@ export const surrenderGame = (request : SignalRRequest) => {
   }
 
 export const makeMove = (request : SignalRRequest) => {
+    console.log("Making move with request:", request);
     return invokeSignalR('MakeMove', request);
 }

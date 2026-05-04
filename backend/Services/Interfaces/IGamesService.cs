@@ -8,4 +8,5 @@ public interface IGamesService
     Task<ErrorOr<GameResponse>> GetGameByIdAsync(string gameId);
     Task<ErrorOr<string>> CreateGameAsync(string user1Id, string user2Id, int time, int increment);
     Task<bool> IsInGameAsync(Guid userId);
+    Task<ErrorOr<MoveInfo>> MakeMoveAsync(string? userId, MakeMoveRequest request);
 }

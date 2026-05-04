@@ -4,7 +4,9 @@ import { HubConnectionBuilder, HubConnection, HubConnectionState, HttpTransportT
 import { v4 as uuid } from 'uuid';
 
 let connection: HubConnection | null = null;
+let isReconnecting = false;
 let heartBeatInterval: ReturnType<typeof setTimeout> | null = null;
+const eventListeners = new Map<string, (...args: any[]) => void>();
 const setIsConnected = useUserStore.getState().setIsConnected;
 export const getConnection = (): HubConnection => {
     if (!connection) throw new Error('SignalR not connected');
@@ -45,6 +47,7 @@ export const connectSignalR = async (): Promise<void> => {
     }
 };
 export const reconnectSignalR = async () => {
+    isReconnecting = true;
     if (connection) {
         try {
             await connection.stop();
@@ -55,6 +58,10 @@ export const reconnectSignalR = async () => {
         connection = null;
     }
     await connectSignalR();
+    for (const [event, handler] of eventListeners) {
+        connection?.on(event, handler);
+    }
+    isReconnecting = false;
 }
 export const startHeartBeat = () => {
     if (heartBeatInterval) return;
@@ -77,7 +84,7 @@ const waitForConnected = async () => {
     await connectSignalR();
   }
 
-  while (!connection || connection.state !== HubConnectionState.Connected) {
+  while (isReconnecting || !connection || connection.state !== HubConnectionState.Connected) {
     await new Promise(res => setTimeout(res, 50));
     }
 };
@@ -87,17 +94,26 @@ export const invokeSignalR = async <TData = unknown>(
     request: SignalRRequest
 ): Promise<SignalRResponse<TData>> => {
     await waitForConnected();
-    const response: SignalRResponse<TData> = await connection!.invoke(methodName, request);
+    let response: SignalRResponse<TData>;
+    try {
+        response = await connection!.invoke(methodName, request);
+    } catch (err: any) {
+        if (isReconnecting || !connection || connection.state !== HubConnectionState.Connected) {
+            await waitForConnected();
+            response = await connection!.invoke(methodName, request);
+        } else {
+            throw err;
+        }
+    }
     if (response.error) {
-        throw Object.assign(new Error(response.error.title), { 
-            signalRError: response.error 
+        throw Object.assign(new Error(response.error.title), {
+            signalRError: response.error
         });
     }
     return response as SignalRResponse<TData>;
 };
 export const signUpForEvent = <TData = unknown>(eventName: string, callback: (response: SignalRResponse<TData>) => void,onError?: (error: SignalRError) => void) => {
-    const conn = getConnection();
-    conn.on(eventName, (Response: SignalRResponse<TData>) => {
+    const handler = (Response: SignalRResponse<TData>) => {
         if (Response == null) {
             console.error(`Received null response for event ${eventName}`);
             return;
@@ -109,9 +125,15 @@ export const signUpForEvent = <TData = unknown>(eventName: string, callback: (re
             return;
         }
         callback(Response);
-    });
-};
-export const leaveEvent = (eventName: string, callback?: (...args: any[]) => void) => {
+    };
+    eventListeners.set(eventName, handler);
     const conn = getConnection();
-    conn.off(eventName, callback || (() => {}));
+    conn.on(eventName, handler);
+};
+export const leaveEvent = (eventName: string) => {
+    const handler = eventListeners.get(eventName);
+    if (handler) {
+        eventListeners.delete(eventName);
+        if (connection) connection.off(eventName, handler);
+    }
 };

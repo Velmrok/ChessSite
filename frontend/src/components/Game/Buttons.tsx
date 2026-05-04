@@ -8,17 +8,17 @@ export function Buttons() {
     const gameId = useParams().gameId!;
     const user = useUserStore((state) => state.user);
     const { t } = useTranslation("game");
-    const isLive = useGameStore((state) => state.game?.status === "active");
+    const isLive = useGameStore((state) => state.game?.gameStatus === "Active");
     const game = useGameStore((state) => state.game);
 
     if (!game || !user) return null;
-    const isDrawOffered = game.isDrawOffered;
+    const drawOfferedBy = game.drawOfferedBy;
     const getPGN = () => {
         let grouped = []
         for (let i = 0; i < game.moves.length; i += 2) {
-            const move = game.moves[i].move;
+            const move = game.moves[i].san;
             if (game.moves[i + 1]) {
-                const nextMove = game.moves[i + 1].move;
+                const nextMove = game.moves[i + 1].san;
                 grouped.push(`${move} ${nextMove} `);
             } else {
                 grouped.push(`${move}`);
@@ -46,7 +46,7 @@ export function Buttons() {
                     >
                         {t('surrender')}
                     </button>
-                    {!isDrawOffered ?
+                    {!drawOfferedBy ?
 
                         <button
                             onClick={onOfferDraw}
@@ -54,7 +54,7 @@ export function Buttons() {
                         >
                             {t('offerDraw')}
                         </button> :
-                        isDrawOffered !== user.nickname ?
+                        drawOfferedBy !== user.nickname ?
                             <button
                                 onClick={onAcceptDraw}
                                 className="bg-green-600 hover:bg-green-700 text-white font-bold py-1 px-3 rounded animation-pulse"

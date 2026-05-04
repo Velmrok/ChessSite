@@ -6,6 +6,7 @@ import { Chess } from "chess.js";
 import { useEffect, useRef, useState } from "react";
 import type { PieceDropHandlerArgs } from "react-chessboard";
 import { useSounds } from "./useSounds";
+import { useApi } from "./useApi";
 
 export function useChessboardLive() {
     const chessRef = useRef<Chess>(new Chess());
@@ -18,14 +19,17 @@ export function useChessboardLive() {
     const [kingPosition, setKingPosition] = useState<string>("");
     const [allPossibleMoves, setAllPossibleMoves] = useState<Move[]>([]);
 const [lastMove, setLastMove] = useState<Move | undefined>(undefined);
-const isLive = game?.status === "active";
+const isLive = game?.gameStatus === "Active";
+const {request} = useApi();
     useEffect(() => {
         if(!game) return;
         if(!isLive) return
     const c = new Chess();
 
+    
     for (let i = 0; i <= currentMoveIndex; i++) {
-      c.move(game.moves[i].move);
+     
+      c.move(game.moves[i].san);
      
     }
     
@@ -68,7 +72,7 @@ const isLive = game?.status === "active";
       targetSquare
     }: PieceDropHandlerArgs) {
       if(!game) return false;
-      const userColor = user?.nickname === game.white.nickname ? 'white' : 'black';
+      const userColor = user?.nickname === game.whitePlayer.nickname ? 'white' : 'black';
       if(userColor !== (chessRef.current.turn() === 'w' ? 'white' : 'black')) {
         return false;
 
@@ -82,9 +86,19 @@ const isLive = game?.status === "active";
       try {
         const move = { from: sourceSquare, to: targetSquare, promotion: 'q' };
 
-        chessGame.move(move);
-        
-        //makeMove(game!.id,chessGame.history()[chessGame.history().length -1]);
+        const result = chessGame.move(move);
+
+        request(() => makeMove({
+          type: "Game",
+          correlationId: crypto.randomUUID(),
+          payload: { gameId: game.id, san: result.san }
+        }), {
+          onError: (err) => {
+            chessGame.undo();
+            return false
+          }
+        });
+
         return true;
       } catch {
       

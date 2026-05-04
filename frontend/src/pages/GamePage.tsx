@@ -20,7 +20,7 @@ export default function GamePage() {
     const currentBlackTime = useGameStore((state) => state.currentBlackTime);
     const currentWhiteTime = useGameStore((state) => state.currentWhiteTime);
     const user = useUserStore((state) => state.user);
-    const isLive = useGameStore((state) => state.game?.gameStatus === "active");
+    const isLive = useGameStore((state) => state.game?.gameStatus === "Active");
     const isInAnalysisTree = useGameStore((state) => state.isInAnalysisTree);
     const gameHasJustStarted = useGameStore((state) => state.gameHasJustStarted);
     const resetGame = useGameStore((state) => state.resetGame);

@@ -21,6 +21,7 @@ namespace backend.Services
         private readonly IHubContext<MainHub> _hubContext;
         private readonly AppDbContext _dbContext;
         private readonly IDatabase _db;
+        private readonly IGameTimerService _gameTimerService;
         private const string DefaultFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
         private static string GameKey(string gameId) => $"games:{gameId}";
@@ -51,11 +52,12 @@ namespace backend.Services
             return 'OK'
         ";
 
-        public GamesService(AppDbContext dbContext,IConnectionMultiplexer redis, IHubContext<MainHub> hubContext)
+        public GamesService(AppDbContext dbContext,IConnectionMultiplexer redis, IHubContext<MainHub> hubContext, IGameTimerService gameTimerService)
         {
             _dbContext = dbContext;
             _db = redis.GetDatabase();
             _hubContext = hubContext;
+            _gameTimerService = gameTimerService;
         }
 
         private Dictionary<GamesSortBy, Expression<Func<Game, object>>> SortSelectors = new()
@@ -173,6 +175,11 @@ namespace backend.Services
             if (!await tran.ExecuteAsync())
                 return Error.Failure("redisTransactionFailed");
 
+            _gameTimerService.ScheduleTimeout(
+                id.ToString(),
+                whitePlayer.Id.ToString(),
+                30_000);
+
             return id.ToString();
         }
 
@@ -264,6 +271,10 @@ namespace backend.Services
                     CorrelationId: gameId,
                     Data: moveInfo
                 ));
+            _gameTimerService.ScheduleTimeout(
+                gameId,
+                newIsWhiteTurn ? gameActive.WhitePlayerId : gameActive.BlackPlayerId,
+                gameActive.IsWhiteTurn ? newWhiteTime : newBlackTime);
 
             return new EmptyResponse();
         }
@@ -287,6 +298,27 @@ namespace backend.Services
 
             return await EndGameInternal(gameId, gameActive, "surrender", winnerId);
         }
+        public async Task HandleTimeoutAsync(string gameId, string timedOutPlayerId)
+        {
+            var gameActiveData = await _db.HashGetAllAsync(GameKey(gameId));
+            if (gameActiveData.Length == 0)
+                return; 
+
+            var gameActive = gameActiveData.FromHashEntries<GameActive>();
+
+            var currentTurnPlayerId = gameActive.IsWhiteTurn
+                ? gameActive.WhitePlayerId
+                : gameActive.BlackPlayerId;
+
+            if (currentTurnPlayerId != timedOutPlayerId)
+                return; 
+
+            var winnerId = gameActive.WhitePlayerId == timedOutPlayerId
+                ? gameActive.BlackPlayerId
+                : gameActive.WhitePlayerId;
+
+            await EndGameInternal(gameId, gameActive, "timeout", winnerId);
+        }
 
         // ==================== HELPERS ====================
 
@@ -301,6 +333,7 @@ namespace backend.Services
         private async Task<ErrorOr<EmptyResponse>> EndGameInternal(
             string gameId, GameActive gameActive, string reason, string? winnerId)
         {
+            _gameTimerService.RemoveGame(gameId);
             var moves = await GetMovesByGameIdAsync(gameId);
 
            Guid? winnerGuid = Guid.TryParse(winnerId, out var g) ? g : null;

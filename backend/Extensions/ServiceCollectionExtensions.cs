@@ -26,6 +26,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IPresenceService, PresenceService>();
         services.AddSingleton<IJwtGenerator, JwtGenerator>();
         services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
+        services.AddSingleton<IGameTimerService, GameTimerService>();
 
 
         services.AddHostedService<HomeBackgroundService>();

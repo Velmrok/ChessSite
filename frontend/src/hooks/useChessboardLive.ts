@@ -92,12 +92,7 @@ const {request} = useApi();
           type: "Game",
           correlationId: crypto.randomUUID(),
           payload: { gameId: game.id, san: result.san }
-        }), {
-          onError: (err) => {
-            chessGame.undo();
-            return false
-          }
-        });
+        }));
 
         return true;
       } catch {

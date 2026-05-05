@@ -62,7 +62,7 @@ export default function useGame() {
     fetch();
     signUpForEvent('GameEnded', (response: SignalRResponse<GameEndedResponse>) => {
       const data = response.data;
-      console.log("Game ended event received for game:", data);
+    
       if (!data) {
         console.error("Received GameEnded event with null data");
         return;

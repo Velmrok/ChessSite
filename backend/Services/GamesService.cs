@@ -14,6 +14,7 @@ using Chess;
 using Microsoft.AspNetCore.SignalR;
 using backend.Hubs;
 using backend.DTO.Common;
+using Microsoft.AspNetCore.Identity;
 namespace backend.Services
 {
     public class GamesService : IGamesService
@@ -205,13 +206,16 @@ namespace backend.Services
             var moves = await GetMovesByGameIdAsync(gameId);
             var currentFen = moves.Count == 0 ? DefaultFen : moves.Last().Fen;
 
-            var board = ChessBoard.LoadFromFen(currentFen);
+            var board = ChessBoard.LoadFromFen(currentFen,AutoEndgameRules.All);
+            
             var move = request.Payload.San;
 
             if (!board.IsValidMove(move))
                 return Error.Failure("invalidMove");
 
             board.Move(move);
+
+
             var newFen = board.ToFen();
             var now = DateTime.UtcNow;
 
@@ -271,6 +275,12 @@ namespace backend.Services
                     CorrelationId: gameId,
                     Data: moveInfo
                 ));
+
+            if (board.IsEndGame)
+            {
+                
+                await HandleEndGameAsync(gameId, gameActive, board.EndGame) ;
+            }
             _gameTimerService.ScheduleTimeout(
                 gameId,
                 newIsWhiteTurn ? gameActive.WhitePlayerId : gameActive.BlackPlayerId,
@@ -321,7 +331,26 @@ namespace backend.Services
         }
 
         // ==================== HELPERS ====================
-
+       
+        private async Task HandleEndGameAsync(string gameId, GameActive gameActive, EndGameInfo endGameInfo)
+        {
+            var winnerId = endGameInfo.WonSide?.AsChar switch
+            {
+                'w' => gameActive.WhitePlayerId,
+                'b' => gameActive.BlackPlayerId,
+                _ => null
+            };
+            var reason = endGameInfo.EndgameType switch 
+            {
+                EndgameType.Checkmate => "checkmate",
+                EndgameType.Stalemate => "stalemate",
+                EndgameType.Repetition => "threefoldRepetition",
+                EndgameType.FiftyMoveRule => "fiftyMoveRule",
+                EndgameType.InsufficientMaterial => "insufficientMaterial",
+                _ => "unknown"
+            };
+            await EndGameInternal(gameId, gameActive, reason, winnerId);
+        }
         private async Task<List<MoveInfo>> GetMovesByGameIdAsync(string gameId)
         {
             var movesData = await _db.ListRangeAsync(MovesKey(gameId));

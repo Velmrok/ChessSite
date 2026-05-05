@@ -30,7 +30,7 @@ export default function GamePage() {
     const pushAnalysisMove = useGameStore((state) => state.pushAnalysisMove);
     const { setCurrentAnalysisMoveIndex } = useAnalysisGame();
     const { setCurrentMoveIndex } = useLiveGame();
-    const  setGameHasJustStarted = useGameStore((state) => state.setGameHasJustStarted);
+    const setGameHasJustStarted = useGameStore((state) => state.setGameHasJustStarted);
     useEffect(() => {
 
         return () => {
@@ -74,6 +74,19 @@ export default function GamePage() {
             </div>
 
         )
+    }
+    const getPGN = () => {
+        let grouped = []
+        for (let i = 0; i < game.moves.length; i += 2) {
+            const move = game.moves[i].san;
+            if (game.moves[i + 1]) {
+                const nextMove = game.moves[i + 1].san;
+                grouped.push(`${move} ${nextMove} `);
+            } else {
+                grouped.push(`${move}`);
+            }
+        }
+        return grouped.map((mv, index) => `${index + 1}. ${mv}`).join(" ");
     }
 
 
@@ -123,7 +136,14 @@ export default function GamePage() {
             flex flex-col items-center w-full gap-6 h-full max-h-[770px] ">
                         <MovesHistory moves={game.moves} time={game.time} />
                         {!gameJustEnded && <Buttons />}
-                        {isLive && <Chat previousMessages={game.messages} />}
+                        {isLive ? <Chat previousMessages={game.messages} /> :
+                            game && !isLive &&
+                            <div className="w-full bg-black/25 h-[20%] flex flex-col items-center justify-center mt-2 ">
+                                <div className="w-full h-full py-2 px-3 text-white overflow-y-auto ">
+                                    {getPGN()}
+                                </div>
+                            </div>
+                        }
 
                     </div>
                 </div>

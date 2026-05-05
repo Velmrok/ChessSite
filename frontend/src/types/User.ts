@@ -73,4 +73,16 @@ export type UsersLeaderboard = Array<{
         rating: number;
     }>
 
+export type ProfileGame = {
+        gameId: string;
+        winnerNickname: string | null;
+        date: string;
+        profileNickname: string;
+        status: GameStatus;
+        gameType: gameType;
+
+        whitePlayer : PlayerSummary
+        blackPlayer : PlayerSummary
+
+    }
 export type User = PublicUser & {};

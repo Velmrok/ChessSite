@@ -15,19 +15,7 @@ export function Buttons() {
     const {request} = useApi();
     if (!game || !user) return null;
     const drawOfferedBy = game.drawOfferedBy;
-    const getPGN = () => {
-        let grouped = []
-        for (let i = 0; i < game.moves.length; i += 2) {
-            const move = game.moves[i].san;
-            if (game.moves[i + 1]) {
-                const nextMove = game.moves[i + 1].san;
-                grouped.push(`${move} ${nextMove} `);
-            } else {
-                grouped.push(`${move}`);
-            }
-        }
-        return grouped.map((mv, index) => `${index + 1}. ${mv}`).join(" ");
-    }
+    
 
     const onSurrender = async () => {
         await request(() => surrenderGame({ type: "Game", correlationId: uuid(), payload: { gameId } })) ;
@@ -70,13 +58,7 @@ export function Buttons() {
 
             }
 
-            {game && !isLive &&
-                <div className="w-full bg-black/25 h-[20%] flex flex-col items-center justify-center mt-2 ">
-                    <div className="w-full h-full py-2 px-3 text-white overflow-y-auto ">
-                        {getPGN()}
-                    </div>
-                </div>
-            }
+            
         </>
     );
 }

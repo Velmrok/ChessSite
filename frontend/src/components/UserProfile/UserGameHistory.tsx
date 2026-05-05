@@ -8,6 +8,7 @@ import PaginationButtons from "../global/Pagination_buttons";
 import { useTranslation } from "react-i18next";
 import { fetchUserGameHistory } from "@/services/userService";
 import { useApi } from "@/hooks/useApi";
+import type { ProfileGame } from "@/types/user";
 
 
 
@@ -88,11 +89,11 @@ export default function UserGameHistory() {
               </tr>
             ) :
               (
-                games.map((game) => {
-                  const status = game.scoreStatus;
+                games.map((game : ProfileGame) => {
+                  const status = game.profileNickname === game.winnerNickname ? "win" : game.winnerNickname === null ? "draw" : "loss";
                   return (
                     <tr
-                      key={game.id}
+                      key={game.gameId}
                       className={`text-white h-[64px] ${statusColors[status]
                         } `}
                     >
@@ -104,10 +105,10 @@ export default function UserGameHistory() {
                               <div className="flex items-center">
                                 <FaChessPawn className="text-white " />
                                 <Link
-                                  to={`/users/${game.whiteNickname}/profile`}
+                                  to={`/users/${game.whitePlayer.nickname}/profile`}
                                   className="hover:text-amber-200 transition"
                                 >
-                                  {game.whiteNickname} ({game.whiteRating})
+                                  {game.whitePlayer.nickname} ({game.whitePlayer.rating})
                                 </Link>
                               </div>
 
@@ -115,10 +116,10 @@ export default function UserGameHistory() {
                               <div className="flex items-center">
                                 <FaChessPawn className="text-black" />
                                 <Link
-                                  to={`/users/${game.blackNickname}/profile`}
+                                  to={`/users/${game.blackPlayer.nickname}/profile`}
                                   className="hover:text-amber-200 transition"
                                 >
-                                  {game.blackNickname} ({game.blackRating})
+                                  {game.blackPlayer.nickname} ({game.blackPlayer.rating})
                                 </Link>
                               </div>
                             </div>
@@ -131,7 +132,7 @@ export default function UserGameHistory() {
                       </td>
                       <td className="h-[64px] ">
                         <Link
-                          to={`/game/${game.id}`}
+                          to={`/games/${game.gameId}`}
                           className="text-yellow-300 hover:underline text-sm md:text-lg flex justify-center items-center"
                         >
                           {t('review')}

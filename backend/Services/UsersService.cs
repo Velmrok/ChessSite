@@ -290,4 +290,27 @@ public class UsersService : IUsersService
         return new OnlineFriendsResponse(Friends: paged, TotalPages: totalPages);
 
     }
+
+    public async Task<ErrorOr<UserGamesResponse>> GetUserGamesAsync(string nickname, PaginationQuery pagination)
+    {
+        var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Nickname == nickname);
+        if (user == null)
+        {
+            return Error.NotFound("userNotFound", "User with the given nickname was not found.");
+        }
+        var gamesQuery = _dbContext.Games
+            .Where(g => g.WhitePlayerId == user.Id || g.BlackPlayerId == user.Id)
+            .OrderByDescending(g => g.FinishedAt);
+        var totalPages = (int)Math.Ceiling(await gamesQuery.CountAsync() / (double)pagination.Limit);
+        var games = await gamesQuery
+            .Include(g => g.WhitePlayer)
+            .Include(g => g.BlackPlayer)
+            .Include(g => g.Winner)
+            .Skip((pagination.PageNumber - 1) * pagination.Limit)
+            .Take(pagination.Limit)
+            .Select(g => g.MapToUserGameSummary(nickname))
+            
+            .ToListAsync();
+        return new UserGamesResponse(games, totalPages);
+    }
 }

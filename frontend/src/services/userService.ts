@@ -1,4 +1,4 @@
-import type { FriendsOnlineResponse, FriendsProfileResponse, UserProfile } from "@/types/user";
+import type { FriendsOnlineResponse, FriendsProfileResponse, ProfileGame, UserProfile } from "@/types/user";
 import apiFetch from "./api";
 
 
@@ -27,7 +27,7 @@ export const uploadUserAvatar = async (avatarFile: File) : Promise<{ profilePict
     return response as Promise<{ profilePictureUrl: string }>;
 }
 export const fetchUserGameHistory = async (nickname: string, page: number): Promise<{ gameHistory: Array<ProfileGame>, totalPages: number }> => {
-    const response = await apiFetch({ url: `/users/${nickname}/games?page=${page}`, method: 'GET', includeCredentials: false, contentType: 'application/json' });
+    const response = await apiFetch({ url: `/users/${nickname}/games?page=${page}&limit=8`, method: 'GET', includeCredentials: false, contentType: 'application/json' });
     return response as Promise<{ gameHistory: Array<ProfileGame>, totalPages: number }>;
 }
 

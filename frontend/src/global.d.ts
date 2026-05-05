@@ -15,25 +15,8 @@ declare global {
 
     type Toast = "success" | "error" | "info";
     type GameStatus = "waiting" | "live" | "finished";
-    type scoreStatus = 'win' | 'loss' | 'draw';
-    type ProfileGame = {
-        id: string;
-        winnerNickname: string | null;
-        date: string;
-        profileNickname: string;
-        status: GameStatus;
-        gameType: gameType;
-        scoreStatus: scoreStatus;
 
-        whiteNickname: string;
-        whiteAvatar: string;
-        whiteRating: number;
-
-        blackNickname: string;
-        blackAvatar: string;
-        blackRating: number;
-
-    }
+    
     
     type gameType = 'bullet' | 'blitz' | 'rapid';
     type QueueList = {

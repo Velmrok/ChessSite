@@ -1,5 +1,6 @@
 using backend.DTO.Common;
 using backend.DTO.Games;
+using backend.DTO.Users;
 using backend.Enums;
 using backend.Models;
 
@@ -141,6 +142,31 @@ namespace backend.Services.Mappers
                 DrawOfferedBy: gameActive.DrawOfferedBy,
                 EndGameReason: null
             );
+        }
+        public static ProfileGameSummary MapToUserGameSummary(this Game game, string profileNickname)
+        {
+            return new
+           (
+            GameId: game.Id.ToString(),
+            WinnerNickname: game.Winner?.Nickname,
+            Date: game.FinishedAt?.ToString("yyyy-MM-dd") ?? "N/A",
+            ProfileNickname: profileNickname,
+            GameType: game.Type,
+            WhitePlayer: new UserGameSummary
+            (
+                Nickname: game.WhitePlayer.Nickname,
+                ProfilePictureUrl: game.WhitePlayer.ProfilePictureUrl,
+                Rating: game.WhitePlayer.Rating.GetRatingByType(game.Type)
+            ),
+            BlackPlayer: new UserGameSummary
+            (
+                Nickname: game.BlackPlayer.Nickname,
+                ProfilePictureUrl: game.BlackPlayer.ProfilePictureUrl,
+                Rating: game.BlackPlayer.Rating.GetRatingByType(game.Type)
+            )
+        );
+        
+
         }
 
 

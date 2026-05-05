@@ -20,14 +20,40 @@ namespace backend.Services
     {
         private readonly IHubContext<MainHub> _hubContext;
         private readonly AppDbContext _dbContext;
-        private readonly IPresenceService _presenceService;
         private readonly IDatabase _db;
-        private const string _defaultFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+        private const string DefaultFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
-        public GamesService(AppDbContext dbContext, IPresenceService presenceService, IConnectionMultiplexer redis, IHubContext<MainHub> hubContext)
+        private static string GameKey(string gameId) => $"games:{gameId}";
+        private static string MovesKey(string gameId) => $"games:{gameId}:moves";
+        private static string MessagesKey(string gameId) => $"games:{gameId}:messages";
+        private static string UserActiveGameKey(string userId) => $"users:{userId}:activeGame";
+        private const string ActiveGamesSet = "activeGames";
+
+        private const string MakeMoveScript = @"
+            if redis.call('EXISTS', KEYS[1]) == 0 then
+                return 'GAME_NOT_FOUND'
+            end
+            local whiteId = redis.call('HGET', KEYS[1], 'whiteplayerid')
+            local blackId = redis.call('HGET', KEYS[1], 'blackplayerid')
+            local isWhiteTurn = redis.call('HGET', KEYS[1], 'iswhiteturn')
+            if ARGV[1] ~= whiteId and ARGV[1] ~= blackId then
+                return 'NOT_IN_GAME'
+            end
+            local expected = (isWhiteTurn == 'True') and whiteId or blackId
+            if ARGV[1] ~= expected then
+                return 'NOT_YOUR_TURN'
+            end
+            redis.call('RPUSH', KEYS[2], ARGV[2])
+            redis.call('HSET', KEYS[1],
+                'iswhiteturn', ARGV[3],
+                'currentwhitetime', ARGV[4],
+                'currentblacktime', ARGV[5])
+            return 'OK'
+        ";
+
+        public GamesService(AppDbContext dbContext,IConnectionMultiplexer redis, IHubContext<MainHub> hubContext)
         {
             _dbContext = dbContext;
-            _presenceService = presenceService;
             _db = redis.GetDatabase();
             _hubContext = hubContext;
         }
@@ -37,23 +63,21 @@ namespace backend.Services
             { GamesSortBy.FinishedAt, g => g.FinishedAt ?? DateTime.MaxValue },
             { GamesSortBy.Time, g => g.Time },
             { GamesSortBy.Nickname, g => g.WhitePlayer.Nickname },
-
         };
 
         public async Task<ErrorOr<GamesResponse>> GetAllGamesAsync(GetGamesQuery query)
         {
+            // TODO ACTIVE GAMES
             var search = query.Query ?? "";
-            var gamesQuerry = _dbContext.Games
+            var gamesQuery = _dbContext.Games
                 .Where(g => g.WhitePlayer.Nickname.Contains(search) || g.BlackPlayer.Nickname.Contains(search))
                 .Where(g => query.GameType == null || g.Type == query.GameType)
                 .Where(g => query.GameStatus == null || g.Status == query.GameStatus);
 
-
-
-            var totalCount = await gamesQuerry.CountAsync();
+            var totalCount = await gamesQuery.CountAsync();
             var totalPages = (int)Math.Ceiling(totalCount / (double)query.Limit);
 
-            var pagedGames = await gamesQuerry
+            var pagedGames = await gamesQuery
                 .SortBy(SortSelectors[query.SortBy ?? GamesSortBy.FinishedAt], query.SortDescending)
                 .Include(g => g.WhitePlayer)
                 .Include(g => g.BlackPlayer)
@@ -62,60 +86,33 @@ namespace backend.Services
                 .Take(query.Limit)
                 .ToListAsync();
 
-            var response = new GamesResponse
-            (
+            var response = new GamesResponse(
                 Games: [.. pagedGames.Select(g => g.MapToGamesResponse(winnerNickname: g.Winner?.Nickname))],
                 TotalPages: totalPages
             );
 
             return response;
-
-        }
-
-        public async Task<ErrorOr<string>> CreateGameAsync(string user1Id, string user2Id, int time, int increment)
-        {
-            var user1 = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id.ToString() == user1Id);
-            var user2 = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id.ToString() == user2Id);
-            if (user1 == null || user2 == null)
-                return Error.NotFound("userNotFound");
-            int rand = Random.Shared.Next(0, 2);
-            var whitePlayer = rand == 0 ? user1 : user2;
-            var blackPlayer = rand == 0 ? user2 : user1;
-
-            var id = Guid.NewGuid();
-            var game = new Game
-            {
-                Id = id,
-                WhitePlayerId = whitePlayer.Id,
-                BlackPlayerId = blackPlayer.Id,
-                Time = time,
-                Increment = increment,
-                Type = time <= 3 ? GameType.Bullet : time <= 5 ? GameType.Blitz : GameType.Rapid
-            };
-            _dbContext.Games.Add(game);
-            await _dbContext.SaveChangesAsync();
-
-            var gameActive = game.MapToGameActive();
-            
-            await _db.HashSetAsync("games:"+id, gameActive.ToHashEntries());
-            await _db.SetAddAsync("activeGames", id.ToString());
-           
-
-            return game.Id.ToString();
         }
 
         public async Task<ErrorOr<GameResponse>> GetGameByIdAsync(string gameId)
         {
-            var isActive = await _db.SetContainsAsync("activeGames", gameId);
+            var isActive = await _db.SetContainsAsync(ActiveGamesSet, gameId);
             if (isActive)
             {
-                var gameActiveData = await _db.HashGetAllAsync("games:" + gameId);
-                var gameActive = gameActiveData.FromHashEntries<GameActive>();
-        
-                var moves = GetMovesByGameId(gameId);
-                List<MessageInfo> messages = [];
-                return gameActive.MapToGameResponse(moves, messages);
+                var gameActiveData = await _db.HashGetAllAsync(GameKey(gameId));
+                if (gameActiveData.Length == 0)
+                {
+                    await _db.SetRemoveAsync(ActiveGamesSet, gameId);
+                }
+                else
+                {
+                    var gameActive = gameActiveData.FromHashEntries<GameActive>();
+                    var moves = await GetMovesByGameIdAsync(gameId);
+                    List<MessageInfo> messages = []; 
+                    return gameActive.MapToGameResponse(moves, messages);
+                }
             }
+
             var game = await _dbContext.Games
                 .Include(g => g.WhitePlayer)
                 .Include(g => g.BlackPlayer)
@@ -130,20 +127,65 @@ namespace backend.Services
 
         public async Task<bool> IsInGameAsync(Guid userId)
         {
-    
-            return await _dbContext
-            .Games.AnyAsync(g => (g.WhitePlayerId == userId || g.BlackPlayerId == userId) && g
-            .Status == GameStatus.Active);
+            return await _db.KeyExistsAsync(UserActiveGameKey(userId.ToString()));
         }
+
+        public async Task<ErrorOr<string>> CreateGameAsync(string user1Id, string user2Id, int time, int increment)
+        {
+            var user1 = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id.ToString() == user1Id);
+            var user2 = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id.ToString() == user2Id);
+            if (user1 == null || user2 == null)
+                return Error.NotFound("userNotFound");
+            if (await IsInGameAsync(user1.Id) || await IsInGameAsync(user2.Id))
+                return Error.Failure("oneOrBothUsersInGame");
+
+            int rand = Random.Shared.Next(0, 2);
+            var whitePlayer = rand == 0 ? user1 : user2;
+            var blackPlayer = rand == 0 ? user2 : user1;
+
+            var id = Guid.NewGuid();
+
+            var gameActive = new GameActive
+            {
+                Id = id.ToString(),
+                WhitePlayerId = whitePlayer.Id.ToString(),
+                BlackPlayerId = blackPlayer.Id.ToString(),
+                WhitePlayerNickname = whitePlayer.Nickname,
+                BlackPlayerNickname = blackPlayer.Nickname,
+                WhitePlayerProfilePictureUrl = whitePlayer.ProfilePictureUrl,
+                BlackPlayerProfilePictureUrl = blackPlayer.ProfilePictureUrl,
+                WhitePlayerRating = whitePlayer.GetRatingByTime(time),
+                BlackPlayerRating = blackPlayer.GetRatingByTime(time),
+                Time = time,
+                Increment = increment,
+                GameType = time <= 3 ? GameType.Bullet : time <= 5 ? GameType.Blitz : GameType.Rapid,
+                IsWhiteTurn = true,
+                CurrentWhiteTime = time * 60_000,
+                CurrentBlackTime = time * 60_000
+            };
+
+            var tran = _db.CreateTransaction();
+            _ = tran.HashSetAsync(GameKey(id.ToString()), gameActive.ToHashEntries());
+            _ = tran.SetAddAsync(ActiveGamesSet, id.ToString());
+            _ = tran.StringSetAsync(UserActiveGameKey(whitePlayer.Id.ToString()), id.ToString());
+            _ = tran.StringSetAsync(UserActiveGameKey(blackPlayer.Id.ToString()), id.ToString());
+
+            if (!await tran.ExecuteAsync())
+                return Error.Failure("redisTransactionFailed");
+
+            return id.ToString();
+        }
+
         public async Task<ErrorOr<EmptyResponse>> MakeMoveAsync(string? userId, SignalRRequest<MakeMoveRequest> request)
         {
+            if (userId == null) return Error.Unauthorized("userNotAuthenticated");
 
             var gameId = request.Payload!.GameId;
-            var isActive = await _db.SetContainsAsync("activeGames", gameId);
-            if (!isActive)
+
+            var gameActiveData = await _db.HashGetAllAsync(GameKey(gameId));
+            if (gameActiveData.Length == 0)
                 return Error.NotFound("gameNotFound");
 
-            var gameActiveData = await _db.HashGetAllAsync("games:" + gameId);
             var gameActive = gameActiveData.FromHashEntries<GameActive>();
 
             if (gameActive.WhitePlayerId != userId && gameActive.BlackPlayerId != userId)
@@ -152,112 +194,171 @@ namespace backend.Services
             var currentTurnPlayerId = gameActive.IsWhiteTurn ? gameActive.WhitePlayerId : gameActive.BlackPlayerId;
             if (currentTurnPlayerId != userId)
                 return Error.Failure("notUsersTurn");
-            
-            var moves = GetMovesByGameId(gameId);
-            
-            var currentFen = moves.Count == 0 ? _defaultFen : moves.Last().Fen;
-           
-            var board = ChessBoard.LoadFromFen(currentFen);
 
+            var moves = await GetMovesByGameIdAsync(gameId);
+            var currentFen = moves.Count == 0 ? DefaultFen : moves.Last().Fen;
+
+            var board = ChessBoard.LoadFromFen(currentFen);
             var move = request.Payload.San;
 
-            var isValidMove = board.IsValidMove(move);
-            if (!isValidMove)
+            if (!board.IsValidMove(move))
                 return Error.Failure("invalidMove");
+
             board.Move(move);
             var newFen = board.ToFen();
             var now = DateTime.UtcNow;
 
-            var currentTimestamp = moves.Count == 0 ? now : moves.Last().Timestamp;
-            var deltaTime = (int)(now - currentTimestamp).TotalMilliseconds;
 
+            var lastMoveTimestampStr = moves.LastOrDefault() != null ? moves.Last().Timestamp.ToString("O") : null;
+            var deltaTime = lastMoveTimestampStr != null ? (int)(now - DateTime.Parse(lastMoveTimestampStr)).TotalMilliseconds : 0;
 
-            if(gameActive.IsWhiteTurn)
-                gameActive.CurrentWhiteTime -= deltaTime;
+            int newWhiteTime = gameActive.CurrentWhiteTime;
+            int newBlackTime = gameActive.CurrentBlackTime;
+
+            if (gameActive.IsWhiteTurn)
+                newWhiteTime -= deltaTime;
             else
-                gameActive.CurrentBlackTime -= deltaTime;
-            var absoluteTime = gameActive.IsWhiteTurn ? gameActive.CurrentWhiteTime : gameActive.CurrentBlackTime;
+                newBlackTime -= deltaTime;
+
+            var absoluteTime = gameActive.IsWhiteTurn ? newWhiteTime : newBlackTime;
 
             if (absoluteTime < 0)
             {
-                return await EndGame(gameId, "timeout", userId);
+                var winnerId = gameActive.IsWhiteTurn ? gameActive.BlackPlayerId : gameActive.WhitePlayerId;
+                return await EndGameInternal(gameId, gameActive, "timeout", winnerId);
             }
 
-            var moveInfo = new MoveInfo(move, newFen, deltaTime, absoluteTime, now);
-            await _db.ListRightPushAsync($"games:{gameId}:moves", JsonSerializer.Serialize(moveInfo));
+            if (gameActive.IsWhiteTurn)
+                newWhiteTime += gameActive.Increment * 1000;
+            else
+                newBlackTime += gameActive.Increment * 1000;
 
-            gameActive.IsWhiteTurn = !gameActive.IsWhiteTurn;
-            await _db.HashSetAsync("games:" + gameId, gameActive.ToHashEntries());
-            
+            var moveInfo = new MoveInfo(move, newFen, deltaTime, absoluteTime, now);
+            var serializedMove = JsonSerializer.Serialize(moveInfo);
+            var newIsWhiteTurn = !gameActive.IsWhiteTurn;
+
+            // lua used to eliminate race condition
+            var luaResult = (string?)await _db.ScriptEvaluateAsync(
+                MakeMoveScript,
+                [GameKey(gameId), MovesKey(gameId)],
+                [
+                    userId,
+                    serializedMove,
+                    newIsWhiteTurn ? "True" : "False",
+                    newWhiteTime.ToString(),
+                    newBlackTime.ToString()
+                ]);
+
+            switch (luaResult)
+            {
+                case "GAME_NOT_FOUND": return Error.NotFound("gameNotFound");
+                case "NOT_IN_GAME": return Error.Failure("userNotInGame");
+                case "NOT_YOUR_TURN": return Error.Failure("notUsersTurn");
+                case "OK": break;
+                default: return Error.Failure("unexpectedRedisError");
+            }
+
             await _hubContext.Clients.Group($"Game:{gameId}")
                 .SendAsync("MoveMade", new SignalRResponse<MoveInfo>(
                     Type: "MoveMade",
-                    CorrelationId: request.Payload.GameId,
+                    CorrelationId: gameId,
                     Data: moveInfo
                 ));
+
             return new EmptyResponse();
         }
+
         public async Task<ErrorOr<EmptyResponse>> SurrenderGameAsync(string? userId, string gameId)
         {
             if (userId == null) return Error.Unauthorized("userNotAuthenticated");
-            return await EndGame(gameId,  "surrender", userId);
-        }
 
-        // --------- helpers ---------
-        private List<MoveInfo> GetMovesByGameId(string gameId)
-        {
-            var movesData = _db.ListRangeAsync($"games:{gameId}:moves").Result;
-            var moves = movesData
-                .Select(m => JsonSerializer.Deserialize<MoveInfo>(m))
-                .OfType<MoveInfo>()
-                .ToList();
-            return moves;
-        }
-        private async Task<ErrorOr<EmptyResponse>> EndGame(string gameId, string reason, string userId)
-        {
-            var gameActiveData = await _db.HashGetAllAsync("games:" + gameId);
-            var gameActive = gameActiveData.FromHashEntries<GameActive>();
-            
-
-            var game = await _dbContext.Games.FirstOrDefaultAsync(g => g.Id.ToString() == gameId);
-            if (game == null)
+            var gameActiveData = await _db.HashGetAllAsync(GameKey(gameId));
+            if (gameActiveData.Length == 0)
                 return Error.NotFound("gameNotFound");
-            if(gameActive == null)
-                return Error.Failure("gameNotActive");
+
+            var gameActive = gameActiveData.FromHashEntries<GameActive>();
 
             if (gameActive.WhitePlayerId != userId && gameActive.BlackPlayerId != userId)
                 return Error.Failure("userNotInGame");
-            var winnerId = gameActive.WhitePlayerId == userId ? gameActive.BlackPlayerId : gameActive.WhitePlayerId;
 
-            var moves = GetMovesByGameId(gameId);
+            var winnerId = gameActive.WhitePlayerId == userId
+                ? gameActive.BlackPlayerId
+                : gameActive.WhitePlayerId;
 
-            game.Status = GameStatus.Finished;
-            game.FinishedAt = DateTime.UtcNow;
-            game.Moves = moves;
+            return await EndGameInternal(gameId, gameActive, "surrender", winnerId);
+        }
+
+        // ==================== HELPERS ====================
+
+        private async Task<List<MoveInfo>> GetMovesByGameIdAsync(string gameId)
+        {
+            var movesData = await _db.ListRangeAsync(MovesKey(gameId));
+            return movesData
+                .Select(m => JsonSerializer.Deserialize<MoveInfo>(m!))
+                .OfType<MoveInfo>()
+                .ToList();
+        }
+        private async Task<ErrorOr<EmptyResponse>> EndGameInternal(
+            string gameId, GameActive gameActive, string reason, string? winnerId)
+        {
+            var moves = await GetMovesByGameIdAsync(gameId);
+
+           Guid? winnerGuid = Guid.TryParse(winnerId, out var g) ? g : null;
             
-            var winner = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id.ToString() == winnerId);
-            if (winner != null)
+            var whiteGuid = Guid.Parse(gameActive.WhitePlayerId);
+            var blackGuid = Guid.Parse(gameActive.BlackPlayerId);
+
+            var users = await _dbContext.Users
+                .Where(u => u.Id == winnerGuid || u.Id == whiteGuid || u.Id == blackGuid)
+                .ToListAsync();
+
+            var winner = users.FirstOrDefault(u => u.Id == winnerGuid);
+           
+            var game = new Game
             {
-                game.WinnerId = winner.Id;
-            }
-            else
+                Id = Guid.Parse(gameId),
+                WhitePlayerId = whiteGuid,
+                BlackPlayerId = blackGuid,
+                WinnerId = winnerGuid,
+                Time = gameActive.Time,
+                Increment = gameActive.Increment,
+                Type = gameActive.GameType,
+                Status = GameStatus.Finished,
+                FinishedAt = DateTime.UtcNow,
+                Moves = moves
+            };
+
+            using (var tran = await _dbContext.Database.BeginTransactionAsync())
             {
-                return Error.NotFound("winnerNotFound");
+                try
+                {
+                    _dbContext.Games.Add(game);
+                    await _dbContext.SaveChangesAsync();
+                    await tran.CommitAsync();
+                }
+                catch
+                {
+                    await tran.RollbackAsync();
+                    throw;
+                }
             }
-            
-            await _dbContext.SaveChangesAsync();
 
-            await _db.SetRemoveAsync("activeGames", gameId);
-            await _db.KeyDeleteAsync("games:" + gameId);
-            await _db.KeyDeleteAsync($"games:{gameId}:moves");
-            await _db.KeyDeleteAsync($"games:{gameId}:messages");
+            var redisTran = _db.CreateTransaction();
+            _ = redisTran.SetRemoveAsync(ActiveGamesSet, gameId);
+            _ = redisTran.KeyDeleteAsync(GameKey(gameId));
+            _ = redisTran.KeyDeleteAsync(MovesKey(gameId));
+            _ = redisTran.KeyDeleteAsync(MessagesKey(gameId));
+            _ = redisTran.KeyDeleteAsync(UserActiveGameKey(gameActive.WhitePlayerId));
+            _ = redisTran.KeyDeleteAsync(UserActiveGameKey(gameActive.BlackPlayerId));
 
-            await _hubContext.Clients.Group($"Game:{gameId}").SendAsync("GameEnded", new SignalRResponse<GameEndedResponse>(
+            var redisOk = await redisTran.ExecuteAsync();
             
-                Type : "GameEnded",
-                CorrelationId : gameId,
-                Data : new GameEndedResponse(gameId, winner.Nickname, reason)
-            ));
+            await _hubContext.Clients.Group($"Game:{gameId}").SendAsync("GameEnded",
+                new SignalRResponse<GameEndedResponse>(
+                    Type: "GameEnded",
+                    CorrelationId: gameId,
+                    Data: new GameEndedResponse(gameId, winner is not null ? winner.Nickname : null , reason)
+                ));
 
             return new EmptyResponse();
         }

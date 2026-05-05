@@ -122,7 +122,7 @@ export default function GamePage() {
                     <div className="bg-black/20 rounded-md shadow-md   p-6 mt-3 xl:mt-0
             flex flex-col items-center w-full gap-6 h-full max-h-[770px] ">
                         <MovesHistory moves={game.moves} time={game.time} />
-                        <Buttons />
+                        {!gameJustEnded && <Buttons />}
                         {isLive && <Chat previousMessages={game.messages} />}
 
                     </div>

@@ -33,6 +33,7 @@ export default function useGame() {
   const setAnalysisMoves = useGameStore((state) => state.setAnalysisMoves);
   const setCurrentAnalysisMoveIndex = useGameStore((state) => state.setCurrentAnalysisMoveIndex);
   const setIsInAnalysisTree = useGameStore((state) => state.setIsInAnalysisTree);
+  const endGame = useGameStore((state) => state.endGame);
 
   const pushMove = useGameStore((state) => state.pushMove);
   const user = useUserStore((state) => state.user);
@@ -70,9 +71,10 @@ export default function useGame() {
       
       if (data.gameId === gameId) {
         setTimeout(() => {
-          useGameStore.getState().endGame(data.winner);
+          endGame(data.winner);
           setGameJustEnded(true);
           setEndData({ winnerNickname: data.winner, reason: data.reason });
+
         }, 500);
       }
     }
@@ -116,8 +118,6 @@ export default function useGame() {
 
     if (!game) return;
 
-
-    //if (game.gameStatus == "Active") return;
     if (currentMoveIndex < 0) {
       setCurrentWhiteTime(game.time * 60 * 1000);
       setCurrentBlackTime(game.time * 60 * 1000);
@@ -148,22 +148,15 @@ export default function useGame() {
   const formatEndData = () => {
     if (!endData) return { title: "", reasonText: "" };
     const winnerNickname = endData.winnerNickname;
-    const reason = endData.reason;
+    const reasonText = endData.reason;
 
     const title = !user ? winnerNickname + " " + t('won') : //user=observer 
       winnerNickname ? winnerNickname == user.nickname ? t('youWon') //user won
         : t('youLost') : //user lost
         t('draw'); // winnerNikname == null => draw
 
-    const reasonText = reason === 'checkmate' ? t('checkmate') :
-      reason === 'surrender' ? t('surrender') :
-        reason === 'timeout' ? t('timeout') :
-          reason === 'threefold_repetition' ? t('threefoldRepetition') :
-            reason === 'insufficient_material' ? t('insufficientMaterial') :
-              reason === 'agreement' ? t('agreement') :
-                reason === 'stalemate' ? t('stalemate') :
-                  reason === 'disconnect' ? t('disconnectEnd') : '';
-    return { title, reasonText };
+   
+    return { title, reasonText};
   }
 
 

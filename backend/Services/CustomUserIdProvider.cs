@@ -5,6 +5,6 @@ public class CustomUserIdProvider : IUserIdProvider
 {
     public string GetUserId(HubConnectionContext connection)
     {
-        return connection.User?.FindFirst(JwtRegisteredClaimNames.Sub)?.Value ?? throw new Exception("User ID claim not found");
+        return connection.User?.FindFirst(JwtRegisteredClaimNames.Sub)?.Value ?? "anonymous";
     }
 }

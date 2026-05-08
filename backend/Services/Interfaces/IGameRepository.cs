@@ -18,4 +18,8 @@ public interface IGameRepository
     Task<Game?> GetFinishedGameByIdAsync(string gameId);
     Task<(List<Game> Games, int TotalPages)> GetFinishedGamesPagedAsync(GetGamesQuery query);
     Task RemoveStaleActiveGameAsync(string gameId);
+
+    Task SetUserAiGameAsync(string userId, string gameId);
+    Task<string?> GetUserAiGameAsync(string userId);
+    Task RemoveUserAiGameAsync(string userId);
 }

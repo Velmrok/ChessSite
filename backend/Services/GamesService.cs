@@ -123,6 +123,16 @@ namespace backend.Services
             if (!await _gameRepository
                 .CreateActiveGameAsync(gameActive, whitePlayer.Id.ToString(), blackPlayer.Id.ToString(), setUserActiveKeys: !isAiGame))
                 return Error.Failure("redisTransactionFailed");
+            if(isAiGame)
+            {
+                var userId = whitePlayer.Id.ToString() == _aiPlayerId ? blackPlayer.Id.ToString() : whitePlayer.Id.ToString();
+                await _gameRepository.SetUserAiGameAsync(userId, id.ToString());
+            }
+            else
+            {
+                await _gameRepository.RemoveUserAiGameAsync(whitePlayer.Id.ToString());
+                await _gameRepository.RemoveUserAiGameAsync(blackPlayer.Id.ToString());
+            }
             
             if (isAiGame && whitePlayer.Id.ToString() == _aiPlayerId)
             {

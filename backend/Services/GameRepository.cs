@@ -22,6 +22,7 @@ public class GameRepository : IGameRepository
     private static string MovesKey(string gameId) => $"games:{gameId}:moves";
     private static string MessagesKey(string gameId) => $"games:{gameId}:messages";
     private static string UserActiveGameKey(string userId) => $"users:{userId}:activeGame";
+    private static string UserAiGameKey(string userId) => $"users:{userId}:aiGame";
     private const string ActiveGamesSet = "activeGames";
 
     private const string MakeMoveScript = @"
@@ -195,5 +196,22 @@ public class GameRepository : IGameRepository
     public async Task RemoveStaleActiveGameAsync(string gameId)
     {
         await _db.SetRemoveAsync(ActiveGamesSet, gameId);
+    }
+    
+
+    public async Task SetUserAiGameAsync(string userId, string gameId)
+    {
+        await _db.StringSetAsync(UserAiGameKey(userId), gameId);
+    }
+
+    public async Task<string?> GetUserAiGameAsync(string userId)
+    {
+        var value = await _db.StringGetAsync(UserAiGameKey(userId));
+        return value.IsNull ? null : value.ToString();
+    }
+
+    public async Task RemoveUserAiGameAsync(string userId)
+    {
+        await _db.KeyDeleteAsync(UserAiGameKey(userId));
     }
 }

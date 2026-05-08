@@ -26,5 +26,6 @@
     "cancelQueue": "Cancel queue",
     "findGame": "Search games",
     "findSomeone": "Find other players",
-    "play": "Play"
+    "play": "Play",
+    "playAgainstAi": "Play vs AI"
 }

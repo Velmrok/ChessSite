@@ -26,5 +26,6 @@
   "cancelQueue": "Anuluj kolejkę",
   "findGame": "Przeszukaj gry",
   "findSomeone": "Znajdź innych graczy",
-  "play": "Graj"
+  "play": "Graj",
+  "playAgainstAi": "Graj przeciwko AI"
 }

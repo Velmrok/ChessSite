@@ -313,4 +313,9 @@ public class UsersService : IUsersService
             .ToListAsync();
         return new UserGamesResponse(games, totalPages);
     }
+
+    public async Task<int> GetCreatedAccountsCountAsync()
+    {
+        return await _dbContext.Users.CountAsync();
+    }
 }

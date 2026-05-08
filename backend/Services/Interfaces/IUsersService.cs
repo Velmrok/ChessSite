@@ -16,5 +16,6 @@ namespace backend.Services.Interfaces
         public Task<ErrorOr<UpdateUserProfilePictureResponse>> UpdateUserProfilePictureAsync(string nickname, UpdateUserProfilePictureRequest request);
         public Task<ErrorOr<OnlineFriendsResponse>> GetOnlineFriendsAsync(string nickname, PaginationQuery pagination);
         public Task<ErrorOr<UserGamesResponse>> GetUserGamesAsync(string nickname, PaginationQuery pagination);
+        public Task<int> GetCreatedAccountsCountAsync();
     }
 }

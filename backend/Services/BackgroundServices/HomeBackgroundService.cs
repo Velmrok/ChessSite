@@ -48,11 +48,13 @@ public class HomeBackgroundService : BackgroundService
         var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         var presenceService = scope.ServiceProvider.GetRequiredService<IPresenceService>();
         var queueService = scope.ServiceProvider.GetRequiredService<IQueueService>();
+        var usersService = scope.ServiceProvider.GetRequiredService<IUsersService>();
+        var gamesRepository = scope.ServiceProvider.GetRequiredService<IGameRepository>();
 
         var usersOnline = await presenceService.GetOnlineCountAsync();
         var usersInQueue = await queueService.GetQueueLengthAsync();
-        var matchesInProgress = -1; // TODO
-        var createdAccounts = -1; // TODO
+        var matchesInProgress = await gamesRepository.GetActiveAiGamesCountAsync();
+        var createdAccounts = await usersService.GetCreatedAccountsCountAsync();
 
         await _hubContext.Clients
             .Group("Home")

@@ -214,4 +214,10 @@ public class GameRepository : IGameRepository
     {
         await _db.KeyDeleteAsync(UserAiGameKey(userId));
     }
+
+    public async Task<int> GetActiveAiGamesCountAsync()
+    {
+        return (int)await _db.SetLengthAsync(ActiveGamesSet);
+    }
+
 }

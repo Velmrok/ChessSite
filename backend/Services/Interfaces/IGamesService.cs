@@ -12,4 +12,5 @@ public interface IGamesService
     Task<ErrorOr<EmptyResponse>> MakeMoveAsync(string? userId, SignalRRequest<MakeMovePayload> request);
     Task<ErrorOr<EmptyResponse>> SurrenderGameAsync(string? userId, string gameId);
     Task HandleTimeoutAsync(string gameId, string timedOutPlayerId);
+    
 }

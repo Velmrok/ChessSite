@@ -22,4 +22,5 @@ public interface IGameRepository
     Task SetUserAiGameAsync(string userId, string gameId);
     Task<string?> GetUserAiGameAsync(string userId);
     Task RemoveUserAiGameAsync(string userId);
+    Task<int> GetActiveAiGamesCountAsync();
 }

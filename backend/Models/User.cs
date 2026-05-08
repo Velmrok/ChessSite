@@ -5,11 +5,8 @@ using backend.Enums;
 namespace backend.Models;
 public class User
 {
-    public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid Id { get; set; }
     public required string Nickname { get; set; }
-    public required string Login { get; set; }
-    public required string Email { get; set; }
-    public required string PasswordHash { get; set; }
     public string ProfileBio { get; set; } = "";
     public string ProfilePictureUrl { get; set; } = "/api/uploads/avatars/default.webp";
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

@@ -18,10 +18,11 @@ builder.Services.AddDatabase(builder.Configuration, builder.Environment.IsEnviro
 
 builder.Services.AddControllers();
 builder.Services.AddApplicationServices();
+builder.Services.AddAuthenticationConfig(builder.Configuration); 
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddJwtAuthentication(builder.Configuration);
+
 
 builder.Services.AddAuthorization(options =>
 {
@@ -41,7 +42,7 @@ else
     builder.Services.AddDistributedMemoryCache();
 }
 
-builder.Services.AddCustomModelValidation();
+
 
 builder.Services.AddCustomRateLimiting();
 
@@ -87,6 +88,7 @@ app.UseCustomCors();
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.UseMiddleware<backend.Middleware.UserProvisioningMiddleware>();
 app.MapControllers();
 
 app.MapHealthChecks("/health");
@@ -104,9 +106,7 @@ using (var scope = app.Services.CreateScope())
         {
             Id = AiUserId,
             Nickname = "Stockfish",
-            Email = "bot@system.local",
-            Login = "stockfish",
-            PasswordHash = "N/A",
+            
            
         });
         await db.SaveChangesAsync();

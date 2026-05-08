@@ -2,6 +2,7 @@ import useUserStore from '@/stores/useUserStore';
 import type { SignalRError, SignalRRequest, SignalRResponse } from '@/types/signalR';
 import { HubConnectionBuilder, HubConnection, HubConnectionState, HttpTransportType } from '@microsoft/signalr';
 import { v4 as uuid } from 'uuid';
+import { authService } from '../authService';
 
 let connection: HubConnection | null = null;
 let isReconnecting = false;
@@ -31,7 +32,10 @@ export const connectSignalR = async (): Promise<void> => {
     if (!connection) {
         connection = new HubConnectionBuilder()
             .withUrl('/api/mainhub', {
-                withCredentials: true,
+                accessTokenFactory: async () => {
+                    const token = await authService.getToken();
+                    return token ?? '';
+                },
                 skipNegotiation: true,
                 transport: HttpTransportType.WebSockets
             })

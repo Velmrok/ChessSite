@@ -3,6 +3,6 @@ import apiFetch from "./api";
 
 
 export const fetchAllUsers = async (url: string) : Promise<UsersSearchResponse> => {
-    const response = await apiFetch({ url: `/users${url}`, method: 'GET', includeCredentials: true, contentType: 'application/json' });
+    const response = await apiFetch(`/users${url}`,{  method: 'GET'}, 'application/json');
     return response as Promise<UsersSearchResponse>;
 }

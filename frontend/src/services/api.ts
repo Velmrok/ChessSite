@@ -1,19 +1,17 @@
+import { authService } from "./authService";
 
-export default async function apiFetch(options:{
-  url: string,
-  method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH',
-  includeCredentials?: boolean,
-  contentType?: string,
-  body?: any}) {
-  const headers = options.contentType ? {
-    "Content-Type": options.contentType,
-  } : undefined;
-  const response = await fetch(`/api${options.url}`, {
-    method: options.method,
-    headers: headers,
-    credentials: options.includeCredentials ? "include" : "same-origin",
-    body: options.body ? options.body : null,
-  });
+export default async function apiFetch(url:string,options:RequestInit,contentType: string| undefined = undefined) {
+  const token = await authService.getToken();
+
+    const response = await fetch('/api' + url, {
+        ...options,
+        headers: {
+            ...options?.headers,
+           ...(contentType ? { "Content-Type": contentType } : {}),
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+    });
+
 
   if (!response.ok) {
     console.error("API Error:", response.status, response.statusText);

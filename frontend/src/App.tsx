@@ -8,14 +8,13 @@ import GamePage from './pages/GamePage'
 import ToastContainer from './components/global/ToastContainer'
 import FindGame from './pages/FindGame'
 import {OnlyLoggedInRoute} from './components/global/ProtectedRoute'
-import RegisterPage from './pages/RegisterPage'
-import LoginPage from './pages/LoginPage'
 import { useAuth } from './hooks/useAuth'
 import UsersSearchPage from './pages/UsersSearchPage'
 import GamesSearchPage from './pages/GamesSearchPage'
 import { useEffect } from 'react'
 import { connectSignalR } from './services/signalR/connection'
 import { useGlobalSignalR } from './hooks/useGlobalSocket'
+import AuthCallback from './pages/AuthCallback'
 
 function App() {
   
@@ -42,9 +41,7 @@ function App() {
     </> :
       <Routes>
         <Route path="/" element={<Home />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
-            
+            <Route path="/auth/callback" element={<AuthCallback />} />
            
             <Route element={<OnlyLoggedInRoute />}>
               <Route path="/find-game" element={<FindGame />} />
@@ -52,6 +49,7 @@ function App() {
                <Route path="/games/:gameId" element={<GamePage />} />
                <Route path ="/games" element={<GamesSearchPage/>} />
                <Route path="/users/:nickname/profile" element={<UserProfilePage />} />
+               
             
             </Route>
 

@@ -17,7 +17,7 @@ public partial class MainHub : Hub
         if (ValidatePayload<JoinQueuePayload,EmptyResponse>(request) is { } error) return error;
 
 
-        var result = await _queueService.JoinQueueAsync(GetUserId(), payload);
+        var result = await _queueService.JoinQueueAsync(GetUserId(), payload!);
         return HandleError<EmptyResponse, EmptyResponse, JoinQueuePayload>(result, request);
     }
     [Authorize]

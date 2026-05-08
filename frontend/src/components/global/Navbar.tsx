@@ -2,7 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import ReactCountryFlag from "react-country-flag";
 import useUserStore from "@/stores/useUserStore";
 import useToastStore from "@/stores/useToastStore";
-import { logoutUser } from "@/services/authService";
+import { authService } from "@/services/authService";
 import { formatTimeFromMs} from "@/services/socket/signalRGlobalService";
 import { CiMenuBurger } from "react-icons/ci";
 import { useState } from "react";
@@ -21,9 +21,9 @@ const GuestMenu = () => {
     return (
 
         <>
-            <Link to="/login" className="text-[8px] md:text-sm hover:text-amber-200 transition-transform duration-300">{t("login")}</Link>
+            <button onClick={() => authService.login()} className="text-[8px] md:text-sm hover:text-amber-200 transition-transform duration-300">{t("login")}</button>
 
-            <Link to="/register" className="text-[8px] md:text-sm hover:text-amber-200 transition-transform duration-300">{t("register")}</Link>
+            <button onClick={() => authService.register()} className="text-[8px] md:text-sm hover:text-amber-200 transition-transform duration-300">{t("register")}</button>
         </>
     );
 }
@@ -74,19 +74,13 @@ export default function Navbar() {
     const navigate = useNavigate();
     const {clearAuth} = useAuthActions();
 
-    const handleLogout = async () => {
-        try {
-            await logoutUser();;
-            clearAuth();
-            navigate('/login');
-        } catch (error: any) {
-            if (error.status === 401) setUser(null);
-            else setToast({ msg: toastT("error.logout"), type: "error" });
-            return;
-        }
-        setToast({ msg: toastT("success.logout"), type: "success" });
-
-    };
+   const handleLogout = async () => {
+    try {
+        await authService.logout();
+    } catch {
+        setToast({ msg: toastT("error.logout"), type: "error" });
+    }
+};
 
 
 

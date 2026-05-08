@@ -46,31 +46,31 @@ namespace backend.Controllers
         [HttpPost("{nickname}/friend")]
         public async Task<IActionResult> AddFriend(string nickname)
         {
-            var currentUserNickname = User.FindFirst("nickname")?.Value;
+            var currentUserNickname = User.FindFirst("preferred_username")?.Value;
             return HandleError(await _usersService.AddFriendAsync(nickname, currentUserNickname!), _ => NoContent());
         }
         [HttpDelete("{nickname}/friend")]
         public async Task<IActionResult> RemoveFriend(string nickname)
         {
-            var currentUserNickname = User.FindFirst("nickname")?.Value;
+            var currentUserNickname = User.FindFirst("preferred_username")?.Value;
             return HandleError(await _usersService.RemoveFriendAsync(nickname, currentUserNickname!), _ => NoContent());
         }
         [HttpPatch("me/profile/bio")]
         public async Task<IActionResult> UpdateUserBio([FromBody] UpdateUserBioRequest request)
         {
-            var currentUserNickname = User.FindFirst("nickname")?.Value;
+            var currentUserNickname = User.FindFirst("preferred_username")?.Value;
             return HandleError(await _usersService.UpdateUserBioAsync(currentUserNickname!, request), Ok);
         }
         [HttpPatch("me/profile/picture")]
         public async Task<IActionResult> UploadUserProfilePicture([FromForm] UpdateUserProfilePictureRequest request)
         {
-            var currentUserNickname = User.FindFirst("nickname")?.Value;
+            var currentUserNickname = User.FindFirst("preferred_username")?.Value;
             return HandleError(await _usersService.UpdateUserProfilePictureAsync(currentUserNickname!, request), Ok);
         }
         [HttpGet("me/friends-online")]
         public async Task<IActionResult> GetOnlineFriends([FromQuery] PaginationQuery pagination)
         {
-            var currentUserNickname = User.FindFirst("nickname")?.Value;
+            var currentUserNickname = User.FindFirst("preferred_username")?.Value;
             return HandleError(await _usersService.GetOnlineFriendsAsync(currentUserNickname!, pagination), Ok);
         }
         [HttpGet("{nickname}/games")]

@@ -33,11 +33,11 @@ public class GameConfiguration : IEntityTypeConfiguration<Game>
         builder
         .Property(g => g.Moves)
         .HasConversion(
-            v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null),
-            v => JsonSerializer.Deserialize<List<MoveInfo>>(v, (JsonSerializerOptions)null) ?? new List<MoveInfo>()
+            v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null!),
+            v => JsonSerializer.Deserialize<List<MoveInfo>>(v, (JsonSerializerOptions)null!) ?? new List<MoveInfo>()
         )
         .Metadata.SetValueComparer(new ValueComparer<List<MoveInfo>>(
-            (a, b) => JsonSerializer.Serialize(a, (JsonSerializerOptions)null) == JsonSerializer.Serialize(b, (JsonSerializerOptions)null),
+            (a, b) => JsonSerializer.Serialize(a, (JsonSerializerOptions)null!) == JsonSerializer.Serialize(b, (JsonSerializerOptions)null!),
             c => c.Aggregate(0, (h, v) => HashCode.Combine(h, v.GetHashCode())),
             c => c.ToList()
         ));

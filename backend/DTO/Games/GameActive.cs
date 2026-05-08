@@ -25,6 +25,9 @@ public class GameActive
     public GameType GameType { get; set; }
     public string? DrawOfferedBy { get; set; }
 
+    public bool IsAiGame { get; set; }
+    public int AiDifficulty { get; set; }
+
 }
 
 

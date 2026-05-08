@@ -6,91 +6,46 @@ using backend.Services.Interfaces;
 using backend.Services.Mappers;
 using ErrorOr;
 using Microsoft.EntityFrameworkCore;
-using backend.Extensions;
-using System.Linq.Expressions;
-using StackExchange.Redis;
-using System.Text.Json;
+using backend.DTO.Common;
 using Chess;
 using Microsoft.AspNetCore.SignalR;
 using backend.Hubs;
-using backend.DTO.Common;
-using Microsoft.AspNetCore.Identity;
+using System.Text.Json;
+
 namespace backend.Services
 {
     public class GamesService : IGamesService
     {
         private readonly IHubContext<MainHub> _hubContext;
         private readonly AppDbContext _dbContext;
-        private readonly IDatabase _db;
+        private readonly IGameRepository _gameRepository;
         private readonly IGameTimerService _gameTimerService;
+        private readonly IChessEngine _chessEngine;
+        private readonly string _aiPlayerId;
         private const string DefaultFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
-        private static string GameKey(string gameId) => $"games:{gameId}";
-        private static string MovesKey(string gameId) => $"games:{gameId}:moves";
-        private static string MessagesKey(string gameId) => $"games:{gameId}:messages";
-        private static string UserActiveGameKey(string userId) => $"users:{userId}:activeGame";
-        private const string ActiveGamesSet = "activeGames";
-
-        private const string MakeMoveScript = @"
-            if redis.call('EXISTS', KEYS[1]) == 0 then
-                return 'GAME_NOT_FOUND'
-            end
-            local whiteId = redis.call('HGET', KEYS[1], 'whiteplayerid')
-            local blackId = redis.call('HGET', KEYS[1], 'blackplayerid')
-            local isWhiteTurn = redis.call('HGET', KEYS[1], 'iswhiteturn')
-            if ARGV[1] ~= whiteId and ARGV[1] ~= blackId then
-                return 'NOT_IN_GAME'
-            end
-            local expected = (isWhiteTurn == 'True') and whiteId or blackId
-            if ARGV[1] ~= expected then
-                return 'NOT_YOUR_TURN'
-            end
-            redis.call('RPUSH', KEYS[2], ARGV[2])
-            redis.call('HSET', KEYS[1],
-                'iswhiteturn', ARGV[3],
-                'currentwhitetime', ARGV[4],
-                'currentblacktime', ARGV[5])
-            return 'OK'
-        ";
-
-        public GamesService(AppDbContext dbContext,IConnectionMultiplexer redis, IHubContext<MainHub> hubContext, IGameTimerService gameTimerService)
+        public GamesService(
+            AppDbContext dbContext,
+            IHubContext<MainHub> hubContext,
+            IGameTimerService gameTimerService,
+            IGameRepository gameRepository,
+            IChessEngine chessEngine,
+            IConfiguration configuration)
         {
             _dbContext = dbContext;
-            _db = redis.GetDatabase();
             _hubContext = hubContext;
             _gameTimerService = gameTimerService;
+            _gameRepository = gameRepository;
+            _chessEngine = chessEngine;
+            _aiPlayerId = configuration["SystemUsers:AiPlayer:Id"] ?? throw new Exception("AIPlayerId not configured"); 
         }
-
-        private Dictionary<GamesSortBy, Expression<Func<Game, object>>> SortSelectors = new()
-        {
-            { GamesSortBy.FinishedAt, g => g.FinishedAt ?? DateTime.MaxValue },
-            { GamesSortBy.Time, g => g.Time },
-            { GamesSortBy.Nickname, g => g.WhitePlayer.Nickname },
-        };
 
         public async Task<ErrorOr<GamesResponse>> GetAllGamesAsync(GetGamesQuery query)
         {
-            // TODO ACTIVE GAMES
-            var search = query.Query ?? "";
-            var gamesQuery = _dbContext.Games
-                .Where(g => g.WhitePlayer.Nickname.Contains(search) || g.BlackPlayer.Nickname.Contains(search))
-                .Where(g => query.GameType == null || g.Type == query.GameType)
-                .Where(g => query.GameStatus == null || g.Status == query.GameStatus);
-
-            var totalCount = await gamesQuery.CountAsync();
-            var totalPages = (int)Math.Ceiling(totalCount / (double)query.Limit);
-
-            var pagedGames = await gamesQuery
-                .SortBy(SortSelectors[query.SortBy ?? GamesSortBy.FinishedAt], query.SortDescending)
-                .Include(g => g.WhitePlayer)
-                .Include(g => g.BlackPlayer)
-                .Include(g => g.Winner)
-                .Skip((query.PageNumber - 1) * query.Limit)
-                .Take(query.Limit)
-                .ToListAsync();
+            var (games, totalPages) = await _gameRepository.GetFinishedGamesPagedAsync(query);
 
             var response = new GamesResponse(
-                Games: [.. pagedGames.Select(g => g.MapToGamesResponse(winnerNickname: g.Winner?.Nickname))],
+                Games: [.. games.Select(g => g.MapToGamesResponse(winnerNickname: g.Winner?.Nickname))],
                 TotalPages: totalPages
             );
 
@@ -99,29 +54,22 @@ namespace backend.Services
 
         public async Task<ErrorOr<GameResponse>> GetGameByIdAsync(string gameId)
         {
-            var isActive = await _db.SetContainsAsync(ActiveGamesSet, gameId);
-            if (isActive)
+            if (await _gameRepository.IsActiveGameAsync(gameId))
             {
-                var gameActiveData = await _db.HashGetAllAsync(GameKey(gameId));
-                if (gameActiveData.Length == 0)
+                var gameActive = await _gameRepository.GetActiveGameAsync(gameId);
+                if (gameActive == null)
                 {
-                    await _db.SetRemoveAsync(ActiveGamesSet, gameId);
+                    await _gameRepository.RemoveStaleActiveGameAsync(gameId);
                 }
                 else
                 {
-                    var gameActive = gameActiveData.FromHashEntries<GameActive>();
-                    var moves = await GetMovesByGameIdAsync(gameId);
-                    List<MessageInfo> messages = []; 
+                    var moves = await _gameRepository.GetMovesByGameIdAsync(gameId);
+                    List<MessageInfo> messages = [];
                     return gameActive.MapToGameResponse(moves, messages);
                 }
             }
 
-            var game = await _dbContext.Games
-                .Include(g => g.WhitePlayer)
-                .Include(g => g.BlackPlayer)
-                .Include(g => g.Winner)
-                .FirstOrDefaultAsync(g => g.Id.ToString() == gameId);
-
+            var game = await _gameRepository.GetFinishedGameByIdAsync(gameId);
             if (game == null)
                 return Error.NotFound("gameNotFound");
 
@@ -130,10 +78,10 @@ namespace backend.Services
 
         public async Task<bool> IsInGameAsync(Guid userId)
         {
-            return await _db.KeyExistsAsync(UserActiveGameKey(userId.ToString()));
+            return await _gameRepository.IsInGameAsync(userId);
         }
 
-        public async Task<ErrorOr<string>> CreateGameAsync(string user1Id, string user2Id, int time, int increment)
+        public async Task<ErrorOr<string>> CreateGameAsync(string? user1Id, string user2Id, int time, int increment, int aiDifficulty = 0)
         {
             var user1 = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id.ToString() == user1Id);
             var user2 = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id.ToString() == user2Id);
@@ -147,6 +95,7 @@ namespace backend.Services
             var blackPlayer = rand == 0 ? user2 : user1;
 
             var id = Guid.NewGuid();
+            bool isAiGame = _aiPlayerId == user1Id || _aiPlayerId == user2Id;
 
             var gameActive = new GameActive
             {
@@ -164,17 +113,21 @@ namespace backend.Services
                 GameType = time <= 3 ? GameType.Bullet : time <= 5 ? GameType.Blitz : GameType.Rapid,
                 IsWhiteTurn = true,
                 CurrentWhiteTime = time * 60_000,
-                CurrentBlackTime = time * 60_000
+                CurrentBlackTime = time * 60_000,
+                IsAiGame = isAiGame,
+                AiDifficulty = aiDifficulty
             };
 
-            var tran = _db.CreateTransaction();
-            _ = tran.HashSetAsync(GameKey(id.ToString()), gameActive.ToHashEntries());
-            _ = tran.SetAddAsync(ActiveGamesSet, id.ToString());
-            _ = tran.StringSetAsync(UserActiveGameKey(whitePlayer.Id.ToString()), id.ToString());
-            _ = tran.StringSetAsync(UserActiveGameKey(blackPlayer.Id.ToString()), id.ToString());
+            
 
-            if (!await tran.ExecuteAsync())
+            if (!await _gameRepository
+                .CreateActiveGameAsync(gameActive, whitePlayer.Id.ToString(), blackPlayer.Id.ToString(), setUserActiveKeys: !isAiGame))
                 return Error.Failure("redisTransactionFailed");
+            
+            if (isAiGame && whitePlayer.Id.ToString() == _aiPlayerId)
+            {
+               _ =  MakeAIMoveAsync(gameActive);
+            }
 
             _gameTimerService.ScheduleTimeout(
                 id.ToString(),
@@ -184,17 +137,15 @@ namespace backend.Services
             return id.ToString();
         }
 
-        public async Task<ErrorOr<EmptyResponse>> MakeMoveAsync(string? userId, SignalRRequest<MakeMoveRequest> request)
+        public async Task<ErrorOr<EmptyResponse>> MakeMoveAsync(string? userId, SignalRRequest<MakeMovePayload> request)
         {
             if (userId == null) return Error.Unauthorized("userNotAuthenticated");
 
             var gameId = request.Payload!.GameId;
 
-            var gameActiveData = await _db.HashGetAllAsync(GameKey(gameId));
-            if (gameActiveData.Length == 0)
+            var gameActive = await _gameRepository.GetActiveGameAsync(gameId);
+            if (gameActive == null)
                 return Error.NotFound("gameNotFound");
-
-            var gameActive = gameActiveData.FromHashEntries<GameActive>();
 
             if (gameActive.WhitePlayerId != userId && gameActive.BlackPlayerId != userId)
                 return Error.Failure("userNotInGame");
@@ -203,11 +154,11 @@ namespace backend.Services
             if (currentTurnPlayerId != userId)
                 return Error.Failure("notUsersTurn");
 
-            var moves = await GetMovesByGameIdAsync(gameId);
+            var moves = await _gameRepository.GetMovesByGameIdAsync(gameId);
             var currentFen = moves.Count == 0 ? DefaultFen : moves.Last().Fen;
 
-            var board = ChessBoard.LoadFromFen(currentFen,AutoEndgameRules.All);
-            
+            var board = ChessBoard.LoadFromFen(currentFen, AutoEndgameRules.All);
+
             var move = request.Payload.San;
 
             if (!board.IsValidMove(move))
@@ -215,10 +166,8 @@ namespace backend.Services
 
             board.Move(move);
 
-
             var newFen = board.ToFen();
             var now = DateTime.UtcNow;
-
 
             var lastMoveTimestampStr = moves.LastOrDefault() != null ? moves.Last().Timestamp.ToString("O") : null;
             var deltaTime = lastMoveTimestampStr != null ? (int)(now - DateTime.Parse(lastMoveTimestampStr)).TotalMilliseconds : 0;
@@ -248,25 +197,12 @@ namespace backend.Services
             var serializedMove = JsonSerializer.Serialize(moveInfo);
             var newIsWhiteTurn = !gameActive.IsWhiteTurn;
 
-            // lua used to eliminate race condition
-            var luaResult = (string?)await _db.ScriptEvaluateAsync(
-                MakeMoveScript,
-                [GameKey(gameId), MovesKey(gameId)],
-                [
-                    userId,
-                    serializedMove,
-                    newIsWhiteTurn ? "True" : "False",
-                    newWhiteTime.ToString(),
-                    newBlackTime.ToString()
-                ]);
+            var luaResult = await _gameRepository.ExecuteMakeMoveScriptAsync(
+                gameId, userId, serializedMove, newIsWhiteTurn, newWhiteTime, newBlackTime);
 
-            switch (luaResult)
+            if (luaResult.IsError)
             {
-                case "GAME_NOT_FOUND": return Error.NotFound("gameNotFound");
-                case "NOT_IN_GAME": return Error.Failure("userNotInGame");
-                case "NOT_YOUR_TURN": return Error.Failure("notUsersTurn");
-                case "OK": break;
-                default: return Error.Failure("unexpectedRedisError");
+                return luaResult.Errors.First();
             }
 
             await _hubContext.Clients.Group($"Game:{gameId}")
@@ -278,13 +214,18 @@ namespace backend.Services
 
             if (board.IsEndGame)
             {
-                
-                await HandleEndGameAsync(gameId, gameActive, board.EndGame) ;
+                await HandleEndGameAsync(gameId, gameActive, board.EndGame!);
+                return new EmptyResponse();
             }
+            
             _gameTimerService.ScheduleTimeout(
                 gameId,
                 newIsWhiteTurn ? gameActive.WhitePlayerId : gameActive.BlackPlayerId,
                 gameActive.IsWhiteTurn ? newWhiteTime : newBlackTime);
+            if (gameActive.IsAiGame)
+            {
+                await MakeAIMoveAsync(gameActive, newFen);
+            }
 
             return new EmptyResponse();
         }
@@ -293,11 +234,9 @@ namespace backend.Services
         {
             if (userId == null) return Error.Unauthorized("userNotAuthenticated");
 
-            var gameActiveData = await _db.HashGetAllAsync(GameKey(gameId));
-            if (gameActiveData.Length == 0)
+            var gameActive = await _gameRepository.GetActiveGameAsync(gameId);
+            if (gameActive == null)
                 return Error.NotFound("gameNotFound");
-
-            var gameActive = gameActiveData.FromHashEntries<GameActive>();
 
             if (gameActive.WhitePlayerId != userId && gameActive.BlackPlayerId != userId)
                 return Error.Failure("userNotInGame");
@@ -308,20 +247,19 @@ namespace backend.Services
 
             return await EndGameInternal(gameId, gameActive, "surrender", winnerId);
         }
+
         public async Task HandleTimeoutAsync(string gameId, string timedOutPlayerId)
         {
-            var gameActiveData = await _db.HashGetAllAsync(GameKey(gameId));
-            if (gameActiveData.Length == 0)
-                return; 
-
-            var gameActive = gameActiveData.FromHashEntries<GameActive>();
+            var gameActive = await _gameRepository.GetActiveGameAsync(gameId);
+            if (gameActive == null)
+                return;
 
             var currentTurnPlayerId = gameActive.IsWhiteTurn
                 ? gameActive.WhitePlayerId
                 : gameActive.BlackPlayerId;
 
             if (currentTurnPlayerId != timedOutPlayerId)
-                return; 
+                return;
 
             var winnerId = gameActive.WhitePlayerId == timedOutPlayerId
                 ? gameActive.BlackPlayerId
@@ -331,7 +269,7 @@ namespace backend.Services
         }
 
         // ==================== HELPERS ====================
-       
+
         private async Task HandleEndGameAsync(string gameId, GameActive gameActive, EndGameInfo endGameInfo)
         {
             var winnerId = endGameInfo.WonSide?.AsChar switch
@@ -340,7 +278,7 @@ namespace backend.Services
                 'b' => gameActive.BlackPlayerId,
                 _ => null
             };
-            var reason = endGameInfo.EndgameType switch 
+            var reason = endGameInfo.EndgameType switch
             {
                 EndgameType.Checkmate => "checkmate",
                 EndgameType.Stalemate => "stalemate",
@@ -351,22 +289,15 @@ namespace backend.Services
             };
             await EndGameInternal(gameId, gameActive, reason, winnerId);
         }
-        private async Task<List<MoveInfo>> GetMovesByGameIdAsync(string gameId)
-        {
-            var movesData = await _db.ListRangeAsync(MovesKey(gameId));
-            return movesData
-                .Select(m => JsonSerializer.Deserialize<MoveInfo>(m!))
-                .OfType<MoveInfo>()
-                .ToList();
-        }
+
         private async Task<ErrorOr<EmptyResponse>> EndGameInternal(
             string gameId, GameActive gameActive, string reason, string? winnerId)
         {
             _gameTimerService.RemoveGame(gameId);
-            var moves = await GetMovesByGameIdAsync(gameId);
+            var moves = await _gameRepository.GetMovesByGameIdAsync(gameId);
 
-           Guid? winnerGuid = Guid.TryParse(winnerId, out var g) ? g : null;
-            
+            Guid? winnerGuid = Guid.TryParse(winnerId, out var g) ? g : null;
+
             var whiteGuid = Guid.Parse(gameActive.WhitePlayerId);
             var blackGuid = Guid.Parse(gameActive.BlackPlayerId);
 
@@ -375,7 +306,7 @@ namespace backend.Services
                 .ToListAsync();
 
             var winner = users.FirstOrDefault(u => u.Id == winnerGuid);
-           
+
             var game = new Game
             {
                 Id = Guid.Parse(gameId),
@@ -389,40 +320,45 @@ namespace backend.Services
                 FinishedAt = DateTime.UtcNow,
                 Moves = moves
             };
+            if(!gameActive.IsAiGame)
+                await _gameRepository.SaveFinishedGameAsync(game);
 
-            using (var tran = await _dbContext.Database.BeginTransactionAsync())
-            {
-                try
-                {
-                    _dbContext.Games.Add(game);
-                    await _dbContext.SaveChangesAsync();
-                    await tran.CommitAsync();
-                }
-                catch
-                {
-                    await tran.RollbackAsync();
-                    throw;
-                }
-            }
+            await _gameRepository.CleanupActiveGameAsync(gameId, gameActive.WhitePlayerId, gameActive.BlackPlayerId);
 
-            var redisTran = _db.CreateTransaction();
-            _ = redisTran.SetRemoveAsync(ActiveGamesSet, gameId);
-            _ = redisTran.KeyDeleteAsync(GameKey(gameId));
-            _ = redisTran.KeyDeleteAsync(MovesKey(gameId));
-            _ = redisTran.KeyDeleteAsync(MessagesKey(gameId));
-            _ = redisTran.KeyDeleteAsync(UserActiveGameKey(gameActive.WhitePlayerId));
-            _ = redisTran.KeyDeleteAsync(UserActiveGameKey(gameActive.BlackPlayerId));
-
-            var redisOk = await redisTran.ExecuteAsync();
-            
             await _hubContext.Clients.Group($"Game:{gameId}").SendAsync("GameEnded",
                 new SignalRResponse<GameEndedResponse>(
                     Type: "GameEnded",
                     CorrelationId: gameId,
-                    Data: new GameEndedResponse(gameId, winner is not null ? winner.Nickname : null , reason)
+                    Data: new GameEndedResponse(gameId, winner is not null ? winner.Nickname : null, reason)
                 ));
 
             return new EmptyResponse();
+        }
+
+        private async Task MakeAIMoveAsync(GameActive gameActive, string fen = DefaultFen)
+        {
+
+            if (gameActive == null)
+                return;
+
+
+            var bestMove = await _chessEngine.GetMoveAsync(fen, gameActive.AiDifficulty);
+            if(bestMove.IsError)
+            {
+                await SurrenderGameAsync(_aiPlayerId, gameActive.Id);
+                return;
+            }
+
+            var makeMoveRequest = new SignalRRequest<MakeMovePayload>(
+                Type: "MakeMove",
+                CorrelationId: gameActive.Id,
+                Payload: new MakeMovePayload
+                (
+                    GameId: gameActive.Id,
+                    San: bestMove.Value 
+                ));
+
+            await MakeMoveAsync(_aiPlayerId, makeMoveRequest); 
         }
     }
 }

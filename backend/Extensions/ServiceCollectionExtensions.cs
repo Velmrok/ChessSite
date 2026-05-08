@@ -23,6 +23,9 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IHomeService, HomeService>();
         services.AddScoped<IQueueService, QueueService>();
 
+        services.AddScoped<IChessEngine, TestChessEngine>();
+        services.AddScoped<IGameRepository, GameRepository>();
+
         services.AddScoped<IPresenceService, PresenceService>();
         services.AddSingleton<IJwtGenerator, JwtGenerator>();
         services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();

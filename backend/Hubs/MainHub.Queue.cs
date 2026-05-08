@@ -14,22 +14,16 @@ public partial class MainHub : Hub
     public async Task<SignalRResponse<EmptyResponse>> JoinQueue(SignalRRequest<JoinQueuePayload> request)
     {
         var payload = request.Payload;
-        if (payload == null)
-            return new SignalRResponse<EmptyResponse>(
-                request.Type,
-                request.CorrelationId,
-                default,
-                new SignalRError("invalidPayload", "Payload is required")
-            );
+        if (ValidatePayload<JoinQueuePayload,EmptyResponse>(request) is { } error) return error;
 
 
         var result = await _queueService.JoinQueueAsync(GetUserId(), payload);
-        return HandleError(result, request);
+        return HandleError<EmptyResponse, EmptyResponse, JoinQueuePayload>(result, request);
     }
     [Authorize]
     public async Task<SignalRResponse<EmptyResponse>> LeaveQueue(SignalRRequest<EmptyPayload> request)
     {
         var result = await _queueService.LeaveQueueAsync(GetUserId());
-        return HandleError(result, request);
+        return HandleError<EmptyResponse, EmptyResponse, EmptyPayload>(result, request);
     }
 }

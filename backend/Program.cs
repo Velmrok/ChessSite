@@ -1,10 +1,14 @@
+using backend.Data;
 using backend.Extensions;
+using backend.Models;
 using backend.Options;
 using backend.Policies;
 using backend.Services;
 using backend.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.EntityFrameworkCore;
+using SixLabors.ImageSharp;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -88,6 +92,25 @@ app.MapControllers();
 app.MapHealthChecks("/health");
 
 app.MapHub<backend.Hubs.MainHub>("/mainhub");
-app.Run();
 
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+     Guid AiUserId = Guid.Parse(builder.Configuration.GetValue<string>("SystemUsers:AiPlayer:Id")!);
+    if (!await db.Users.AnyAsync(u => u.Id == AiUserId))
+    {
+        db.Users.Add(new User
+        {
+            Id = AiUserId,
+            Nickname = "Stockfish",
+            Email = "bot@system.local",
+            Login = "stockfish",
+            PasswordHash = "N/A",
+           
+        });
+        await db.SaveChangesAsync();
+    }
+}
+app.Run();
 public partial class Program { }

@@ -1,6 +1,6 @@
 namespace backend.DTO.Games
 {
-    public record SurrenderGameRequest(
+    public record SurrenderGamePayload(
         string GameId
     );
 }

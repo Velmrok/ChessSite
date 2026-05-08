@@ -1,5 +1,5 @@
 namespace backend.DTO.Games;
-public record MakeMoveRequest(
+public record MakeMovePayload(
     string GameId,
     string San
 );

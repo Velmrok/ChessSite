@@ -11,6 +11,8 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useApi } from "@/hooks/useApi";
 import type { LeaderboardResponse, QmViewMode } from "@/types/home";
+import { invokeSignalR } from "@/services/signalR/connection";
+import type { SignalRResponse } from "@/types/signalR";
 
 
 export default function HomeUser() {
@@ -48,6 +50,15 @@ export default function HomeUser() {
     const changeQMViewMode=(mode:QmViewMode)=>{
         return () => setQmViewMode(mode);
     }
+    const playAgainstAi = async () => {
+        const response: SignalRResponse<{ gameId: string }> | undefined = await request(()=> invokeSignalR("PlayWithAi",
+            {type: "Home", correlationId: crypto.randomUUID(), payload: { time: 5, increment: 0 , difficulty: 5} }
+         ));
+        if(response) {
+            if(!response.data) console.error("No game ID returned from server");
+            navigate(`/games/${response.data?.gameId}`);
+        }
+    }
 
 
     return (
@@ -83,6 +94,15 @@ export default function HomeUser() {
                          hover:scale-105 transition-all">{t('findGame')}</button>
                          
                     </div>
+
+                    <div className="flex flex-col items-center gap-4">
+                        <span>{t('playAgainstAi')}</span>
+                        <button onClick={playAgainstAi}
+                         className="bg-cyan-500/60 px-8 py-2 rounded hover:bg-cyan-500
+                         hover:scale-105 transition-all">{t('play')}</button>
+                         
+                    </div>
+
                     
                     
 

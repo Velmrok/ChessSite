@@ -39,10 +39,12 @@ export default function useGame() {
   const user = useUserStore((state) => state.user);
   const {request} = useApi();
 
+  const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
 
     const fetch = async () => {
-
+        setIsLoading(true);
         const joinGameGroupResponse = request(() => joinGameRoom({type: "Game:"+gameId, correlationId: uuid()}));
         setGameJustEnded(false);
         const response = await request<GameState>(()=>fetchGame(gameId));
@@ -56,6 +58,7 @@ export default function useGame() {
             setIsInAnalysisTree(false);
            
         }
+        setIsLoading(false);
 
       
 
@@ -160,5 +163,5 @@ export default function useGame() {
   }
 
 
-  return { gameJustEnded, formatEndData };
+  return { gameJustEnded, formatEndData, isLoading };
 }

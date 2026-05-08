@@ -1,5 +1,6 @@
 using backend.DTO.Common;
 using backend.DTO.Queue;
+using backend.Services;
 using backend.Services.Interfaces;
 using ErrorOr;
 using Microsoft.AspNetCore.Authorization;
@@ -10,24 +11,25 @@ namespace backend.Hubs;
 
 public partial class MainHub : Hub
 {
-    private readonly IGamesService _gameService;
     private readonly IHomeService _homeService;
     private readonly IPresenceService _presenceService;
     private readonly IQueueService _queueService;
     private readonly IGamesService _gamesService;
+
+    private readonly string _aiuserId;
     public MainHub(
-        IGamesService gameService,
         IHomeService homeService,
         IQueueService queueService,
         IPresenceService presenceService,
-        IGamesService gamesService
+        IGamesService gamesService,
+        IConfiguration configuration
         )
     {
-        _gameService = gameService;
         _homeService = homeService;
         _presenceService = presenceService;
         _queueService = queueService;
         _gamesService = gamesService;
+        _aiuserId = configuration.GetValue<string>("SystemUsers:AiPlayer:Id")!;
 
     }
 
@@ -88,10 +90,10 @@ public partial class MainHub : Hub
             default
         );
     }
-    protected SignalRResponse<TResponse> HandleError<TResponse, TPayload>(
-    ErrorOr<TResponse> result,
+    protected SignalRResponse<TResponse> HandleError<TResponse,TResult, TPayload>(
+    ErrorOr<TResult> result,
     SignalRRequest<TPayload> request,
-    Func<TResponse, TResponse>? onSuccess = null)
+    Func<TResult, TResponse>? onSuccess = null)
     {
         if (result.IsError)
         {

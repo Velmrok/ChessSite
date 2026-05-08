@@ -14,6 +14,7 @@ import ChessBoard from "@/components/Game/Chessboard";
 import useAnalysisGame from "@/hooks/useAnalysiGame";
 import useLiveGame from "@/hooks/useLiveGame";
 import GameStartOverlay from "@/components/Game/GameStartOverlay";
+import NotFound from "./NotFound";
 
 export default function GamePage() {
 
@@ -26,7 +27,7 @@ export default function GamePage() {
     const resetGame = useGameStore((state) => state.resetGame);
     const game = useGameStore((state) => state.game);
     const [orientation, setOrientation] = useState<"white" | "black">("white");
-    const { gameJustEnded, formatEndData } = useGame();
+    const { gameJustEnded, formatEndData, isLoading } = useGame();
     const pushAnalysisMove = useGameStore((state) => state.pushAnalysisMove);
     const { setCurrentAnalysisMoveIndex } = useAnalysisGame();
     const { setCurrentMoveIndex } = useLiveGame();
@@ -67,12 +68,17 @@ export default function GamePage() {
         }
     }, [game, user]);
 
-    if (!game) {
+    if (isLoading) {
         return (
             <div className="flex justify-center items-center h-screen bg-cyan-800">
                 <Loading />;
             </div>
 
+        )
+    }
+    if (!game) {
+        return (
+            <NotFound whatIsMissing="game" />
         )
     }
     const getPGN = () => {

@@ -12,24 +12,36 @@ public partial class MainHub : Hub
 
 
     [Authorize]
-    public async Task<SignalRResponse<EmptyResponse>> MakeMove(SignalRRequest<MakeMoveRequest> request)
+    public async Task<SignalRResponse<EmptyResponse>> MakeMove(SignalRRequest<MakeMovePayload> request)
     {
-        if (ValidatePayload<MakeMoveRequest,EmptyResponse>(request) is { } error) return error;
+        if (ValidatePayload<MakeMovePayload,EmptyResponse>(request) is { } error) return error;
 
         var userId = GetUserId();
         
         var result = await _gamesService.MakeMoveAsync(userId, request);
-        return HandleError(result, request);
+        return HandleError<EmptyResponse, EmptyResponse, MakeMovePayload>(result, request);
     } 
     [Authorize]
-    public async Task<SignalRResponse<EmptyResponse>> SurrenderGame(SignalRRequest<SurrenderGameRequest> request)
+    public async Task<SignalRResponse<EmptyResponse>> SurrenderGame(SignalRRequest<SurrenderGamePayload> request)
     {
-        if (ValidatePayload<SurrenderGameRequest,EmptyResponse>(request) is { } error) return error;
+        if (ValidatePayload<SurrenderGamePayload,EmptyResponse>(request) is { } error) return error;
 
         var userId = GetUserId();
     
         
         var result = await _gamesService.SurrenderGameAsync(userId, request.Payload!.GameId);
-        return HandleError(result, request); 
+        return HandleError<EmptyResponse, EmptyResponse, SurrenderGamePayload>(result, request); 
     } 
+    [Authorize]
+    public async Task<SignalRResponse<CreateAiGameResponse>> PlayWithAi(SignalRRequest<CreateAiGamePayload> request)
+    {
+        if (ValidatePayload<CreateAiGamePayload,CreateAiGameResponse>(request) is { } error) return error;
+
+        var userId = GetUserId();
+    
+        
+        var result = await _gamesService.CreateGameAsync(userId,_aiuserId,request.Payload!.Time,request.Payload.Increment,request.Payload.Difficulty);
+        
+        return HandleError(result, request,(x)=>new CreateAiGameResponse(x)); 
+    }
 }

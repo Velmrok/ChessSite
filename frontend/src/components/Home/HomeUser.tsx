@@ -81,6 +81,13 @@ export default function HomeUser() {
                          className="bg-cyan-500/60 px-8 py-2 rounded hover:bg-cyan-500 hover:scale-105 transition-all">{t('play')}</button>
                     </div>
                     <div className="flex flex-col items-center gap-4">
+                        <span>{t('playAgainstAi')}</span>
+                        <button onClick={playAgainstAi}
+                         className="bg-cyan-500/60 px-8 py-2 rounded hover:bg-cyan-500
+                         hover:scale-105 transition-all">{t('play')}</button>
+                         
+                    </div>
+                    <div className="flex flex-col items-center gap-4">
                         <span>{t('lookingForSomeone')}</span>
                         <button onClick={()=>navigate('/search')}
                          className="bg-cyan-500/60 px-8 py-2 rounded hover:bg-cyan-500
@@ -95,13 +102,7 @@ export default function HomeUser() {
                          
                     </div>
 
-                    <div className="flex flex-col items-center gap-4">
-                        <span>{t('playAgainstAi')}</span>
-                        <button onClick={playAgainstAi}
-                         className="bg-cyan-500/60 px-8 py-2 rounded hover:bg-cyan-500
-                         hover:scale-105 transition-all">{t('play')}</button>
-                         
-                    </div>
+                    
 
                     
                     

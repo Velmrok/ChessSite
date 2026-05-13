@@ -39,11 +39,11 @@ export default function Chat({ previousMessages }: Props) {
                 ref={chatRef}
             >
                 {messages && messages.map((msg, index) => {
-                    const isMine = user != null && msg.nickname === user.nickname;
-                    const isSameOwnerPrev = index > 0 && messages[index - 1].nickname === messages[index].nickname;
+                    const isMine = user != null && msg.senderNickname === user.nickname;
+                    const isSameOwnerPrev = index > 0 && messages[index - 1].senderNickname === messages[index].senderNickname;
                     return (
                         <div className={`flex flex-col ${isMine ? 'items-end' : 'items-start'}`}>
-                            {!isSameOwnerPrev && <span className="text-xs">{msg.nickname}</span>}
+                            {!isSameOwnerPrev && <span className="text-xs">{msg.senderNickname}</span>}
                             <div className="inline-flex max-w-[75%] ">
 
                                 <div
@@ -51,7 +51,7 @@ export default function Chat({ previousMessages }: Props) {
                             ${isMine ? 'bg-blue-600 text-white' : 'bg-gray-700 text-white'}
                                                                     `}
                                 >
-                                    {msg.text}
+                                    {msg.content}
                                 </div>
                             </div>
                         </div>

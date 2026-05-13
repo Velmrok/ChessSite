@@ -4,7 +4,7 @@ export type GameSearchParams = {
     query: string; 
     limit: number;
     gameType: GameType | null;
-    status: GameStatus | null;
+    gameStatus: GameStatus | null;
     page: number;
     sortBy : 'date' | 'time' | 'nickname' ;
     SortDescending: boolean; 

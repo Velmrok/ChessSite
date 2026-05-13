@@ -14,7 +14,7 @@ type UserStore = {
 
 
 };
-const useUserStore = create<UserStore>((set, get) => ({
+const useUserStore = create<UserStore>((set) => ({
     user: null,
     
     isConnected: false,

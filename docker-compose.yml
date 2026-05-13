@@ -1,4 +1,4 @@
-version: '3.8'
+
 
 secrets:
   db_password:
@@ -24,7 +24,7 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - backend-net
+      - db-net
     secrets:
       - db_password
     
@@ -51,6 +51,7 @@ services:
     networks:
       - backend-net
       - frontend-net
+      - db-net
     secrets:
       - db_password
       - cf_access_key
@@ -69,16 +70,14 @@ services:
     container_name: chess_frontend_production
     working_dir: /app
     ports:
-      - "443:443"
-    volumes:
-      - ./chess.site.pem:/etc/ssl/cert.pem:ro
-      - ./chess.site-key.pem:/etc/ssl/key.pem:ro
+      - "80:80"
     depends_on:
       backend:
         condition: service_healthy
     restart: unless-stopped
     networks:
       - frontend-net
+
   
   redis:
     image: redis:7-alpine
@@ -94,12 +93,63 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.0
+    container_name: chess_keycloak_production
+    command: start 
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://keycloak-db:5432/keycloak
+      KC_DB_USERNAME: ${KC_DB_USER}
+      KC_DB_PASSWORD: ${KC_DB_PASSWORD}
+      KEYCLOAK_ADMIN: ${KC_ADMIN_USER}
+      KEYCLOAK_ADMIN_PASSWORD: ${KC_ADMIN_PASSWORD}
+      KC_HOSTNAME: ${KC_HOSTNAME}
+      KC_PROXY_HEADERS: xforwarded 
+      KC_HTTP_ENABLED: "true"
+      KC_HEALTH_ENABLED: "true"
+      KC_RELATIVE_PATH: /auth
+    depends_on:
+      keycloak-db:
+          condition: service_healthy
+    networks:
+      - keycloak-net
+      - frontend-net
+      - backend-net
+    healthcheck:
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/localhost/9000 && echo -e 'GET /auth/health/ready HTTP/1.1\\r\\nHost: localhost\\r\\n\\r\\n' >&3 && cat <&3 | grep -q '200 OK'"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+
+  keycloak-db:
+    container_name: chess_keycloak_db_production
+    image: postgres:16
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: ${KC_DB_USER}
+      POSTGRES_PASSWORD: ${KC_DB_PASSWORD}
+    volumes:
+      - keycloak_db_data_production:/var/lib/postgresql/data
+    networks:
+      - keycloak-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${KC_DB_USER} -d keycloak"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
   redis_data_production:
   postgres_data_production:
   data_protection_keys:
+  keycloak_db_data_production:
 networks:
   frontend-net:
   backend-net:
+  db-net:
+    internal: true
+  keycloak-net:
+    internal: true
 

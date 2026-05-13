@@ -15,7 +15,7 @@ const useGameSearchStore = create<GameSearchStore>((set, get) => ({
         query: '',
         limit: 10,
         gameType: null,
-        status: null,
+        gameStatus: null,
         page: 1,
         sortBy: "date",
         SortDescending: false,
@@ -27,7 +27,7 @@ const useGameSearchStore = create<GameSearchStore>((set, get) => ({
             query: '',
             limit: 10,
             gameType: null,
-            status: null,
+            gameStatus: null,
             page: 1,
             sortBy: 'date',
             SortDescending: false,
@@ -49,7 +49,7 @@ const useGameSearchStore = create<GameSearchStore>((set, get) => ({
         append("query", params.query);
         append("limit", params.limit, 10);
         append("gameType", params.gameType, null);
-        append("status", params.status, null);
+        append("status", params.gameStatus, null);
         append("page", params.page, 1);
         append("sortBy", params.sortBy, 'date');
         append("SortDescending", params.SortDescending, false);

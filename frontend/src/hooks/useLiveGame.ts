@@ -22,18 +22,18 @@ export default function useLivesGame() {
     }, [currentWhiteTime, currentBlackTime]);
 
     useEffect(() => {
-        if (game?.status === 'finished') {
+        if (game?.gameStatus === 'Finished') {
             if (timerIdRef.current) clearInterval(timerIdRef.current);
             timerIdRef.current = null;
         }
-    }, [game?.status]);
+    }, [game?.gameStatus]);
 
     useEffect(() => {
-        if (game?.status !== "active") return;
+        if (game?.gameStatus !== "Active") return;
         if (game.moves.length === 0) return;
 
-        setTimer(game?.currentTurn || "white");
-    }, [game?.currentTurn]);
+        setTimer(game?.isWhiteTurn ? "white" : "black");
+    }, [game?.isWhiteTurn]);
 
     useEffect(() => {
         return () => {

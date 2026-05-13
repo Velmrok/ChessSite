@@ -1,4 +1,4 @@
-import type { PublicUser, UserProfile, FriendsProfile} from "@/types/user";
+import type { PublicUser, UserProfile, FriendsProfile, ProfileGame} from "@/types/user";
 import { create } from "zustand";
 
 type UserProfileStore = {

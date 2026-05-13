@@ -9,15 +9,16 @@ import { useTranslation } from "react-i18next";
 import Avatar from "../global/Avatar";
 
 
-
-export default function FriendsOnline() {
+type Props = {
+    loadingFriends: boolean;
+}
+export default function FriendsOnline({loadingFriends}: Props) {
 
     const { t } = useTranslation("home");
     const user = useUserStore((state) => state.user);
     if (!user) throw new Error("User not found");
 
     const friends = useHomeStore(state => state.friends);
-    const loadingFriends = useHomeStore(state => state.loadingFriends);
     const friendsPage = useHomeStore(state => state.friendsPage);
     const totalFriendsPages = useHomeStore(state => state.totalFriendsPages);
     const setFriendsPage = useHomeStore(state => state.setFriendsPage);

@@ -27,9 +27,12 @@ export default function HomeUser() {
     const navigate = useNavigate();
     const setFriends = useHomeStore(state => state.setFriends);
     const {request} = useApi();
+
+    const [loadingFriends, setLoadingFriends] = useState(false);
     
 
      useEffect(() => {
+        setLoadingFriends(true);
         const fetchLeaderboard = async () => {
             const response = await request(getLeaderboard);
             setLeaderboard(response);
@@ -39,6 +42,7 @@ export default function HomeUser() {
             if(response) {
                 setFriends(response.friends);
             }
+            setLoadingFriends(false);
         }
         
         fetchLeaderboard();
@@ -117,7 +121,7 @@ export default function HomeUser() {
                     qmViewMode={qmViewMode}
                     />
                 {qmViewMode==='queue' && <QuickQueue />}
-                {qmViewMode==='friends' && <FriendsOnline  />}
+                {qmViewMode==='friends' && <FriendsOnline loadingFriends={loadingFriends} />}
                 {qmViewMode==='leaderboard' && <LeaderBoard leaderboard={leaderboard} />}
                 
                 </div>

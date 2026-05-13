@@ -5,14 +5,16 @@ import ChessBoard from "../components/FindGame/ChessBoard";
 import PlayerBar from "@/components/FindGame/PlayerBar";
 import useUserStore from "@/stores/useUserStore";
 import { useState } from "react";
+import { useQueueStore } from "@/stores/useQueueStore";
 
 export default function FindGame() {
     const user = useUserStore((state) => state.user);
-    const [currentTime, setCurrentTime] = useState("10+0");
+    const selectedTime = useQueueStore(state => state.selectedTime);
+    
 
     if (!user || typeof (user.rating) == 'number') throw new Error("Error on FindGame that doesnt make any sense");
     const gameType = (): "bullet" | "blitz" | "rapid" => {
-        const base = currentTime.split("+").map(Number)[0];
+        const base = selectedTime.split("+").map(Number)[0];
         if (base < 3) return 'bullet';
         if (base < 10) return 'blitz';
         return 'rapid';
@@ -27,13 +29,13 @@ export default function FindGame() {
                  flex flex-col items-center justify-center mt-5">
 
                     <PlayerBar nickname="Opponent" avatarUrl="/default-avatar.webp"
-                        time={currentTime} withLink={false} />
+                        time={selectedTime} withLink={false} />
                     <ChessBoard />
                     <PlayerBar nickname={user.nickname} avatarUrl={user.profilePictureUrl} withLink={true}
-                        rating={user.rating[gameType()]} time={currentTime} />
+                        rating={user.rating[gameType()]} time={selectedTime} />
                 </div>
                 <div className="h-full w-[70%] xl:w-[30%] flex items-start justify-center xl:mt-9">
-                    <GameForm currentTime={currentTime} setCurrentTime={setCurrentTime} />
+                    <GameForm />
                 </div>
             </div>
         </div>

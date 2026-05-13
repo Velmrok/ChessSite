@@ -28,7 +28,7 @@ export default function FilterMenu() {
             ...params,
             query: debouncedQuery,
             gameType: formik.values.gameType as 'rapid' | 'blitz' | 'bullet' | null,
-            status: formik.values.status as 'active' | 'finished' | null,
+            gameStatus: formik.values.status as 'Active' | 'Finished' | null,
         });
     }, [
         debouncedQuery,
@@ -91,8 +91,8 @@ export default function FilterMenu() {
                     onChange={formik.handleChange}
                 >
                     <option value="all">{t('all')}</option>
-                    <option value="active">{t('active')}</option>
-                    <option value="finished">{t('finished')}</option>
+                    <option value="Active">{t('active')}</option>
+                    <option value="Finished">{t('finished')}</option>
                 </select>
             </div>
     )

@@ -96,7 +96,9 @@ services:
   keycloak:
     image: quay.io/keycloak/keycloak:26.0
     container_name: chess_keycloak_production
-    command: start 
+    command: start --import-realm     # ← dopisek
+    volumes:
+    - ./keycloak-export:/opt/keycloak/data/import:ro
     environment:
       KC_DB: postgres
       KC_DB_URL: jdbc:postgresql://keycloak-db:5432/keycloak

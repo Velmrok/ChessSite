@@ -8,7 +8,7 @@ public class User
     public Guid Id { get; set; }
     public required string Nickname { get; set; }
     public string ProfileBio { get; set; } = "";
-    public string ProfilePictureUrl { get; set; } = "/api/uploads/avatars/default.webp";
+    public string ProfilePictureUrl { get; set; } = "/avatar-default.webp";
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime LastActive { get; set; } = DateTime.UtcNow;
     public RatingStats Rating { get; set; } = new RatingStats(1200, 1200, 1200);

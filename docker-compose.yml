@@ -98,7 +98,7 @@ services:
     container_name: chess_keycloak_production
     command: start --import-realm     # ← dopisek
     volumes:
-    - ./keycloak-export:/opt/keycloak/data/import:ro
+    - ./.keycloak-export:/opt/keycloak/data/import:ro
     environment:
       KC_DB: postgres
       KC_DB_URL: jdbc:postgresql://keycloak-db:5432/keycloak
@@ -110,7 +110,6 @@ services:
       KC_PROXY_HEADERS: xforwarded 
       KC_HTTP_ENABLED: "true"
       KC_HEALTH_ENABLED: "true"
-      KC_RELATIVE_PATH: /auth
     depends_on:
       keycloak-db:
           condition: service_healthy
@@ -119,7 +118,7 @@ services:
       - frontend-net
       - backend-net
     healthcheck:
-      test: ["CMD-SHELL", "exec 3<>/dev/tcp/localhost/9000 && echo -e 'GET /auth/health/ready HTTP/1.1\\r\\nHost: localhost\\r\\n\\r\\n' >&3 && cat <&3 | grep -q '200 OK'"]
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/localhost/9000 && echo -e 'GET /health/ready HTTP/1.1\\r\\nHost: localhost\\r\\n\\r\\n' >&3 && cat <&3 | grep -q '200 OK'"]
       interval: 15s
       timeout: 5s
       retries: 10

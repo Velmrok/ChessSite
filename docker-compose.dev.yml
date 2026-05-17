@@ -80,10 +80,7 @@ services:
       sh -c "
       npm install &&
       npm run dev
-      "
-    depends_on:
-      backend : 
-        condition: service_healthy
+      " 
     networks:
       - frontend-net
 
@@ -105,7 +102,9 @@ services:
   keycloak:
     image: quay.io/keycloak/keycloak:26.0
     container_name: chess_keycloak
-    command: start-dev
+    command: start-dev --import-realm
+    volumes:
+    - ./.keycloak-export:/opt/keycloak/data/import:ro
     environment:
       KC_DB: postgres
       KC_DB_URL: jdbc:postgresql://keycloak-db:5432/keycloak
@@ -133,6 +132,20 @@ services:
       - keycloak_db_data:/var/lib/postgresql/data
     networks:
       - keycloak-net
+  local-chess-engine:
+    build: ./local.Chess.Engine
+    container_name: local_chess_engine
+    working_dir: /app
+    ports:
+      - "5000:5000"
+    networks:
+      - backend-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
 
 volumes:
   postgres_data:

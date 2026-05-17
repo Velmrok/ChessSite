@@ -59,6 +59,10 @@ namespace backend.Services
 
                 await gamesService.HandleTimeoutAsync(gameId, playerId);
             }
+            catch (OperationCanceledException)
+            {
+
+            }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Timer error for game {GameId}", gameId);

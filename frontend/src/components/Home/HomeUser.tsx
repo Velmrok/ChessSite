@@ -56,7 +56,7 @@ export default function HomeUser() {
     }
     const playAgainstAi = async () => {
         const response: SignalRResponse<{ gameId: string }> | undefined = await request(()=> invokeSignalR("PlayWithAi",
-            {type: "Home", correlationId: crypto.randomUUID(), payload: { time: 5, increment: 0 , difficulty: 5} }
+            {type: "Home", correlationId: crypto.randomUUID(), payload: { time: 30, increment: 15 , difficulty: 5} }
          ));
         if(response) {
             if(!response.data) console.error("No game ID returned from server");

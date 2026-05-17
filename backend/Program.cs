@@ -17,7 +17,7 @@ builder.Services.AddDatabase(builder.Configuration, builder.Environment.IsEnviro
 
 
 builder.Services.AddControllers();
-builder.Services.AddApplicationServices();
+builder.Services.AddApplicationServices(builder.Configuration);
 builder.Services.AddAuthenticationConfig(builder.Configuration); 
 
 builder.Services.AddEndpointsApiExplorer();

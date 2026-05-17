@@ -81,7 +81,7 @@ namespace backend.Services
             return await _gameRepository.IsInGameAsync(userId);
         }
 
-        public async Task<ErrorOr<string>> CreateGameAsync(string? user1Id, string user2Id, int time, int increment, int aiDifficulty = 0)
+        public async Task<ErrorOr<string>> CreateGameAsync(string? user1Id, string user2Id, int time, int increment, int aiDifficulty = 1)
         {
             var user1 = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id.ToString() == user1Id);
             var user2 = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id.ToString() == user2Id);
@@ -352,7 +352,7 @@ namespace backend.Services
                 return;
 
 
-            var bestMove = await _chessEngine.GetMoveAsync(fen, gameActive.AiDifficulty);
+            var bestMove = await _chessEngine.GetMoveAsync(fen, gameActive.AiDifficulty * 1000);
             if(bestMove.IsError)
             {
                 await SurrenderGameAsync(_aiPlayerId, gameActive.Id);

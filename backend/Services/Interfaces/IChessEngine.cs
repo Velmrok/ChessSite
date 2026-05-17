@@ -8,13 +8,3 @@ namespace backend.Services.Interfaces
         public Task<ErrorOr<string>> GetMoveAsync(string fen, int thinkTimeMs);
     }
 }
-
-
-public class TestChessEngine : IChessEngine
-{
-    public async Task<ErrorOr<string>> GetMoveAsync(string fen, int thinkTimeMs)
-    {
-        await Task.Delay(thinkTimeMs);
-        return "e5";
-    }
-}

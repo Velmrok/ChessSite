@@ -42,6 +42,7 @@ services:
       - Storage__AccountId=${CF_ACCOUNT_ID}
       - Storage__BucketName=${CF_BUCKET_NAME}
       - Storage__PublicBaseUrl=${CF_PUBLIC_URL}
+      - Keycloak__Authority=${APP_BASE_URL}/realms/chess
     depends_on:
       db :
         condition: service_healthy
@@ -66,7 +67,13 @@ services:
     
    
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      target: production
+      args:
+        VITE_KEYCLOAK_AUTHORITY: "${APP_BASE_URL}/realms/chess/"
+        VITE_KEYCLOAK_REDIRECT_URI: "${APP_BASE_URL}/auth/callback/"
+        VITE_KEYCLOAK_POST_LOGOUT_URI: "${APP_BASE_URL}/"
     container_name: chess_frontend_production
     working_dir: /app
     ports:
@@ -110,6 +117,7 @@ services:
       KC_PROXY_HEADERS: xforwarded 
       KC_HTTP_ENABLED: "true"
       KC_HEALTH_ENABLED: "true"
+      APP_BASE_URL: ${APP_BASE_URL}
     depends_on:
       keycloak-db:
           condition: service_healthy

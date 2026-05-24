@@ -96,6 +96,21 @@ app.MapHealthChecks("/health");
 app.MapHub<backend.Hubs.MainHub>("/mainhub");
 
 
+////////////////////////////////////////////////////// DEBUG ONLY - REMOVE LATER
+
+        
+        var items = new List<string>();
+
+        app.MapGet("/items", () => items);
+
+        app.MapPost("/items", ( Item item) =>
+        {
+            items.Add(item.Name);
+            return Results.Ok(items);
+        });
+
+//////////////////////////////////////////////////////
+
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -114,3 +129,4 @@ using (var scope = app.Services.CreateScope())
 }
 app.Run();
 public partial class Program { }
+public record Item(string Name);

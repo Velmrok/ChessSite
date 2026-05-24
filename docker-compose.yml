@@ -28,9 +28,8 @@ services:
     secrets:
       - db_password
     
-
   backend:
-    build: ./backend
+    image : velmrok/chess-backend:v1 
     container_name: chess_backend_production
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
@@ -65,15 +64,15 @@ services:
       timeout: 5s
       retries: 5
     
-   
   frontend:
-    build:
-      context: ./frontend
-      target: production
-      args:
-        VITE_KEYCLOAK_AUTHORITY: "${APP_BASE_URL}/realms/chess/"
-        VITE_KEYCLOAK_REDIRECT_URI: "${APP_BASE_URL}/auth/callback/"
-        VITE_KEYCLOAK_POST_LOGOUT_URI: "${APP_BASE_URL}/"
+    # build:
+    #   context: ./frontend
+    #   target: production
+    #   args:
+    #     VITE_KEYCLOAK_AUTHORITY: "${APP_BASE_URL}/realms/chess/"
+    #     VITE_KEYCLOAK_REDIRECT_URI: "${APP_BASE_URL}/auth/callback/"
+    #     VITE_KEYCLOAK_POST_LOGOUT_URI: "${APP_BASE_URL}/"
+    image: velmrok/chess-frontend:v1
     container_name: chess_frontend_production
     working_dir: /app
     ports:
@@ -149,7 +148,7 @@ services:
       timeout: 5s
       retries: 5
   local-chess-engine:
-    image: nnue_engine #./local.Chess.Engine
+    image: velmrok/chess-engine:v1 #./local.Chess.Engine
     container_name: local_chess_engine
     working_dir: /app
     ports:
@@ -157,7 +156,7 @@ services:
     networks:
       - backend-net
     environment:
-      - DEPTH=11
+      - DEPTH=5
       - QDEPTH=15
       - QUANTIZED=--quantized
     healthcheck:

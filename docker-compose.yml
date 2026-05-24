@@ -27,7 +27,15 @@ services:
       - db-net
     secrets:
       - db_password
-    
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+        reservations:
+          cpus: "0.25"
+          memory: 256M
+
   backend:
     image : velmrok/chess-backend:v1 
     container_name: chess_backend_production

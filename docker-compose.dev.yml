@@ -133,13 +133,17 @@ services:
     networks:
       - keycloak-net
   local-chess-engine:
-    build: ./local.Chess.Engine
+    image: nnue_engine #./local.Chess.Engine
     container_name: local_chess_engine
     working_dir: /app
     ports:
       - "5000:5000"
     networks:
       - backend-net
+    environment:
+      - DEPTH=9
+      - QDEPTH=15
+      - QUANTIZED=--quantized
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
       interval: 1m30s

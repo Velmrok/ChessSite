@@ -8,10 +8,12 @@ namespace backend.Services;
 public class MyLocalChessEngine : IChessEngine
 {
     private readonly HttpClient _httpClient;
+    private readonly ILogger<MyLocalChessEngine> _logger;
 
-    public MyLocalChessEngine(HttpClient httpClient)
+    public MyLocalChessEngine(HttpClient httpClient, ILogger<MyLocalChessEngine> logger)
     {
         _httpClient = httpClient;
+        _logger = logger;
     }
 
     public async Task<ErrorOr<string>> GetMoveAsync(string fen, int thinkTimeMs)
@@ -19,14 +21,14 @@ public class MyLocalChessEngine : IChessEngine
         
         var request= new AIMoveRequest 
         (
-            Fen : fen,
-            ThinkTimeMs : thinkTimeMs
+            Fen : fen
         );
 
         var response = await _httpClient.PostAsJsonAsync("/move", request);
 
         if (!response.IsSuccessStatusCode)
         {
+            _logger.LogError("Engine returned non-success status code: {StatusCode}", response.StatusCode);
             return Error.Failure("Engine.Error", $"Engine returned : {response.StatusCode}");
         }
 
@@ -34,6 +36,7 @@ public class MyLocalChessEngine : IChessEngine
 
         if (result == null || string.IsNullOrWhiteSpace(result.San))
         {
+            _logger.LogWarning("Engine returned invalid response");
             return Error.Validation("Engine.InvalidResponse", "Empty move received from engine");
         }
 

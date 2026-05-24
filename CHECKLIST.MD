@@ -5,12 +5,12 @@
 | Usługa | Obraz | Port (host) | Sieci |
 |---|---|---|---|
 | `db` | `postgres:15` | 5432 (dev) / — (prod) | backend-net (+db-net prod) |
-| `backend` | dev: `dotnet/sdk:8.0` + `dotnet watch`; prod: build `./backend` | 5062 (dev) / — (prod) | frontend-net, backend-net (+db-net prod) |
-| `frontend` | dev: `node:20-alpine` + vite; prod: build `./frontend` → nginx | 5173 (dev) / 80 (prod) | frontend-net |
+| `backend` | dev: `dotnet/sdk:8.0` + `dotnet watch`; prod: `velmrok/chess-backend:v1` | 5062 (dev) / — (prod) | frontend-net, backend-net (+db-net prod) |
+| `frontend` | dev: `node:20-alpine` + vite; prod: `velmrok/chess-frontend:v1` → nginx | 5173 (dev) / 80 (prod) | frontend-net |
 | `redis` | `redis:7-alpine` | 6379 (dev) / — (prod) | backend-net |
 | `keycloak` | `quay.io/keycloak/keycloak:26.0` | 8080 | frontend-net, backend-net, keycloak-net |
 | `keycloak-db` | `postgres:16` | — | keycloak-net |
-| `local-chess-engine` | `mylocalengine:latest`  | 5000 (dev) / — (prod) | backend-net |
+| `local-chess-engine` | `velmrok/chess-engine:v1`  | 5000 (dev) / — (prod) | backend-net |
 
 ## Wolumeny
 
@@ -53,7 +53,7 @@ Browser ──▶ frontend(nginx) ─[reverse proxy]─┬─▶ backend ──�
 - Docker Engine ≥ 24 + Compose V2.
 - Wolne porty dev: 5173, 5062, 5432, 6379, 8080, 5000.
 - `.env` w katalogu głównym wg [.env.example](.env.example).
-- `.secrets/ w katalogu głównym wg .secrets.example/
+- `.secrets/ w katalogu głównym wg .secrets.example/ (w dev tylko db_password)
 - Produkcja wymaga domeny z HTTPS, która przekazuje ruch do aplikacji działającej lokalnie na HTTP.
 
 ## Uruchomienie

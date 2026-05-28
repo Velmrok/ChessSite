@@ -14,7 +14,8 @@ RUN dotnet publish -c Release -o /app/publish
 # ===== RUNTIME STAGE =====
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
-RUN apt-get update && apt-get install -y curl
+RUN apt-get update && apt-get install -y --no-install-recommends curl \
+    && rm -rf /var/lib/apt/lists/*
 
 USER app
 

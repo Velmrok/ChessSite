@@ -141,7 +141,7 @@ services:
       timeout: 3s
       retries: 5
   local-chess-engine:
-    image: mylocalengine #./local.Chess.Engine
+    image: velmrok/chess-engine:v1 #./local.Chess.Engine
     container_name: local_chess_engine
     working_dir: /app
     ports:

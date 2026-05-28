@@ -37,7 +37,7 @@ services:
           memory: 256M
 
   backend:
-    image : velmrok/chess-backend:v1 
+    image : velmrok/chess-backend:v2 
     container_name: chess_backend_production
     environment:
       - ASPNETCORE_ENVIRONMENT=Production

@@ -8,7 +8,7 @@
 | `backend` | dev: `dotnet/sdk:8.0` + `dotnet watch`; prod: `velmrok/chess-backend:v1` | 5062 (dev) / — (prod) | frontend-net, backend-net (+db-net prod) |
 | `frontend` | dev: `node:20-alpine` + vite; prod: `velmrok/chess-frontend:v1` → nginx | 5173 (dev) / 80 (prod) | frontend-net |
 | `redis` | `redis:7-alpine` | 6379 (dev) / — (prod) | backend-net |
-| `keycloak` | `quay.io/keycloak/keycloak:26.0` | 8080 | frontend-net, backend-net, keycloak-net |
+| `keycloak` | `quay.io/keycloak/keycloak:26.0` | 8080 (dev)/  — (prod) | frontend-net, backend-net, keycloak-net |
 | `keycloak-db` | `postgres:16` | — | keycloak-net |
 | `local-chess-engine` | `velmrok/chess-engine:v1`  | 5000 (dev) / — (prod) | backend-net |
 
@@ -59,7 +59,7 @@ Browser ──▶ frontend(nginx) ─[reverse proxy]─┬─▶ backend ──�
 ## Uruchomienie
 
 ```bash
-./run_dev_app.sh #/.ps1         # dev
+./run_dev_app.sh #/.ps1         # devV
 ./run_production_app.sh #/.ps1   # prod
 ```
 ## Weryfikacja

@@ -12,8 +12,8 @@ public class Game
     public Guid BlackPlayerId { get; set; }
     public Guid? WinnerId { get; set; } = null;
 
-    public User WhitePlayer { get; set; } = null!;
-    public User BlackPlayer { get; set; } = null!;
+    public User? WhitePlayer { get; set; } = null;
+    public User? BlackPlayer { get; set; } = null;
     public User? Winner { get; set; } = null;
 
     public bool IsWhiteTurn { get; set; } = true;

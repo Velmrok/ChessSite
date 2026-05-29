@@ -38,7 +38,7 @@ namespace backend.Migrations
 
                     b.HasIndex("FriendId");
 
-                    b.ToTable("Friendships");
+                    b.ToTable("Friendships", (string)null);
                 });
 
             modelBuilder.Entity("backend.Models.Game", b =>
@@ -86,7 +86,7 @@ namespace backend.Migrations
 
                     b.HasIndex("WinnerId");
 
-                    b.ToTable("Games");
+                    b.ToTable("Games", (string)null);
                 });
 
             modelBuilder.Entity("backend.Models.User", b =>
@@ -183,7 +183,7 @@ namespace backend.Migrations
                     b.HasIndex("Nickname")
                         .IsUnique();
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("backend.Models.Friendship", b =>

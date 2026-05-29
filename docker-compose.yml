@@ -45,7 +45,7 @@ services:
       - ConnectionStrings__Host=db
       - ConnectionStrings__Database=${POSTGRES_DB}
       - ConnectionStrings__Username=${POSTGRES_USER}
-      - Storage__Provider=R2
+      - Storage__Provider=Local
       - Storage__AccountId=${CF_ACCOUNT_ID}
       - Storage__BucketName=${CF_BUCKET_NAME}
       - Storage__PublicBaseUrl=${CF_PUBLIC_URL}

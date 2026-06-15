@@ -63,6 +63,14 @@ builder.Services.AddSignalR();
 
 var app = builder.Build();
 
+var forwardedHeadersOptions = new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+};
+forwardedHeadersOptions.KnownNetworks.Clear();
+forwardedHeadersOptions.KnownProxies.Clear();
+
+app.UseForwardedHeaders(forwardedHeadersOptions);
 app.MigrateDatabase();
 
 if (app.Environment.IsDevelopment())
@@ -75,13 +83,9 @@ app.UseRateLimiter();
 
 app.UseGlobalErrorHandling();
 
-app.UseHttpsRedirection();
 
 
-app.UseForwardedHeaders(new ForwardedHeadersOptions
-{
-    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-});
+
 
 app.UseCustomCors();
 
@@ -95,32 +99,6 @@ app.MapHealthChecks("/health");
 
 app.MapHub<backend.Hubs.MainHub>("/mainhub");
 
-
-////////////////////////////////////////////////////// DEBUG ONLY - REMOVE LATER
-
-        app.MapGet("/items", async (AppDbContext db) => {
-            await db.Database.ExecuteSqlRawAsync("CREATE TABLE IF NOT EXISTS \"Items\" (\"Name\" TEXT);");
-            var items = new List<string>();
-            var connection = db.Database.GetDbConnection();
-            await connection.OpenAsync();
-            using var command = connection.CreateCommand();
-            command.CommandText = "SELECT \"Name\" FROM \"Items\"";
-            using var reader = await command.ExecuteReaderAsync();
-            while (await reader.ReadAsync())
-            {
-                items.Add(reader.GetString(0));
-            }
-            return items;
-        });
-
-        app.MapPost("/items", async (Item item, AppDbContext db) =>
-        {
-            await db.Database.ExecuteSqlRawAsync("CREATE TABLE IF NOT EXISTS \"Items\" (\"Name\" TEXT);");
-            await db.Database.ExecuteSqlRawAsync("INSERT INTO \"Items\" (\"Name\") VALUES ({0})", item.Name);
-            return Results.Ok();
-        });
-
-//////////////////////////////////////////////////////
 
 using (var scope = app.Services.CreateScope())
 {

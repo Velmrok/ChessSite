@@ -37,7 +37,7 @@ services:
           memory: 256M
 
   backend:
-    image : velmrok/chess-backend:v2 
+    build : ./backend
     container_name: chess_backend_production
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
@@ -45,7 +45,7 @@ services:
       - ConnectionStrings__Host=db
       - ConnectionStrings__Database=${POSTGRES_DB}
       - ConnectionStrings__Username=${POSTGRES_USER}
-      - Storage__Provider=Local
+      - Storage__Provider=${STORAGE_PROVIDER}
       - Storage__AccountId=${CF_ACCOUNT_ID}
       - Storage__BucketName=${CF_BUCKET_NAME}
       - Storage__PublicBaseUrl=${CF_PUBLIC_URL}
@@ -81,14 +81,14 @@ services:
           memory: 512M
 
   frontend:
-    # build:
-    #   context: ./frontend
-    #   target: production
-    #   args:
-    #     VITE_KEYCLOAK_AUTHORITY: "${APP_BASE_URL}/realms/chess/"
-    #     VITE_KEYCLOAK_REDIRECT_URI: "${APP_BASE_URL}/auth/callback/"
-    #     VITE_KEYCLOAK_POST_LOGOUT_URI: "${APP_BASE_URL}/"
-    image: velmrok/chess-frontend:v1
+    build:
+      context: ./frontend
+      target: production
+      args:
+        VITE_KEYCLOAK_AUTHORITY: "${APP_BASE_URL}/realms/chess/"
+        VITE_KEYCLOAK_REDIRECT_URI: "${APP_BASE_URL}/auth/callback/"
+        VITE_KEYCLOAK_POST_LOGOUT_URI: "${APP_BASE_URL}/"
+        NGINX_CONF: ${NGINX_CONF}
     container_name: chess_frontend_production
     working_dir: /app
     ports:
@@ -135,9 +135,7 @@ services:
   keycloak:
     image: quay.io/keycloak/keycloak:26.0
     container_name: chess_keycloak_production
-    command: start --import-realm
-    volumes:
-    - ./.keycloak-export:/opt/keycloak/data/import:ro
+    command: start
     environment:
       KC_DB: postgres
       KC_DB_URL: jdbc:postgresql://keycloak-db:5432/keycloak
@@ -146,7 +144,8 @@ services:
       KEYCLOAK_ADMIN: ${KC_ADMIN_USER}
       KEYCLOAK_ADMIN_PASSWORD: ${KC_ADMIN_PASSWORD}
       KC_HOSTNAME: ${KC_HOSTNAME}
-      KC_PROXY_HEADERS: xforwarded 
+      KC_HOSTNAME_BACKCHANNEL_DYNAMIC: "true"
+      KC_PROXY_HEADERS: xforwarded
       KC_HTTP_ENABLED: "true"
       KC_HEALTH_ENABLED: "true"
       APP_BASE_URL: ${APP_BASE_URL}
@@ -158,7 +157,7 @@ services:
       - frontend-net
       - backend-net
     healthcheck:
-      test: ["CMD-SHELL", "exec 3<>/dev/tcp/localhost/9000 && echo -e 'GET /health/ready HTTP/1.1\\r\\nHost: localhost\\r\\n\\r\\n' >&3 && cat <&3 | grep -q '200 OK'"]
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/localhost/9000 && echo -e 'GET /health/ready HTTP/1.1\\r\\nHost: localhost\\r\\nConnection: close\\r\\n\\r\\n' >&3 && cat <&3 | grep -q '200 OK'"]
       interval: 15s
       timeout: 5s
       retries: 10
@@ -196,6 +195,27 @@ services:
         reservations:
           cpus: "0.25"
           memory: 256M
+  keycloak-config-cli:
+    image: adorsys/keycloak-config-cli:6.5.1-26.0.5 
+    container_name: chess_keycloak_config
+    depends_on:
+      keycloak:
+        condition: service_started
+    volumes:
+      - ./keycloak:/config:ro
+    environment:
+      KEYCLOAK_URL: http://keycloak:8080
+      KEYCLOAK_USER: ${KC_ADMIN_USER}
+      KEYCLOAK_PASSWORD: ${KC_ADMIN_PASSWORD}
+      KEYCLOAK_AVAILABILITYCHECK_ENABLED: "true"
+      KEYCLOAK_AVAILABILITYCHECK_TIMEOUT: 120s
+      IMPORT_FILES_LOCATIONS: /config/*.yaml
+      IMPORT_VARSUBSTITUTION_ENABLED: "true"
+      APP_BASE_URL: ${APP_BASE_URL}
+      KC_ADMIN_CLIENT_SECRET: ${KC_ADMIN_CLIENT_SECRET}
+    networks:
+      - keycloak-net
+    restart: "no"
 
   local-chess-engine:
     image: velmrok/chess-engine:v1 #./local.Chess.Engine

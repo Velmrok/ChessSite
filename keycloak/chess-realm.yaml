@@ -1,0 +1,43 @@
+realm: chess
+enabled: true
+registrationAllowed: true
+loginWithEmailAllowed: true
+sslRequired: external
+
+clients:
+  - clientId: chess-frontend
+    enabled: true
+    publicClient: true
+    standardFlowEnabled: true
+    directAccessGrantsEnabled: true
+    frontchannelLogout: true
+    redirectUris:
+      - "$(env:APP_BASE_URL)/*"
+    webOrigins:
+      - "$(env:APP_BASE_URL)"
+    protocolMappers:
+      - name: chess-frontend-audience
+        protocol: openid-connect
+        protocolMapper: oidc-audience-mapper
+        config:
+          included.client.audience: chess-frontend
+          access.token.claim: "true"
+          id.token.claim: "false"
+          introspection.token.claim: "true"
+          userinfo.token.claim: "false"
+
+  - clientId: chess-backend-admin
+    enabled: true
+    publicClient: false
+    serviceAccountsEnabled: true
+    standardFlowEnabled: false
+    directAccessGrantsEnabled: false
+    secret: "$(env:KC_ADMIN_CLIENT_SECRET)"
+
+users:
+  - username: service-account-chess-backend-admin
+    enabled: true
+    serviceAccountClientId: chess-backend-admin
+    clientRoles:
+      realm-management:
+        - manage-users

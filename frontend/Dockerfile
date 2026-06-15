@@ -13,6 +13,7 @@ ARG VITE_KEYCLOAK_AUTHORITY
 ARG VITE_KEYCLOAK_REDIRECT_URI
 ARG VITE_KEYCLOAK_POST_LOGOUT_URI
 
+
 ENV VITE_KEYCLOAK_AUTHORITY=$VITE_KEYCLOAK_AUTHORITY
 ENV VITE_KEYCLOAK_REDIRECT_URI=$VITE_KEYCLOAK_REDIRECT_URI
 ENV VITE_KEYCLOAK_POST_LOGOUT_URI=$VITE_KEYCLOAK_POST_LOGOUT_URI
@@ -27,6 +28,7 @@ RUN chown -R nginx:nginx /var/cache/nginx /var/log/nginx /etc/nginx/conf.d /run 
 ARG NODE_ENV=production
 ARG BUILD_DATE
 ARG VERSION
+ARG NGINX_CONF=nginx/default.conf
 
 LABEL org.opencontainers.image.created=${BUILD_DATE} \
       org.opencontainers.image.version=${VERSION} \
@@ -36,7 +38,7 @@ USER nginx
 
 COPY --from=build --chown=nginx:nginx /app/dist /usr/share/nginx/html
 
-COPY --chown=nginx:nginx nginx/default.conf /etc/nginx/conf.d/default.conf
+COPY --chown=nginx:nginx ${NGINX_CONF} /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
 

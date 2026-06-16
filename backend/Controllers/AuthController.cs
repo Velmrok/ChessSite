@@ -10,6 +10,8 @@ using backend.DTO.Auth;
 using backend.Extensions;
 using backend.Services.Helpers.Auth;
 using backend.Services.Interfaces;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -36,16 +38,32 @@ public class AuthController : ControllerBase
         _queueService = queueService;
         _logger = logger;
     }
+    [HttpGet("login")]
+    public IActionResult Login()
+    {
+
+        var props = new AuthenticationProperties { RedirectUri = "/" };
+        return Challenge(props, "oidc");
+    }
+    [HttpGet("logout")]
+    public IActionResult Logout()
+    {
+        var props = new AuthenticationProperties { RedirectUri = "/" };
+
+        return SignOut(props,
+            CookieAuthenticationDefaults.AuthenticationScheme,
+            "oidc");
+    }
 
     [HttpGet("me")]
     [Authorize]
     public async Task<IActionResult> GetMe()
     {
         var allClaims = User.Claims.Select(c => $"{c.Type}={c.Value}");
-        _logger.LogWarning($"GetMe claims: {string.Join(", ", allClaims)}");
+
 
         var sub = User.FindFirst("sub")?.Value;
-        _logger.LogWarning($"GetMe sub: {sub}");
+
         var userId = User.FindFirst("sub")?.Value;
         if (userId == null) return Unauthorized();
 

@@ -1,14 +1,12 @@
-import { authService } from "./authService";
 
 export default async function apiFetch(url:string,options:RequestInit,contentType: string| undefined = undefined) {
-  const token = await authService.getToken();
 
     const response = await fetch('/api' + url, {
         ...options,
+        credentials: "include",
         headers: {
             ...options?.headers,
            ...(contentType ? { "Content-Type": contentType } : {}),
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
     });
 

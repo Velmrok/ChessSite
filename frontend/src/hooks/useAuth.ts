@@ -8,18 +8,9 @@ export function useAuth() {
 
     useEffect(() => {
         (async () => {
-            if (window.location.pathname === "/auth/callback") {
-                setLoading(false);
-                return;
-            }
-            const isAuth = await authService.isAuthenticated();
-            if (isAuth) {
-                const me = await authService.getMe();
-                if (me) applyAuth(me);
-                else clearAuth();
-            } else {
-                clearAuth();
-            }
+            const me = await authService.getMe();
+            if (me) applyAuth(me);
+            else clearAuth();
             setLoading(false);
         })();
     }, []);

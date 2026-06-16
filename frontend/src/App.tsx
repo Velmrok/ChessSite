@@ -14,7 +14,6 @@ import GamesSearchPage from './pages/GamesSearchPage'
 import { useEffect } from 'react'
 import { connectSignalR } from './services/signalR/connection'
 import { useGlobalSignalR } from './hooks/useGlobalSocket'
-import AuthCallback from './pages/AuthCallback'
 
 function App() {
   
@@ -41,7 +40,6 @@ function App() {
     </> :
       <Routes>
         <Route path="/" element={<Home />} />
-            <Route path="/auth/callback" element={<AuthCallback />} />
            
             <Route element={<OnlyLoggedInRoute />}>
               <Route path="/find-game" element={<FindGame />} />

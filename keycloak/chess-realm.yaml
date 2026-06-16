@@ -7,12 +7,13 @@ sslRequired: external
 clients:
   - clientId: chess-frontend
     enabled: true
-    publicClient: true
+    publicClient: false
     standardFlowEnabled: true
     directAccessGrantsEnabled: true
     frontchannelLogout: true
     redirectUris:
-      - "$(env:APP_BASE_URL)/*"
+      - "$(env:APP_BASE_URL)/api/signin-oidc"
+      - "$(env:APP_BASE_URL)/api/signout-oidc"
     webOrigins:
       - "$(env:APP_BASE_URL)"
     protocolMappers:
@@ -25,6 +26,7 @@ clients:
           id.token.claim: "false"
           introspection.token.claim: "true"
           userinfo.token.claim: "false"
+    secret: "$(env:KC_FRONTEND_SECRET)"
 
   - clientId: chess-backend-admin
     enabled: true

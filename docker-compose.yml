@@ -49,7 +49,7 @@ services:
       - Storage__AccountId=${CF_ACCOUNT_ID}
       - Storage__BucketName=${CF_BUCKET_NAME}
       - Storage__PublicBaseUrl=${CF_PUBLIC_URL}
-      - Keycloak__Authority=${APP_BASE_URL}/realms/chess
+      - Keycloak__FrontendSecret=${KC_FRONTEND_SECRET}
     depends_on:
       db :
         condition: service_healthy
@@ -213,6 +213,7 @@ services:
       IMPORT_VARSUBSTITUTION_ENABLED: "true"
       APP_BASE_URL: ${APP_BASE_URL}
       KC_ADMIN_CLIENT_SECRET: ${KC_ADMIN_CLIENT_SECRET}
+      KC_FRONTEND_SECRET: ${KC_FRONTEND_SECRET}
     networks:
       - keycloak-net
     restart: "no"

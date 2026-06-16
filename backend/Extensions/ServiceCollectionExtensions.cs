@@ -3,6 +3,7 @@ using backend.Services;
 using backend.Services.BackgroundServices;
 using backend.Services.Helpers.Auth;
 using backend.Services.Interfaces;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
 
@@ -27,7 +28,7 @@ public static class ServiceCollectionExtensions
 
         services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
         services.AddSingleton<IGameTimerService, GameTimerService>();
-
+        services.AddSingleton<ITicketStore, RedisTicketStore>();
 
         services.AddHostedService<HomeBackgroundService>();
         services.AddHostedService<PresenceBackgroundService>();

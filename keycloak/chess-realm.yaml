@@ -4,6 +4,11 @@ registrationAllowed: true
 loginWithEmailAllowed: true
 sslRequired: external
 
+roles:
+  realm:
+    - name: admin
+      description: Chess platform administrator
+
 clients:
   - clientId: chess-frontend
     enabled: true
@@ -26,6 +31,16 @@ clients:
           id.token.claim: "false"
           introspection.token.claim: "true"
           userinfo.token.claim: "false"
+      - name: realm-roles
+        protocol: openid-connect
+        protocolMapper: oidc-usermodel-realm-role-mapper
+        config:
+          multivalued: "true"
+          claim.name: "roles"
+          jsonType.label: "String"
+          access.token.claim: "true"
+          id.token.claim: "true"
+          userinfo.token.claim: "true"
     secret: "$(env:KC_FRONTEND_SECRET)"
 
   - clientId: chess-backend-admin
@@ -37,6 +52,19 @@ clients:
     secret: "$(env:KC_ADMIN_CLIENT_SECRET)"
 
 users:
+  - username: chessadmin
+    enabled: true
+    email: chessadmin@chess.local
+    emailVerified: true
+    firstName: Chess
+    lastName: Admin
+    credentials:
+      - type: password
+        value: admin123
+        temporary: false
+    realmRoles:
+      - admin
+
   - username: service-account-chess-backend-admin
     enabled: true
     serviceAccountClientId: chess-backend-admin

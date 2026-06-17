@@ -26,6 +26,7 @@ public static class AuthenticationExtensions
             options.ClientId = "chess-frontend";
             options.CallbackPath = "/api/signin-oidc";
             options.ResponseMode = "query";
+            options.UsePkce = true;
             options.NonceCookie.SameSite = SameSiteMode.Lax;
             options.CorrelationCookie.SameSite = SameSiteMode.Lax;
             options.SignedOutCallbackPath = "/api/signout-oidc";
@@ -34,8 +35,9 @@ public static class AuthenticationExtensions
             options.SaveTokens = true;
             options.Scope.Add("openid"); options.Scope.Add("profile"); options.Scope.Add("email");
             options.Scope.Add("offline_access");
-            options.MapInboundClaims = false; 
+            options.MapInboundClaims = false;
             options.TokenValidationParameters.NameClaimType = "preferred_username";
+            options.TokenValidationParameters.RoleClaimType = "roles";
         });
         services.AddOptions<CookieAuthenticationOptions>(CookieAuthenticationDefaults.AuthenticationScheme)
     .Configure<ITicketStore>((options, store) => options.SessionStore = store);

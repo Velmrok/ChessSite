@@ -10,7 +10,7 @@ using Microsoft.Extensions.Caching.Distributed;
 
 namespace backend.Controllers
 {
-    //[Authorize]
+    [Authorize]
     [ApiController]
     [Route("/users")]
     public class UsersController : MyControllerBase

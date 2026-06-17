@@ -16,6 +16,8 @@ clients:
     standardFlowEnabled: true
     directAccessGrantsEnabled: true
     frontchannelLogout: true
+    attributes:
+      pkce.code.challenge.method: S256 
     redirectUris:
       - "$(env:APP_BASE_URL)/api/signin-oidc"
       - "$(env:APP_BASE_URL)/api/signout-oidc"

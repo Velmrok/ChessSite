@@ -1,13 +1,20 @@
+import { useEffect } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 import useUserStore from '@/stores/useUserStore';
+import { authService } from '@/services/authService';
 
 export const OnlyLoggedInRoute = () => {
     const user = useUserStore((state) => state.user);
 
 
-    if (!user) {
+    useEffect(() => {
+        if (!user) {
+            authService.login();
+        }
+    }, [user]);
 
-        return <Navigate to="/login" replace />;
+    if (!user) {
+        return null;
     }
 
 

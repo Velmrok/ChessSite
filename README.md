@@ -48,7 +48,7 @@ echo "mojeHaslo"   > .secrets/db_password.txt
 echo "x"           > .secrets/cf_access_key.txt
 echo "x"           > .secrets/cf_secret_key.txt
 
-docker compose -f -d docker-compose.yml up --build            # start aplikacji
+docker compose -f  docker-compose.yml up --build -d           # start aplikacji
 ```
 
 ## Konto testowe (admin)
